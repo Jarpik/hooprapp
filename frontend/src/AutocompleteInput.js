@@ -11,7 +11,7 @@ const AutocompleteInput = ({ onPlayerSelect, placeholder = "Enter NBA player nam
 
   // Fetch all players when component mounts
   useEffect(() => {
-    fetch('http://localhost:3001/api/players')
+    fetch('https://hooprapp.onrender.com/api/players')
       .then(response => response.json())
       .then(data => {
         setAllPlayers(data.players);
