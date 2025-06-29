@@ -1,12 +1,31 @@
 const express = require('express');
 const cors = require('cors');
+const { Pool } = require('pg');
 const app = express();
 const PORT = 3001;
 
 app.use(cors());
 app.use(express.json());
 
-// In-memory user storage (we'll use a database later)
+// Database connection
+const pool = new Pool({
+  connectionString: 'postgresql://postgres:Legoboy99!@db.sdpvfaoekjckxbwcxfjj.supabase.co:5432/postgres',
+  ssl: {
+    rejectUnauthorized: false
+  }
+});
+
+// Test database connection
+pool.connect((err, client, release) => {
+  if (err) {
+    console.error('Error acquiring client', err.stack);
+  } else {
+    console.log('Connected to Supabase database!');
+    release();
+  }
+});
+
+// In-memory user storage (we'll move this to database later)
 let users = {};
 let userStats = {};
 
@@ -14,258 +33,54 @@ app.get('/', (req, res) => {
   res.json({ message: 'StatleNBA API is running!' });
 });
 
-// Extended players data with 20 NBA stars
-const players = [
-  {
-    name: 'LeBron James',
-    team: 'Los Angeles Lakers',
-    position: 'SF',
-    ppg: 25.7,
-    rpg: 7.3,
-    apg: 7.3,
-    age: 39,
-    height: "6'9\"",
-    championships: 4
-  },
-  {
-    name: 'Stephen Curry',
-    team: 'Golden State Warriors', 
-    position: 'PG',
-    ppg: 26.4,
-    rpg: 4.5,
-    apg: 5.1,
-    age: 36,
-    height: "6'2\"",
-    championships: 4
-  },
-  {
-    name: 'Kevin Durant',
-    team: 'Phoenix Suns',
-    position: 'SF',
-    ppg: 27.1,
-    rpg: 6.6,
-    apg: 5.0,
-    age: 35,
-    height: "6'10\"",
-    championships: 2
-  },
-  {
-    name: 'Giannis Antetokounmpo',
-    team: 'Milwaukee Bucks',
-    position: 'PF',
-    ppg: 30.4,
-    rpg: 11.5,
-    apg: 6.5,
-    age: 29,
-    height: "6'11\"",
-    championships: 1
-  },
-  {
-    name: 'Luka Dončić',
-    team: 'Dallas Mavericks',
-    position: 'PG',
-    ppg: 32.4,
-    rpg: 8.6,
-    apg: 9.1,
-    age: 25,
-    height: "6'7\"",
-    championships: 0
-  },
-  {
-    name: 'Jayson Tatum',
-    team: 'Boston Celtics',
-    position: 'SF',
-    ppg: 26.9,
-    rpg: 8.1,
-    apg: 4.9,
-    age: 26,
-    height: "6'8\"",
-    championships: 1
-  },
-  {
-    name: 'Nikola Jokić',
-    team: 'Denver Nuggets',
-    position: 'C',
-    ppg: 26.4,
-    rpg: 12.4,
-    apg: 9.0,
-    age: 29,
-    height: "6'11\"",
-    championships: 1
-  },
-  {
-    name: 'Joel Embiid',
-    team: 'Philadelphia 76ers',
-    position: 'C',
-    ppg: 34.7,
-    rpg: 11.0,
-    apg: 5.6,
-    age: 30,
-    height: "7'0\"",
-    championships: 0
-  },
-  {
-    name: 'Kawhi Leonard',
-    team: 'LA Clippers',
-    position: 'SF',
-    ppg: 23.7,
-    rpg: 6.1,
-    apg: 3.6,
-    age: 33,
-    height: "6'7\"",
-    championships: 2
-  },
-  {
-    name: 'Damian Lillard',
-    team: 'Milwaukee Bucks',
-    position: 'PG',
-    ppg: 24.3,
-    rpg: 4.4,
-    apg: 7.0,
-    age: 34,
-    height: "6'2\"",
-    championships: 0
-  },
-  {
-    name: 'Jimmy Butler',
-    team: 'Miami Heat',
-    position: 'SF',
-    ppg: 20.8,
-    rpg: 5.3,
-    apg: 5.0,
-    age: 35,
-    height: "6'7\"",
-    championships: 0
-  },
-  {
-    name: 'Anthony Davis',
-    team: 'Los Angeles Lakers',
-    position: 'PF',
-    ppg: 24.7,
-    rpg: 12.6,
-    apg: 3.5,
-    age: 31,
-    height: "6'10\"",
-    championships: 1
-  },
-  {
-    name: 'Kobe Bryant',
-    team: 'Los Angeles Lakers',
-    position: 'SG',
-    ppg: 25.0,
-    rpg: 5.2,
-    apg: 4.7,
-    age: 41,
-    height: "6'6\"",
-    championships: 5
-  },
-  {
-    name: 'Tim Duncan',
-    team: 'San Antonio Spurs',
-    position: 'PF',
-    ppg: 19.0,
-    rpg: 10.8,
-    apg: 3.0,
-    age: 40,
-    height: "6'11\"",
-    championships: 5
-  },
-  {
-    name: 'Shaquille ONeal',
-    team: 'Los Angeles Lakers',
-    position: 'C',
-    ppg: 23.7,
-    rpg: 10.9,
-    apg: 2.5,
-    age: 39,
-    height: "7'1\"",
-    championships: 4
-  },
-  {
-    name: 'Magic Johnson',
-    team: 'Los Angeles Lakers',
-    position: 'PG',
-    ppg: 19.5,
-    rpg: 7.2,
-    apg: 11.2,
-    age: 32,
-    height: "6'9\"",
-    championships: 5
-  },
-  {
-    name: 'Larry Bird',
-    team: 'Boston Celtics',
-    position: 'SF',
-    ppg: 24.3,
-    rpg: 10.0,
-    apg: 6.3,
-    age: 35,
-    height: "6'9\"",
-    championships: 3
-  },
-  {
-    name: 'Michael Jordan',
-    team: 'Chicago Bulls',
-    position: 'SG',
-    ppg: 30.1,
-    rpg: 6.2,
-    apg: 5.3,
-    age: 35,
-    height: "6'6\"",
-    championships: 6
-  },
-  {
-    name: 'Kyrie Irving',
-    team: 'Dallas Mavericks',
-    position: 'PG',
-    ppg: 25.6,
-    rpg: 5.0,
-    apg: 5.2,
-    age: 32,
-    height: "6'2\"",
-    championships: 1
-  },
-  {
-    name: 'Paul George',
-    team: 'LA Clippers',
-    position: 'SF',
-    ppg: 22.6,
-    rpg: 5.2,
-    apg: 3.5,
-    age: 34,
-    height: "6'8\"",
-    championships: 0
+// Get all players from database
+app.get('/api/players', async (req, res) => {
+  try {
+    const result = await pool.query('SELECT * FROM players WHERE active = true ORDER BY name');
+    res.json({ players: result.rows });
+  } catch (error) {
+    console.error('Error fetching players:', error);
+    res.status(500).json({ error: 'Failed to fetch players' });
   }
-];
-
-app.get('/api/players', (req, res) => {
-  res.json({ players: players });
 });
 
 // Daily player endpoint with date-based selection
-app.get('/api/daily-player', (req, res) => {
-  // Get today's date in YYYY-MM-DD format
-  const today = new Date();
-  const dateString = today.toISOString().split('T')[0];
-  
-  // Create a simple hash from the date string
-  let hash = 0;
-  for (let i = 0; i < dateString.length; i++) {
-    const char = dateString.charCodeAt(i);
-    hash = ((hash << 5) - hash) + char;
-    hash = hash & hash; // Convert to 32-bit integer
+app.get('/api/daily-player', async (req, res) => {
+  try {
+    // Get all active players
+    const result = await pool.query('SELECT * FROM players WHERE active = true');
+    const players = result.rows;
+    
+    if (players.length === 0) {
+      return res.status(500).json({ error: 'No players found' });
+    }
+    
+    // Get today's date in YYYY-MM-DD format
+    const today = new Date();
+    const dateString = today.toISOString().split('T')[0];
+    
+    // Create a simple hash from the date string
+    let hash = 0;
+    for (let i = 0; i < dateString.length; i++) {
+      const char = dateString.charCodeAt(i);
+      hash = ((hash << 5) - hash) + char;
+      hash = hash & hash; // Convert to 32-bit integer
+    }
+    
+    // Use absolute value and modulo to get a consistent index
+    const playerIndex = Math.abs(hash) % players.length;
+    const dailyPlayer = players[playerIndex];
+    
+    console.log(`Daily player for ${dateString}: ${dailyPlayer.name} (index: ${playerIndex})`);
+    
+    res.json({ 
+      player: dailyPlayer,
+      date: dateString 
+    });
+  } catch (error) {
+    console.error('Error fetching daily player:', error);
+    res.status(500).json({ error: 'Failed to fetch daily player' });
   }
-  
-  // Use absolute value and modulo to get a consistent index
-  const playerIndex = Math.abs(hash) % players.length;
-  const dailyPlayer = players[playerIndex];
-  
-  console.log(`Daily player for ${dateString}: ${dailyPlayer.name} (index: ${playerIndex})`);
-  
-  res.json({ 
-    player: dailyPlayer,
-    date: dateString 
-  });
 });
 
 // User registration
