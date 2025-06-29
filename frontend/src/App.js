@@ -20,7 +20,7 @@ function App() {
 
   // Fetch daily player from backend
   useEffect(() => {
-    fetch('http://localhost:3001/api/daily-player')
+    fetch('https://hooprapp.onrender.com/api/daily-player')
       .then(response => response.json())
       .then(data => {
         setDailyPlayer(data.player);
@@ -43,7 +43,7 @@ function App() {
 
   const fetchUserStats = async (email) => {
     try {
-      const response = await fetch(`http://localhost:3001/api/user/${email}/stats`);
+      const response = await fetch(`https://hooprapp.onrender.com/api/user/${email}/stats`);
       const data = await response.json();
       setUserStats(data.stats);
     } catch (error) {
@@ -143,7 +143,7 @@ Play at: hooprapp.com`;
     if (!user) return;
 
     try {
-      const response = await fetch('http://localhost:3001/api/submit-game', {
+      const response = await fetch('https://hooprapp.onrender.com/api/submit-game', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -233,7 +233,7 @@ Play at: hooprapp.com`;
     setShareText('');
     setCopySuccess(false);
     // Fetch a new daily player
-    fetch('http://localhost:3001/api/daily-player')
+    fetch('https://hooprapp.onrender.com/api/daily-player')
       .then(response => response.json())
       .then(data => {
         setDailyPlayer(data.player);
