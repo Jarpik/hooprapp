@@ -1,5 +1,8 @@
 const { Pool } = require('pg');
 
+// Import fetch for Node.js
+const fetch = require('node-fetch');
+
 // Database connection
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
