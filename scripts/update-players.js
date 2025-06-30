@@ -1,8 +1,5 @@
 const { Pool } = require('pg');
 
-// Import fetch for Node.js
-const fetch = require('node-fetch');
-
 // Database connection
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
@@ -15,7 +12,7 @@ async function updateNBAPlayers() {
   try {
     console.log('🏀 Starting NBA players update...');
     
-    // Fetch current players from Ball Don't Lie API
+    // Use built-in fetch (Node 18+)
     const response = await fetch('https://www.balldontlie.io/api/v1/players?per_page=100');
     const data = await response.json();
     const players = data.data;
