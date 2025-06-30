@@ -8,175 +8,87 @@ const pool = new Pool({
   }
 });
 
-async function updatePlayerStats() {
+async function debugPlayerStats() {
   try {
-    console.log('📊 Starting stats update for existing players...');
+    console.log('🔍 DEBUGGING: Testing stats extraction...');
     
-    // Get all players without stats
-    const playersResult = await pool.query(`
-      SELECT id, name, team 
-      FROM players 
-      WHERE active = true 
-      AND (ppg IS NULL OR ppg = 0 OR position = 'N/A' OR position IS NULL)
-      ORDER BY name
-      LIMIT 50
-    `);
+    // Test with a few well-known players
+    const testPlayers = [
+      { name: 'LeBron James', expectedUrl: 'jamesle01' },
+      { name: 'Stephen Curry', expectedUrl: 'curryst01' },
+      { name: 'Giannis Antetokounmpo', expectedUrl: 'antetgi01' }
+    ];
     
-    const players = playersResult.rows;
-    console.log(`📋 Found ${players.length} players needing stats update`);
-    
-    let updated = 0;
-    
-    for (const player of players) {
+    for (const player of testPlayers) {
+      console.log(`\n🏀 Testing ${player.name}...`);
+      
+      // Try the standard Basketball Reference URL format
+      const url = `https://www.basketball-reference.com/players/${player.expectedUrl.charAt(0)}/${player.expectedUrl}.html`;
+      
       try {
-        console.log(`🔍 Getting stats for ${player.name}...`);
+        console.log(`📡 Fetching: ${url}`);
         
-        // Create search-friendly name for Basketball Reference
-        const searchName = player.name.toLowerCase()
-          .replace(/\s+/g, '-')
-          .replace(/[^a-z-]/g, '');
-        
-        // Try different Basketball Reference URL patterns
-        const urlPatterns = [
-          `https://www.basketball-reference.com/players/${searchName.charAt(0)}/${searchName.substring(0, 8)}.html`,
-          `https://www.basketball-reference.com/players/${searchName.charAt(0)}/${searchName}.html`
-        ];
-        
-        let playerHtml = null;
-        
-        for (const url of urlPatterns) {
-          try {
-            console.log(`📡 Trying: ${url}`);
-            const response = await fetch(url, {
-              headers: {
-                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
-              }
-            });
-            
-            if (response.ok) {
-              playerHtml = await response.text();
-              console.log(`✅ Found player page for ${player.name}`);
-              break;
-            }
-          } catch (urlError) {
-            console.log(`⚠️ URL failed: ${urlError.message}`);
+        const response = await fetch(url, {
+          headers: {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
           }
-        }
+        });
         
-        if (!playerHtml) {
-          console.log(`❌ Could not find stats page for ${player.name}`);
-          continue;
-        }
+        console.log(`📊 Response Status: ${response.status}`);
+        console.log(`📊 Content Type: ${response.headers.get('content-type')}`);
         
-        // Extract stats from the HTML
-        const stats = extractPlayerStats(playerHtml, player.name);
-        
-        if (stats) {
-          // Update player with stats
-          await pool.query(`
-            UPDATE players 
-            SET 
-              position = COALESCE($1, position),
-              ppg = COALESCE($2, ppg),
-              rpg = COALESCE($3, rpg),
-              apg = COALESCE($4, apg),
-              age = COALESCE($5, age),
-              height = COALESCE($6, height),
-              last_updated = CURRENT_DATE
-            WHERE id = $7
-          `, [
-            stats.position, 
-            stats.ppg, 
-            stats.rpg, 
-            stats.apg, 
-            stats.age, 
-            stats.height, 
-            player.id
-          ]);
+        if (response.ok) {
+          const html = await response.text();
+          console.log(`📄 HTML Length: ${html.length} characters`);
           
-          updated++;
-          console.log(`✅ Updated ${player.name}: ${stats.position}, ${stats.ppg} PPG, ${stats.rpg} RPG, ${stats.apg} APG`);
+          // Look for key indicators
+          const hasPlayerName = html.includes(player.name);
+          const hasStatsTable = html.includes('per_game');
+          const hasPosition = html.includes('Position:');
+          
+          console.log(`✅ Contains player name: ${hasPlayerName}`);
+          console.log(`✅ Contains stats table: ${hasStatsTable}`);
+          console.log(`✅ Contains position: ${hasPosition}`);
+          
+          // Try to extract basic info
+          const positionMatch = html.match(/<strong>Position:<\/strong>\s*([^<\n]+)/);
+          const heightMatch = html.match(/<strong>Height:<\/strong>\s*([^<\n]+)/);
+          
+          if (positionMatch) console.log(`📍 Position found: ${positionMatch[1].trim()}`);
+          if (heightMatch) console.log(`📏 Height found: ${heightMatch[1].trim()}`);
+          
+          // Look for 2024-25 stats
+          const currentSeasonMatch = html.includes('2024-25');
+          console.log(`📅 Has 2024-25 season: ${currentSeasonMatch}`);
+          
+          if (currentSeasonMatch) {
+            // Show a snippet around the 2024-25 season
+            const seasonIndex = html.indexOf('2024-25');
+            const snippet = html.substring(seasonIndex, seasonIndex + 500);
+            console.log(`📊 2024-25 snippet: ${snippet.substring(0, 200)}...`);
+          }
+          
         } else {
-          console.log(`⚠️ No stats found for ${player.name}`);
+          console.log(`❌ Failed to fetch: ${response.status} ${response.statusText}`);
         }
         
-        // Respectful delay
-        await new Promise(resolve => setTimeout(resolve, 2000));
-        
-      } catch (playerError) {
-        console.error(`❌ Error processing ${player.name}:`, playerError.message);
+      } catch (error) {
+        console.log(`❌ Error fetching ${player.name}: ${error.message}`);
       }
+      
+      // Delay between requests
+      await new Promise(resolve => setTimeout(resolve, 3000));
     }
     
-    console.log(`🎉 Stats update complete! Updated ${updated} players with detailed stats`);
+    console.log('\n🎉 Debug complete! Check the logs above to see what we can extract.');
     
   } catch (error) {
-    console.error('💥 Error updating player stats:', error.message);
+    console.error('💥 Debug error:', error.message);
     process.exit(1);
   } finally {
     await pool.end();
   }
 }
 
-function extractPlayerStats(html, playerName) {
-  try {
-    // Extract current season stats (2024-25)
-    const stats = {};
-    
-    // Position
-    const positionMatch = html.match(/<strong>Position:<\/strong>\s*([^<\n]+)/);
-    if (positionMatch) {
-      stats.position = positionMatch[1].trim().split(/[,&]/)[0]; // Take first position if multiple
-    }
-    
-    // Height
-    const heightMatch = html.match(/<strong>(?:Height|Ht):<\/strong>\s*([^<\n]+)/);
-    if (heightMatch) {
-      stats.height = heightMatch[1].trim();
-    }
-    
-    // Age/Born
-    const ageMatch = html.match(/<strong>Born:<\/strong>.*?\(age (\d+)\)/);
-    if (ageMatch) {
-      stats.age = parseInt(ageMatch[1]);
-    }
-    
-    // Current season stats - look for 2024-25 row in per-game table
-    const statPatterns = [
-      // Pattern for per-game stats table
-      /2024-25.*?<td[^>]*data-stat="pts_per_g"[^>]*>([^<]+)<\/td>.*?<td[^>]*data-stat="trb_per_g"[^>]*>([^<]+)<\/td>.*?<td[^>]*data-stat="ast_per_g"[^>]*>([^<]+)<\/td>/s,
-      // Alternative pattern
-      /<tr[^>]*id="per_game\.2025"[^>]*>.*?<td[^>]*>([0-9.]+)<\/td>.*?<td[^>]*>([0-9.]+)<\/td>.*?<td[^>]*>([0-9.]+)<\/td>/s
-    ];
-    
-    for (const pattern of statPatterns) {
-      const statMatch = html.match(pattern);
-      if (statMatch) {
-        stats.ppg = parseFloat(statMatch[1]) || 0;
-        stats.rpg = parseFloat(statMatch[2]) || 0;
-        stats.apg = parseFloat(statMatch[3]) || 0;
-        break;
-      }
-    }
-    
-    // If no current season, try career averages
-    if (!stats.ppg) {
-      const careerMatch = html.match(/Career.*?<td[^>]*data-stat="pts_per_g"[^>]*>([^<]+)<\/td>.*?<td[^>]*data-stat="trb_per_g"[^>]*>([^<]+)<\/td>.*?<td[^>]*data-stat="ast_per_g"[^>]*>([^<]+)<\/td>/s);
-      if (careerMatch) {
-        stats.ppg = parseFloat(careerMatch[1]) || 0;
-        stats.rpg = parseFloat(careerMatch[2]) || 0;
-        stats.apg = parseFloat(careerMatch[3]) || 0;
-      }
-    }
-    
-    console.log(`📊 Extracted stats for ${playerName}:`, stats);
-    return Object.keys(stats).length > 0 ? stats : null;
-    
-  } catch (error) {
-    console.error(`❌ Error extracting stats for ${playerName}:`, error.message);
-    return null;
-  }
-}
-
-// Run the stats updater
-updatePlayerStats();
+// Run the debug
+debugPlayerStats();
