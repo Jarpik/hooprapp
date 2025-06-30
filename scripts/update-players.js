@@ -12,11 +12,34 @@ async function updateNBAPlayers() {
   try {
     console.log('🏀 Starting NBA players update...');
     
-    // Use built-in fetch (Node 18+)
+    // Fetch current players from Ball Don't Lie API with error handling
+    console.log('📡 Calling Ball Don\'t Lie API...');
     const response = await fetch('https://www.balldontlie.io/api/v1/players?per_page=100');
-    const data = await response.json();
-    const players = data.data;
     
+    console.log(`📊 API Response Status: ${response.status}`);
+    console.log(`📊 Content Type: ${response.headers.get('content-type')}`);
+    
+    if (!response.ok) {
+      throw new Error(`API returned status ${response.status}`);
+    }
+    
+    const responseText = await response.text();
+    console.log(`📄 Response preview: ${responseText.substring(0, 200)}...`);
+    
+    let data;
+    try {
+      data = JSON.parse(responseText);
+    } catch (parseError) {
+      console.error('❌ Failed to parse JSON response');
+      console.error('Response was:', responseText.substring(0, 500));
+      throw new Error('API returned invalid JSON');
+    }
+    
+    if (!data || !data.data) {
+      throw new Error('API response missing data field');
+    }
+    
+    const players = data.data;
     console.log(`📥 Fetched ${players.length} players from API`);
     
     // Filter for active NBA players (those with teams)
@@ -33,7 +56,7 @@ async function updateNBAPlayers() {
     let newPlayers = 0;
     let updatedPlayers = 0;
     
-    for (const player of activePlayers) {
+    for (const player of activePlayers.slice(0, 10)) { // Limit to first 10 for testing
       const fullName = `${player.first_name} ${player.last_name}`;
       const team = player.team.full_name;
       const position = player.position || 'N/A';
@@ -52,6 +75,7 @@ async function updateNBAPlayers() {
             VALUES ($1, $2, $3, true, CURRENT_DATE)
           `, [fullName, team, position]);
           newPlayers++;
+          console.log(`➕ Added: ${fullName} (${team})`);
         } else {
           // Update existing player
           await pool.query(`
@@ -60,6 +84,7 @@ async function updateNBAPlayers() {
             WHERE name = $3
           `, [team, position, fullName]);
           updatedPlayers++;
+          console.log(`🔄 Updated: ${fullName} (${team})`);
         }
       } catch (error) {
         console.error(`❌ Error processing ${fullName}:`, error.message);
@@ -69,7 +94,7 @@ async function updateNBAPlayers() {
     console.log(`🎉 Update complete! Added ${newPlayers} new players, updated ${updatedPlayers} existing players`);
     
   } catch (error) {
-    console.error('💥 Error updating NBA players:', error);
+    console.error('💥 Error updating NBA players:', error.message);
     process.exit(1);
   } finally {
     await pool.end();
