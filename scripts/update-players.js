@@ -8,9 +8,7 @@ const pool = new Pool({
   }
 });
 
-// Function to generate Basketball Reference ID from player name
 function generateBRefID(playerName) {
-  // Basketball Reference naming convention: first 5 letters of last name + first 2 of first name + 01
   const parts = playerName.toLowerCase().split(' ');
   if (parts.length < 2) return null;
   
@@ -23,42 +21,148 @@ function generateBRefID(playerName) {
   return `${lastPart}${firstPart}01`;
 }
 
-async function updateAllPlayersWithStats() {
+function extractAllPlayerData(html, playerName) {
+  const stats = {};
+  
+  // 1. STATS from SUMMARY section (this works!)
+  const ptsMatch = html.match(/<span[^>]*data-tip="Points"[^>]*><strong>PTS<\/strong><\/span><p>([0-9.]+)<\/p>/);
+  if (ptsMatch) stats.ppg = parseFloat(ptsMatch[1]);
+  
+  const trbMatch = html.match(/<span[^>]*data-tip="Total Rebounds"[^>]*><strong>TRB<\/strong><\/span><p>([0-9.]+)<\/p>/);
+  if (trbMatch) stats.rpg = parseFloat(trbMatch[1]);
+  
+  const astMatch = html.match(/<span[^>]*data-tip="Assists"[^>]*><strong>AST<\/strong><\/span><p>([0-9.]+)<\/p>/);
+  if (astMatch) stats.apg = parseFloat(astMatch[1]);
+  
+  // 2. POSITION - Try multiple comprehensive patterns
+  const positionPatterns = [
+    // Pattern 1: Standard format
+    /<strong>Position:<\/strong>\s*([^<\n]+)/i,
+    // Pattern 2: In paragraph tags
+    /<p><strong>Position<\/strong><\/p>\s*<p[^>]*>([^<]+)<\/p>/i,
+    // Pattern 3: Different HTML structure
+    /Position<\/strong>[\s\S]*?<p[^>]*>([A-Z]{1,3}(?:-[A-Z]{1,3})?)<\/p>/i,
+    // Pattern 4: Meta data format
+    /<span[^>]*>Position<\/span>[\s\S]*?<span[^>]*>([A-Z]{1,3})<\/span>/i,
+    // Pattern 5: Simple position in parentheses or brackets
+    /\b([A-Z]{1,2}(?:-[A-Z]{1,2})?)\b/g
+  ];
+  
+  for (const pattern of positionPatterns) {
+    const match = html.match(pattern);
+    if (match) {
+      let position = match[1].trim();
+      // Validate it looks like a position (PG, SG, SF, PF, C, etc.)
+      if (/^[A-Z]{1,3}(?:-[A-Z]{1,3})?$/.test(position)) {
+        stats.position = position;
+        console.log(`📍 Position found: ${position}`);
+        break;
+      }
+    }
+  }
+  
+  // 3. HEIGHT - Multiple patterns
+  const heightPatterns = [
+    // Pattern 1: Standard format
+    /<strong>Height:<\/strong>\s*([^<\n]+)/i,
+    // Pattern 2: In paragraph format
+    /<p><strong>Height<\/strong><\/p>\s*<p[^>]*>([^<]+)<\/p>/i,
+    // Pattern 3: Direct height format
+    /(\d+'-\d+"|\d+'\d+"|\d+ ft \d+ in)/i,
+    // Pattern 4: Metric to feet conversion context
+    /(\d+'-\d+")[\s\S]*?cm/i
+  ];
+  
+  for (const pattern of heightPatterns) {
+    const match = html.match(pattern);
+    if (match) {
+      let height = match[1].trim();
+      // Validate it looks like height
+      if (/\d+'\d*"?|\d+ ft/.test(height)) {
+        stats.height = height;
+        console.log(`📏 Height found: ${height}`);
+        break;
+      }
+    }
+  }
+  
+  // 4. AGE - Multiple patterns
+  const agePatterns = [
+    // Pattern 1: Standard age format
+    /\(age\s+(\d+)\)/i,
+    // Pattern 2: Born format
+    /<strong>Born:<\/strong>[\s\S]*?\(age\s+(\d+)\)/i,
+    // Pattern 3: Simple age context
+    /age[:\s]+(\d+)/i,
+    // Pattern 4: Birth year calculation (if we can find birth year)
+    /Born[\s\S]*?(\d{4})[\s\S]*?\(age\s+(\d+)\)/i
+  ];
+  
+  for (const pattern of agePatterns) {
+    const match = html.match(pattern);
+    if (match) {
+      let age = parseInt(match[1]) || parseInt(match[2]);
+      if (age && age > 15 && age < 50) { // Reasonable NBA player age
+        stats.age = age;
+        console.log(`🎂 Age found: ${age}`);
+        break;
+      }
+    }
+  }
+  
+  // 5. Alternative: Look in the player bio/info section more specifically
+  const bioSectionMatch = html.match(/<div[^>]*class="[^"]*info[^"]*"[^>]*>([\s\S]*?)<\/div>/i);
+  if (bioSectionMatch) {
+    const bioSection = bioSectionMatch[1];
+    
+    // Try position in bio
+    if (!stats.position) {
+      const bioPosition = bioSection.match(/Position[:\s]*([A-Z]{1,3}(?:-[A-Z]{1,3})?)/i);
+      if (bioPosition) {
+        stats.position = bioPosition[1];
+        console.log(`📍 Position found in bio: ${stats.position}`);
+      }
+    }
+    
+    // Try height in bio
+    if (!stats.height) {
+      const bioHeight = bioSection.match(/(\d+'-\d+")/);
+      if (bioHeight) {
+        stats.height = bioHeight[1];
+        console.log(`📏 Height found in bio: ${stats.height}`);
+      }
+    }
+    
+    // Try age in bio
+    if (!stats.age) {
+      const bioAge = bioSection.match(/age[:\s]*(\d+)/i);
+      if (bioAge) {
+        stats.age = parseInt(bioAge[1]);
+        console.log(`🎂 Age found in bio: ${stats.age}`);
+      }
+    }
+  }
+  
+  console.log(`📊 Final extracted data for ${playerName}:`, stats);
+  return stats;
+}
+
+async function updateWithBetterExtraction() {
   try {
-    console.log('🏀 Updating ALL players in database with real stats...');
+    console.log('🏀 Testing better data extraction on a few known players...');
     
-    // Get ALL players from database
-    const playersResult = await pool.query(`
-      SELECT id, name, team 
-      FROM players 
-      WHERE active = true 
-      ORDER BY name
-    `);
+    // Test with a few players that we know have good data
+    const testPlayers = [
+      { name: 'LeBron James', bref_id: 'jamesle01' },
+      { name: 'Stephen Curry', bref_id: 'curryst01' },
+      { name: 'Giannis Antetokounmpo', bref_id: 'antetgi01' }
+    ];
     
-    const allPlayers = playersResult.rows;
-    console.log(`📋 Found ${allPlayers.length} total players to update`);
-    
-    let updated = 0;
-    let failed = 0;
-    
-    // Process each player
-    for (let i = 0; i < allPlayers.length; i++) {
-      const player = allPlayers[i];
-      
+    for (const player of testPlayers) {
       try {
-        console.log(`\n🔍 [${i + 1}/${allPlayers.length}] Processing ${player.name}...`);
+        console.log(`\n🔍 Testing extraction for ${player.name}...`);
         
-        // Generate Basketball Reference ID
-        const brefId = generateBRefID(player.name);
-        if (!brefId) {
-          console.log(`❌ Could not generate Basketball Reference ID for ${player.name}`);
-          failed++;
-          continue;
-        }
-        
-        console.log(`🔗 Trying Basketball Reference ID: ${brefId}`);
-        
-        const url = `https://www.basketball-reference.com/players/${brefId.charAt(0)}/${brefId}.html`;
+        const url = `https://www.basketball-reference.com/players/${player.bref_id.charAt(0)}/${player.bref_id}.html`;
         
         const response = await fetch(url, {
           headers: {
@@ -67,81 +171,27 @@ async function updateAllPlayersWithStats() {
         });
         
         if (!response.ok) {
-          console.log(`❌ Basketball Reference page not found for ${player.name} (${response.status})`);
-          failed++;
+          console.log(`❌ Failed to fetch ${player.name}: ${response.status}`);
           continue;
         }
         
         const html = await response.text();
         
-        // Verify this is the right player by checking if name appears in HTML
-        if (!html.toLowerCase().includes(player.name.toLowerCase())) {
-          console.log(`❌ Page doesn't match ${player.name} - wrong player`);
-          failed++;
-          continue;
-        }
+        // Use enhanced extraction
+        const stats = extractAllPlayerData(html, player.name);
         
-        console.log(`✅ Found correct Basketball Reference page for ${player.name}`);
-        
-        // Extract stats from the SUMMARY section
-        const stats = {};
-        
-        // PPG - Points
-        const ptsMatch = html.match(/<span[^>]*data-tip="Points"[^>]*><strong>PTS<\/strong><\/span><p>([0-9.]+)<\/p>/);
-        if (ptsMatch) {
-          stats.ppg = parseFloat(ptsMatch[1]);
-          console.log(`📊 PPG: ${stats.ppg}`);
-        }
-        
-        // RPG - Total Rebounds  
-        const trbMatch = html.match(/<span[^>]*data-tip="Total Rebounds"[^>]*><strong>TRB<\/strong><\/span><p>([0-9.]+)<\/p>/);
-        if (trbMatch) {
-          stats.rpg = parseFloat(trbMatch[1]);
-          console.log(`📊 RPG: ${stats.rpg}`);
-        }
-        
-        // APG - Assists
-        const astMatch = html.match(/<span[^>]*data-tip="Assists"[^>]*><strong>AST<\/strong><\/span><p>([0-9.]+)<\/p>/);
-        if (astMatch) {
-          stats.apg = parseFloat(astMatch[1]);
-          console.log(`📊 APG: ${stats.apg}`);
-        }
-        
-        // Position, Age, Height
-        const infoSection = html.substring(0, 50000);
-        
-        // Position
-        const positionPatterns = [
-          /Position:\s*<\/strong>\s*([^<\n]+)/i,
-          /Position<\/strong><\/p>\s*<p[^>]*>([^<]+)<\/p>/i,
-          /<strong>Position<\/strong>[\s\S]*?<p[^>]*>([^<]+)<\/p>/i
-        ];
-        
-        for (const pattern of positionPatterns) {
-          const match = infoSection.match(pattern);
-          if (match) {
-            stats.position = match[1].trim().split(/[,\-&]/)[0].trim();
-            console.log(`📍 Position: ${stats.position}`);
-            break;
-          }
-        }
-        
-        // Age
-        const ageMatch = infoSection.match(/\(age\s+(\d+)\)/i);
-        if (ageMatch) {
-          stats.age = parseInt(ageMatch[1]);
-          console.log(`🎂 Age: ${stats.age}`);
-        }
-        
-        // Height
-        const heightMatch = infoSection.match(/(\d+'-\d+")/);
-        if (heightMatch) {
-          stats.height = heightMatch[1].trim();
-          console.log(`📏 Height: ${stats.height}`);
-        }
+        console.log(`\n📋 COMPLETE DATA for ${player.name}:`);
+        console.log(`   PPG: ${stats.ppg || 'Not found'}`);
+        console.log(`   RPG: ${stats.rpg || 'Not found'}`);
+        console.log(`   APG: ${stats.apg || 'Not found'}`);
+        console.log(`   Position: ${stats.position || 'Not found'}`);
+        console.log(`   Height: ${stats.height || 'Not found'}`);
+        console.log(`   Age: ${stats.age || 'Not found'}`);
         
         // Update database
-        if (Object.keys(stats).length > 0) {
+        const playerCheck = await pool.query('SELECT id FROM players WHERE name = $1', [player.name]);
+        
+        if (playerCheck.rows.length > 0) {
           await pool.query(`
             UPDATE players 
             SET 
@@ -152,7 +202,7 @@ async function updateAllPlayersWithStats() {
               age = COALESCE($5, age),
               height = COALESCE($6, height),
               last_updated = CURRENT_DATE
-            WHERE id = $7
+            WHERE name = $7
           `, [
             stats.position || null,
             stats.ppg || null,
@@ -160,51 +210,28 @@ async function updateAllPlayersWithStats() {
             stats.apg || null,
             stats.age || null,
             stats.height || null,
-            player.id
+            player.name
           ]);
           
-          updated++;
-          console.log(`✅ Updated ${player.name} with real stats!`);
-        } else {
-          console.log(`⚠️ No stats extracted for ${player.name}`);
-          failed++;
+          console.log(`✅ Updated ${player.name} with enhanced data extraction`);
         }
         
-        // Respectful delay between requests
-        await new Promise(resolve => setTimeout(resolve, 2000));
+        await new Promise(resolve => setTimeout(resolve, 5000));
         
-      } catch (playerError) {
-        console.error(`❌ Error processing ${player.name}:`, playerError.message);
-        failed++;
+      } catch (error) {
+        console.error(`❌ Error testing ${player.name}:`, error.message);
       }
     }
     
-    console.log(`\n🎉 COMPLETE! Updated ${updated} players, ${failed} failed`);
-    
-    // Show final stats
-    const finalResult = await pool.query(`
-      SELECT COUNT(*) as total_with_stats,
-             AVG(ppg) as avg_ppg,
-             MAX(ppg) as max_ppg,
-             MIN(ppg) as min_ppg
-      FROM players 
-      WHERE active = true AND ppg > 0
-    `);
-    
-    const finalStats = finalResult.rows[0];
-    console.log(`📊 Final Database Stats:`);
-    console.log(`   Players with stats: ${finalStats.total_with_stats}`);
-    console.log(`   Average PPG: ${Math.round(finalStats.avg_ppg * 10) / 10}`);
-    console.log(`   Highest PPG: ${finalStats.max_ppg}`);
-    console.log(`   Lowest PPG: ${finalStats.min_ppg}`);
+    console.log('\n🎯 Test complete! Check if the enhanced extraction found position/age/height.');
     
   } catch (error) {
-    console.error('💥 Error updating all players:', error.message);
+    console.error('💥 Error:', error.message);
     process.exit(1);
   } finally {
     await pool.end();
   }
 }
 
-// Run the complete updater
-updateAllPlayersWithStats();
+// Run the enhanced extraction test
+updateWithBetterExtraction();
