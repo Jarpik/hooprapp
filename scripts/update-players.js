@@ -10,9 +10,9 @@ const pool = new Pool({
 
 async function scrapeNBAPlayers() {
   try {
-    console.log('🏀 Starting NBA players scraping from Basketball Reference...');
+    console.log('🏀 Starting FULL NBA players scraping...');
     
-    // NBA teams and their Basketball Reference codes
+    // ALL 30 NBA teams
     const teams = [
       { code: 'ATL', name: 'Atlanta Hawks' },
       { code: 'BOS', name: 'Boston Celtics' },
@@ -50,49 +50,88 @@ async function scrapeNBAPlayers() {
     let newPlayers = 0;
     let updatedPlayers = 0;
     
-    // Process first 5 teams for testing
-    for (const team of teams.slice(0, 5)) {
+    console.log(`📊 Processing ALL ${teams.length} NBA teams...`);
+    
+    // Process ALL teams (not just 5)
+    for (const team of teams) {
       try {
-        console.log(`🔍 Scraping ${team.name}...`);
+        console.log(`🔍 Scraping ${team.name}... (${teams.indexOf(team) + 1}/${teams.length})`);
         
-        // Basketball Reference roster URL
-        const url = `https://www.basketball-reference.com/teams/${team.code}/2025.html`;
-        console.log(`📡 Fetching: ${url}`);
+        // Try multiple URL patterns for Basketball Reference
+        const urls = [
+          `https://www.basketball-reference.com/teams/${team.code}/2025.html`,
+          `https://www.basketball-reference.com/teams/${team.code}/2024.html`
+        ];
         
-        const response = await fetch(url, {
-          headers: {
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+        let html = null;
+        for (const url of urls) {
+          try {
+            console.log(`📡 Trying: ${url}`);
+            const response = await fetch(url, {
+              headers: {
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+              }
+            });
+            
+            if (response.ok) {
+              html = await response.text();
+              console.log(`✅ Successfully fetched from ${url}`);
+              break;
+            }
+          } catch (urlError) {
+            console.log(`⚠️ Failed URL ${url}: ${urlError.message}`);
           }
-        });
+        }
         
-        if (!response.ok) {
-          console.log(`⚠️ Failed to fetch ${team.code}: ${response.status}`);
+        if (!html) {
+          console.log(`❌ Could not fetch any data for ${team.name}`);
           continue;
         }
         
-        const html = await response.text();
+        // More aggressive player name extraction
+        const patterns = [
+          // Pattern 1: Standard roster table
+          /<tr[^>]*>.*?<th[^>]*data-stat="player"[^>]*><a[^>]*>([^<]+)<\/a>.*?<td[^>]*data-stat="pos"[^>]*>([^<]*)<\/td>.*?<td[^>]*data-stat="age"[^>]*>([^<]*)<\/td>/gs,
+          // Pattern 2: Simple player links
+          /<a[^>]*href="\/players\/[^"]*"[^>]*>([A-Z][a-z]+ [A-Z][a-z]+(?:\s[A-Z][a-z]+)?)<\/a>/g,
+          // Pattern 3: Player names in roster context
+          /player"[^>]*>([A-Z][a-z]+\s+[A-Z][a-z]+(?:\s+[A-Z][a-z]+)?)<\/a>/g
+        ];
         
-        // Look for player table rows - Basketball Reference has cleaner structure
-        const playerRegex = /<tr[^>]*>.*?<th[^>]*data-stat="player"[^>]*><a[^>]*>([^<]+)<\/a>.*?<td[^>]*data-stat="pos"[^>]*>([^<]*)<\/td>.*?<td[^>]*data-stat="age"[^>]*>([^<]*)<\/td>/gs;
+        let foundPlayers = new Set();
         
-        const matches = [...html.matchAll(playerRegex)];
-        console.log(`📋 Found ${matches.length} players on ${team.name}`);
-        
-        for (const match of matches) {
-          const playerName = match[1].trim();
-          const position = match[2].trim() || 'N/A';
-          const age = parseInt(match[3]) || null;
+        for (const pattern of patterns) {
+          const matches = [...html.matchAll(pattern)];
+          console.log(`📋 Pattern found ${matches.length} matches for ${team.name}`);
           
-          // Skip if name is too short or looks invalid
-          if (playerName.length < 3 || playerName.includes('Player') || playerName.includes('Name')) {
-            continue;
+          for (const match of matches) {
+            const playerName = match[1].trim();
+            const position = match[2] ? match[2].trim() : 'N/A';
+            const age = match[3] ? parseInt(match[3]) : null;
+            
+            // Validate player name
+            if (playerName.length < 5 || 
+                playerName.length > 50 ||
+                /[0-9]/.test(playerName) ||
+                /(Player|Name|Subscribe|Manage|Menu|Search|Login)/i.test(playerName)) {
+              continue;
+            }
+            
+            foundPlayers.add(JSON.stringify({ name: playerName, position, age }));
           }
+        }
+        
+        console.log(`✅ Found ${foundPlayers.size} unique players for ${team.name}`);
+        
+        // Process unique players
+        for (const playerJson of foundPlayers) {
+          const player = JSON.parse(playerJson);
           
           try {
             // Check if player exists
             const existingPlayer = await pool.query(
               'SELECT id FROM players WHERE name = $1',
-              [playerName]
+              [player.name]
             );
             
             if (existingPlayer.rows.length === 0) {
@@ -100,44 +139,57 @@ async function scrapeNBAPlayers() {
               await pool.query(`
                 INSERT INTO players (name, team, position, age, active, last_updated) 
                 VALUES ($1, $2, $3, $4, true, CURRENT_DATE)
-              `, [playerName, team.name, position, age]);
+              `, [player.name, team.name, player.position, player.age]);
               newPlayers++;
-              console.log(`➕ Added: ${playerName} (${team.name}) - ${position}, Age ${age}`);
+              console.log(`➕ Added: ${player.name} (${team.name})`);
             } else {
               // Update existing player
               await pool.query(`
                 UPDATE players 
                 SET team = $1, position = $2, age = $3, active = true, last_updated = CURRENT_DATE 
                 WHERE name = $4
-              `, [team.name, position, age, playerName]);
+              `, [team.name, player.position, player.age, player.name]);
               updatedPlayers++;
-              console.log(`🔄 Updated: ${playerName} (${team.name}) - ${position}, Age ${age}`);
+              console.log(`🔄 Updated: ${player.name} (${team.name})`);
             }
             
             totalPlayers++;
           } catch (dbError) {
-            console.error(`❌ Database error for ${playerName}:`, dbError.message);
+            console.error(`❌ Database error for ${player.name}:`, dbError.message);
           }
         }
         
-        // Respectful delay between requests
-        await new Promise(resolve => setTimeout(resolve, 2000));
+        // Delay between teams to be respectful
+        await new Promise(resolve => setTimeout(resolve, 3000));
         
       } catch (teamError) {
         console.error(`❌ Error processing team ${team.code}:`, teamError.message);
       }
     }
     
-    // Clean up bad entries
-    console.log('🧹 Cleaning up invalid entries...');
-    await pool.query(`
+    // Clean up any remaining bad entries
+    console.log('🧹 Final cleanup...');
+    const cleanupResult = await pool.query(`
       DELETE FROM players 
-      WHERE name IN ('Subscribe Now', 'Manage Favorites', 'Player', 'Name') 
-      OR LENGTH(name) < 3
+      WHERE name ~ '[0-9]' 
+      OR LENGTH(name) < 5 
+      OR LENGTH(name) > 50
+      OR name ILIKE '%subscribe%'
+      OR name ILIKE '%manage%'
+      OR name ILIKE '%menu%'
+      OR name ILIKE '%search%'
     `);
     
-    console.log(`🎉 Scraping complete! Processed ${totalPlayers} players total`);
-    console.log(`📊 Added ${newPlayers} new players, updated ${updatedPlayers} existing players`);
+    console.log(`🗑️ Cleaned up ${cleanupResult.rowCount} invalid entries`);
+    
+    // Final count
+    const totalResult = await pool.query('SELECT COUNT(*) as count FROM players WHERE active = true');
+    
+    console.log(`🎉 SCRAPING COMPLETE!`);
+    console.log(`📊 Total active players in database: ${totalResult.rows[0].count}`);
+    console.log(`📊 Added ${newPlayers} new players`);
+    console.log(`📊 Updated ${updatedPlayers} existing players`);
+    console.log(`📊 Processed ${totalPlayers} players this run`);
     
   } catch (error) {
     console.error('💥 Error scraping NBA players:', error.message);
