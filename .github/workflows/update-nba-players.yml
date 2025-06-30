@@ -1,0 +1,33 @@
+name: Update NBA Players Daily
+
+on:
+  schedule:
+    # Run every day at 3 AM UTC (11 PM EST / 8 PM PST)
+    - cron: '0 3 * * *'
+  workflow_dispatch: # Allows manual triggering
+
+jobs:
+  update-players:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18'
+        
+    - name: Install dependencies
+      run: |
+        cd scripts
+        npm init -y
+        npm install pg node-fetch
+        
+    - name: Run NBA players update
+      env:
+        DATABASE_URL: ${{ secrets.DATABASE_URL }}
+      run: |
+        cd scripts
+        node update-players.js
