@@ -8,8 +8,7 @@ const pool = new Pool({
     rejectUnauthorized: false
   }
 });
-
-// Enhanced Basketball Reference ID generation with more mappings
+// FIXED Basketball Reference ID generation with CORRECT pattern
 function generateBRefID(playerName) {
   const parts = playerName.toLowerCase().split(' ');
   if (parts.length < 2) return null;
@@ -17,19 +16,25 @@ function generateBRefID(playerName) {
   let firstName = parts[0].replace(/[^a-z]/g, '');
   let lastName = parts[parts.length - 1].replace(/[^a-z]/g, '');
   
-  // Handle special cases
+  // Handle suffixes (Jr, Sr, III, etc.)
   if (lastName === 'jr' || lastName === 'sr' || lastName === 'iii' || lastName === 'ii' || lastName === 'iv') {
     if (parts.length >= 3) {
       lastName = parts[parts.length - 2].replace(/[^a-z]/g, '');
     }
   }
   
-  // Expanded special name handling
+  // Handle hyphenated last names (take first part)
+  if (lastName.includes('-')) {
+    lastName = lastName.split('-')[0];
+  }
+  
+  // Known Basketball Reference exceptions
   const nameMap = {
     'paul george': 'georgpa01',
     'victor wembanyama': 'wembavi01', 
     'shai gilgeous-alexander': 'gilgesh01',
     'walker kessler': 'kesslwa01',
+    'trae young': 'youngtr01',
     'lebron james': 'jamesle01',
     'stephen curry': 'curryst01',
     'kevin durant': 'duranke01',
@@ -61,7 +66,9 @@ function generateBRefID(playerName) {
     'jayson tatum': 'tatumja01',
     'jaylen brown': 'brownja02',
     'jimmy butler': 'butleji01',
-    'bam adebayo': 'adebaba01'
+    'bam adebayo': 'adebaba01',
+    'adem bona': 'bonaad01',
+    'alex len': 'lenal01'
   };
   
   const fullName = playerName.toLowerCase().replace(/[^a-z\s]/g, '');
@@ -69,12 +76,14 @@ function generateBRefID(playerName) {
     return nameMap[fullName];
   }
   
-  // Standard Basketball Reference format
-  const lastPart = lastName.substring(0, 5).padEnd(5, 'x');
-  const firstPart = firstName.substring(0, 2).padEnd(2, 'x');
+  // CORRECT Basketball Reference format: last name (up to 5 chars) + first name (up to 2 chars) + 01
+  // Examples: Walker Kessler → kesslwa01, Trae Young → youngtr01
+  const lastPart = lastName.substring(0, 5);
+  const firstPart = firstName.substring(0, 2);
   
   return `${lastPart}${firstPart}01`;
 }
+
 
 // Multiple ID attempts for hard-to-find players
 function generateAlternativeIDs(playerName) {
