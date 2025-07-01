@@ -9,105 +9,78 @@ const pool = new Pool({
   }
 });
 
-// Known ESPN Player IDs for common players
-const knownESPNIds = {
-  'lebron james': '1966',
-  'stephen curry': '3975',
-  'kevin durant': '3202',
-  'giannis antetokounmpo': '3032977',
-  'luka doncic': '4066648',
-  'nikola jokic': '3112335',
-  'jayson tatum': '4065648',
-  'joel embiid': '3059318',
-  'damian lillard': '6606',
-  'jimmy butler': '6430',
-  'paul george': '4251',
-  'kawhi leonard': '6450',
-  'russell westbrook': '3468',
-  'chris paul': '2779',
-  'anthony davis': '6583',
-  'alex sarr': '5160992',
-  'alex len': '2596107',
-  'adem bona': '5105637'
+// Known player IDs for multiple sources
+const knownPlayerIDs = {
+  // ESPN IDs
+  espn: {
+    'lebron james': '1966',
+    'stephen curry': '3975',
+    'kevin durant': '3202',
+    'giannis antetokounmpo': '3032977',
+    'luka doncic': '4066648',
+    'nikola jokic': '3112335',
+    'jayson tatum': '4065648',
+    'joel embiid': '3059318',
+    'alex sarr': '5160992',
+    'alex len': '2596107',
+    'adem bona': '5105637'
+  },
+  // Yahoo Sports IDs (more reliable for height/age)
+  yahoo: {
+    'alex sarr': '10294',
+    'lebron james': '3704',
+    'stephen curry': '4612',
+    'kevin durant': '4244'
+  }
 };
 
-// Generate potential ESPN player IDs using various strategies
-function generatePotentialESPNIds(playerName) {
-  const ids = [];
-  
-  // Check known IDs first
-  const knownId = knownESPNIds[playerName.toLowerCase()];
-  if (knownId) {
-    ids.push(knownId);
-    return ids; // Return early if we have a known ID
-  }
-  
-  // Generate potential IDs based on patterns
-  // ESPN seems to use sequential IDs, rookies get higher numbers
-  
-  // Try common ID ranges
-  const baseRanges = [
-    // Recent rookies (2024-2025)
-    [5100000, 5200000],
-    // Players from 2020-2024  
-    [4000000, 5100000],
-    // Players from 2015-2020
-    [3000000, 4000000],
-    // Veteran players
-    [1000, 10000]
-  ];
-  
-  // Generate some IDs to test (we'll try a few from each range)
-  for (const [start, end] of baseRanges) {
-    // Try a few IDs from each range
-    for (let i = 0; i < 5; i++) {
-      const randomId = Math.floor(Math.random() * (end - start)) + start;
-      ids.push(randomId.toString());
-    }
-  }
-  
-  return ids;
-}
-
-// Create ESPN profile URL slug from player name
-function createESPNSlug(playerName) {
+// Create player name slug for URLs
+function createSlug(playerName) {
   return playerName
     .toLowerCase()
     .replace(/[^a-z\s]/g, '')
     .replace(/\s+/g, '-');
 }
 
-// Fetch and parse ESPN player profile
-async function fetchESPNProfile(espnId, playerName) {
+// Calculate age from birth date
+function calculateAge(birthDateString) {
+  if (!birthDateString) return null;
+  
+  const today = new Date();
+  const birthDate = new Date(birthDateString);
+  let age = today.getFullYear() - birthDate.getFullYear();
+  const monthDiff = today.getMonth() - birthDate.getMonth();
+  
+  if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+    age--;
+  }
+  
+  return age >= 18 && age <= 50 ? age : null;
+}
+
+// Fetch Yahoo Sports player data
+async function fetchYahooSportsData(playerName) {
   try {
-    const slug = createESPNSlug(playerName);
-    const url = `https://www.espn.com/nba/player/_/id/${espnId}/${slug}`;
+    const yahooId = knownPlayerIDs.yahoo[playerName.toLowerCase()];
+    if (!yahooId) return null;
     
-    console.log(`🔗 Trying ESPN URL: ${url}`);
+    const url = `https://sports.yahoo.com/nba/players/${yahooId}/`;
+    console.log(`🔗 Trying Yahoo Sports: ${url}`);
     
     const response = await fetch(url, {
       headers: {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36',
-        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8',
+        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
         'Accept-Language': 'en-US,en;q=0.9',
-        'Accept-Encoding': 'gzip, deflate, br, zstd',
-        'Referer': 'https://www.google.com/',
-        'Connection': 'keep-alive',
-        'Upgrade-Insecure-Requests': '1',
-        'Sec-Fetch-Dest': 'document',
-        'Sec-Fetch-Mode': 'navigate',
-        'Sec-Fetch-Site': 'cross-site',
-        'Sec-Fetch-User': '?1'
+        'Referer': 'https://www.google.com/'
       }
     });
     
-    if (!response.ok) {
-      throw new Error(`HTTP ${response.status}`);
-    }
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
     
     const html = await response.text();
     
-    // Verify this is the right player page
+    // Verify this is the right player
     const playerFirstName = playerName.split(' ')[0].toLowerCase();
     const playerLastName = playerName.split(' ').pop().toLowerCase();
     
@@ -115,71 +88,174 @@ async function fetchESPNProfile(espnId, playerName) {
       throw new Error('Wrong player page');
     }
     
-    console.log(`✅ Found correct ESPN page for ${playerName}`);
-    return extractESPNStats(html, playerName);
+    console.log(`✅ Found Yahoo Sports page for ${playerName}`);
+    return extractYahooData(html, playerName);
     
   } catch (error) {
-    throw error;
+    console.log(`❌ Yahoo Sports failed for ${playerName}: ${error.message}`);
+    return null;
   }
 }
 
-// Extract player stats from ESPN profile HTML
-function extractESPNStats(html, playerName) {
+// Extract data from Yahoo Sports
+function extractYahooData(html, playerName) {
   const stats = {};
   
   try {
-    // Position extraction
+    // Height/Weight pattern: "Height/Weight: 7' 0"/205 lbs"
+    const heightWeightMatch = html.match(/Height\/Weight:\s*([^\/]+)\/\d+\s*lbs/i);
+    if (heightWeightMatch) {
+      let height = heightWeightMatch[1].trim();
+      // Clean up height format
+      height = height.replace(/["''\s]/g, '').replace(/(\d)(\d)/, "$1'$2") + '"';
+      if (/^\d+'\d+"$/.test(height)) {
+        stats.height = height;
+      }
+    }
+    
+    // Position - look for position indicators
     const positionPatterns = [
-      /Position<\/span><span[^>]*>([^<]+)<\/span>/i,
+      /Position[^>]*>([^<]+)</i,
       /"position":"([^"]+)"/i,
-      /Position:\s*([A-Z\-]+)/i
+      /\b(PG|SG|SF|PF|C|Guard|Forward|Center)\b/i
     ];
     
     for (const pattern of positionPatterns) {
       const match = html.match(pattern);
       if (match && match[1]) {
-        const position = match[1].trim();
-        if (/^[A-Z\-]+$/.test(position) && position.length <= 10) {
+        const position = match[1].trim().toUpperCase();
+        if (/^(PG|SG|SF|PF|C|GUARD|FORWARD|CENTER)$/.test(position)) {
           stats.position = position;
           break;
         }
       }
     }
     
-    // Height extraction
-    const heightPatterns = [
-      /Height<\/span><span[^>]*>([^<]+)<\/span>/i,
-      /"height":"([^"]+)"/i,
-      /Height:\s*([0-9]+['']?\s*[0-9]+"?)/i,
-      /(\d+'\s*\d+"|\d+'\d+")/
-    ];
-    
-    for (const pattern of heightPatterns) {
-      const match = html.match(pattern);
-      if (match && match[1]) {
-        const height = match[1].trim();
-        if (/\d+['']?\s*\d+"?/.test(height)) {
-          stats.height = height.replace(/['']/g, "'");
-          if (!stats.height.includes('"')) {
-            stats.height += '"';
-          }
-          break;
-        }
-      }
+    // Season stats - look for current season averages
+    const seasonStatsMatch = html.match(/(\d+\.\d+)\s+(\d+\.\d+)\s+(\d+\.\d+)/);
+    if (seasonStatsMatch) {
+      const stat1 = parseFloat(seasonStatsMatch[1]);
+      const stat2 = parseFloat(seasonStatsMatch[2]);
+      const stat3 = parseFloat(seasonStatsMatch[3]);
+      
+      // Usually in order: PPG, RPG, APG
+      if (stat1 >= 0 && stat1 <= 50) stats.ppg = stat1;
+      if (stat2 >= 0 && stat2 <= 25) stats.rpg = stat2;
+      if (stat3 >= 0 && stat3 <= 15) stats.apg = stat3;
     }
     
-    // Age extraction
+    console.log(`📊 Yahoo Sports data for ${playerName}:`);
+    console.log(`   Position: ${stats.position || 'Not found'}`);
+    console.log(`   Height: ${stats.height || 'Not found'}`);
+    console.log(`   PPG: ${stats.ppg || 'Not found'}`);
+    console.log(`   RPG: ${stats.rpg || 'Not found'}`);
+    console.log(`   APG: ${stats.apg || 'Not found'}`);
+    
+  } catch (error) {
+    console.error(`Error extracting Yahoo data for ${playerName}:`, error.message);
+  }
+  
+  return stats;
+}
+
+// Fetch ESPN player data with updated patterns
+async function fetchESPNData(playerName) {
+  try {
+    const espnId = knownPlayerIDs.espn[playerName.toLowerCase()];
+    if (!espnId) return null;
+    
+    const slug = createSlug(playerName);
+    const url = `https://www.espn.com/nba/player/_/id/${espnId}/${slug}`;
+    console.log(`🔗 Trying ESPN: ${url}`);
+    
+    const response = await fetch(url, {
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36',
+        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+        'Accept-Language': 'en-US,en;q=0.9',
+        'Referer': 'https://www.google.com/'
+      }
+    });
+    
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    
+    const html = await response.text();
+    
+    // Verify this is the right player
+    const playerFirstName = playerName.split(' ')[0].toLowerCase();
+    const playerLastName = playerName.split(' ').pop().toLowerCase();
+    
+    if (!html.toLowerCase().includes(playerFirstName) || !html.toLowerCase().includes(playerLastName)) {
+      throw new Error('Wrong player page');
+    }
+    
+    console.log(`✅ Found ESPN page for ${playerName}`);
+    return extractESPNData(html, playerName);
+    
+  } catch (error) {
+    console.log(`❌ ESPN failed for ${playerName}: ${error.message}`);
+    return null;
+  }
+}
+
+// Extract data from ESPN with updated patterns
+function extractESPNData(html, playerName) {
+  const stats = {};
+  
+  try {
+    // Position from title: "Alex Sarr - Washington Wizards Power Forward - ESPN"
+    const titlePositionMatch = html.match(/<title>[^-]+-[^-]+(Power Forward|Point Guard|Shooting Guard|Small Forward|Center|Guard|Forward)[^<]*<\/title>/i);
+    if (titlePositionMatch) {
+      const position = titlePositionMatch[1].trim().toUpperCase();
+      // Convert full names to abbreviations
+      const positionMap = {
+        'POINT GUARD': 'PG',
+        'SHOOTING GUARD': 'SG', 
+        'SMALL FORWARD': 'SF',
+        'POWER FORWARD': 'PF',
+        'CENTER': 'C',
+        'GUARD': 'G',
+        'FORWARD': 'F'
+      };
+      stats.position = positionMap[position] || position;
+    }
+    
+    // Stats from ESPN format: "PTS · 13.0 · 83rd"
+    const ptsMatch = html.match(/PTS[^0-9]*(\d+\.\d+)/i);
+    if (ptsMatch) {
+      const ppg = parseFloat(ptsMatch[1]);
+      if (ppg >= 0 && ppg <= 50) stats.ppg = ppg;
+    }
+    
+    const rebMatch = html.match(/REB[^0-9]*(\d+\.\d+)/i);
+    if (rebMatch) {
+      const rpg = parseFloat(rebMatch[1]);
+      if (rpg >= 0 && rpg <= 25) stats.rpg = rpg;
+    }
+    
+    const astMatch = html.match(/AST[^0-9]*(\d+\.\d+)/i);
+    if (astMatch) {
+      const apg = parseFloat(astMatch[1]);
+      if (apg >= 0 && apg <= 15) stats.apg = apg;
+    }
+    
+    // Age from draft info or birth year
     const agePatterns = [
-      /Age<\/span><span[^>]*>(\d+)<\/span>/i,
-      /"age":(\d+)/i,
-      /Age:\s*(\d+)/i,
-      /\((\d+)\s*years?\s*old\)/i
+      /Age[^0-9]*(\d+)/i,
+      /\((\d+)\s*years?\s*old\)/i,
+      /Born[^0-9]*(\d{4})/i  // Birth year, we'll calculate age
     ];
     
     for (const pattern of agePatterns) {
       const match = html.match(pattern);
       if (match && match[1]) {
-        const age = parseInt(match[1]);
+        let age = parseInt(match[1]);
+        
+        // If it's a birth year, calculate current age
+        if (age > 1950 && age < 2010) {
+          age = new Date().getFullYear() - age;
+        }
+        
         if (age >= 18 && age <= 50) {
           stats.age = age;
           break;
@@ -187,112 +263,169 @@ function extractESPNStats(html, playerName) {
       }
     }
     
-    // Stats extraction (PPG, RPG, APG)
-    const statPatterns = [
-      // Current season averages
-      /PTS<\/span><span[^>]*>([0-9.]+)<\/span>/i,
-      /PPG[^>]*>([0-9.]+)</i,
-      /Points[^>]*>([0-9.]+)</i,
-    ];
-    
-    for (const pattern of statPatterns) {
-      const match = html.match(pattern);
-      if (match && match[1]) {
-        const ppg = parseFloat(match[1]);
-        if (ppg > 0 && ppg < 50) {
-          stats.ppg = ppg;
-          break;
-        }
-      }
-    }
-    
-    // RPG
-    const reboundPatterns = [
-      /REB<\/span><span[^>]*>([0-9.]+)<\/span>/i,
-      /RPG[^>]*>([0-9.]+)</i,
-      /Rebounds[^>]*>([0-9.]+)</i,
-    ];
-    
-    for (const pattern of reboundPatterns) {
-      const match = html.match(pattern);
-      if (match && match[1]) {
-        const rpg = parseFloat(match[1]);
-        if (rpg > 0 && rpg < 30) {
-          stats.rpg = rpg;
-          break;
-        }
-      }
-    }
-    
-    // APG
-    const assistPatterns = [
-      /AST<\/span><span[^>]*>([0-9.]+)<\/span>/i,
-      /APG[^>]*>([0-9.]+)</i,
-      /Assists[^>]*>([0-9.]+)</i,
-    ];
-    
-    for (const pattern of assistPatterns) {
-      const match = html.match(pattern);
-      if (match && match[1]) {
-        const apg = parseFloat(match[1]);
-        if (apg > 0 && apg < 20) {
-          stats.apg = apg;
-          break;
-        }
-      }
-    }
-    
-    console.log(`📊 Extracted ESPN data for ${playerName}:`);
+    console.log(`📊 ESPN data for ${playerName}:`);
     console.log(`   Position: ${stats.position || 'Not found'}`);
-    console.log(`   Height: ${stats.height || 'Not found'}`);
     console.log(`   Age: ${stats.age || 'Not found'}`);
     console.log(`   PPG: ${stats.ppg || 'Not found'}`);
     console.log(`   RPG: ${stats.rpg || 'Not found'}`);
     console.log(`   APG: ${stats.apg || 'Not found'}`);
     
   } catch (error) {
-    console.error(`Error extracting ESPN stats for ${playerName}:`, error.message);
+    console.error(`Error extracting ESPN data for ${playerName}:`, error.message);
   }
   
   return stats;
 }
 
-// Main function to get player data from ESPN
-async function getESPNPlayerData(playerName) {
-  const potentialIds = generatePotentialESPNIds(playerName);
-  
-  console.log(`🔍 Trying ${potentialIds.length} potential ESPN IDs for ${playerName}...`);
-  
-  for (const espnId of potentialIds) {
-    try {
-      const stats = await fetchESPNProfile(espnId, playerName);
-      
-      // If we got some meaningful data, return it
-      if (stats && (stats.position || stats.ppg || stats.age || stats.height)) {
-        console.log(`✅ Successfully found data for ${playerName} with ESPN ID: ${espnId}`);
-        
-        // Add the successful ID to our known list for future runs
-        knownESPNIds[playerName.toLowerCase()] = espnId;
-        
-        return stats;
+// Wikipedia scraping for birth dates and heights
+async function fetchWikipediaData(playerName) {
+  try {
+    const wikiSlug = playerName.replace(/\s+/g, '_');
+    const url = `https://en.wikipedia.org/wiki/${wikiSlug}`;
+    console.log(`🔗 Trying Wikipedia: ${url}`);
+    
+    const response = await fetch(url, {
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36',
+        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8'
       }
-      
-    } catch (error) {
-      console.log(`❌ ESPN ID ${espnId} failed: ${error.message}`);
-      continue;
+    });
+    
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    
+    const html = await response.text();
+    
+    // Verify this is about the basketball player
+    if (!html.toLowerCase().includes('basketball') || !html.toLowerCase().includes('nba')) {
+      throw new Error('Not a basketball player page');
     }
     
-    // Small delay between attempts
-    await new Promise(resolve => setTimeout(resolve, 1000));
+    console.log(`✅ Found Wikipedia page for ${playerName}`);
+    return extractWikipediaData(html, playerName);
+    
+  } catch (error) {
+    console.log(`❌ Wikipedia failed for ${playerName}: ${error.message}`);
+    return null;
+  }
+}
+
+// Extract data from Wikipedia
+function extractWikipediaData(html, playerName) {
+  const stats = {};
+  
+  try {
+    // Birth date patterns
+    const birthPatterns = [
+      /born (\d{1,2})\s+(January|February|March|April|May|June|July|August|September|October|November|December)\s+(\d{4})/i,
+      /\(born[^)]*(\d{1,2})\s+(January|February|March|April|May|June|July|August|September|October|November|December)\s+(\d{4})/i
+    ];
+    
+    for (const pattern of birthPatterns) {
+      const match = html.match(pattern);
+      if (match) {
+        const day = match[1];
+        const month = match[2];
+        const year = match[3];
+        const birthDate = new Date(`${month} ${day}, ${year}`);
+        const age = calculateAge(birthDate);
+        if (age) {
+          stats.age = age;
+          break;
+        }
+      }
+    }
+    
+    // Height patterns in Wikipedia
+    const heightPatterns = [
+      /(\d+)\s*ft\s*(\d+)\s*in/i,
+      /(\d+)′(\d+)″/,
+      /height[^0-9]*(\d+)[^0-9]*(\d+)/i
+    ];
+    
+    for (const pattern of heightPatterns) {
+      const match = html.match(pattern);
+      if (match && match[1] && match[2]) {
+        const feet = parseInt(match[1]);
+        const inches = parseInt(match[2]);
+        if (feet >= 5 && feet <= 8 && inches >= 0 && inches <= 11) {
+          stats.height = `${feet}'${inches}"`;
+          break;
+        }
+      }
+    }
+    
+    console.log(`📊 Wikipedia data for ${playerName}:`);
+    console.log(`   Age: ${stats.age || 'Not found'}`);
+    console.log(`   Height: ${stats.height || 'Not found'}`);
+    
+  } catch (error) {
+    console.error(`Error extracting Wikipedia data for ${playerName}:`, error.message);
   }
   
-  return null;
+  return stats;
+}
+
+// Main function to get comprehensive player data
+async function getPlayerData(playerName) {
+  console.log(`\n🔍 Getting comprehensive data for ${playerName}...`);
+  
+  const combinedStats = {};
+  
+  try {
+    // Try ESPN first (for stats and position)
+    const espnData = await fetchESPNData(playerName);
+    if (espnData) {
+      Object.assign(combinedStats, espnData);
+    }
+    
+    await new Promise(resolve => setTimeout(resolve, 2000));
+    
+    // Try Yahoo Sports (for height and additional stats)
+    const yahooData = await fetchYahooSportsData(playerName);
+    if (yahooData) {
+      // Merge data, prioritizing non-null values
+      Object.keys(yahooData).forEach(key => {
+        if (yahooData[key] && !combinedStats[key]) {
+          combinedStats[key] = yahooData[key];
+        }
+      });
+    }
+    
+    await new Promise(resolve => setTimeout(resolve, 2000));
+    
+    // Try Wikipedia for age/height if still missing
+    if (!combinedStats.age || !combinedStats.height) {
+      const wikiData = await fetchWikipediaData(playerName);
+      if (wikiData) {
+        Object.keys(wikiData).forEach(key => {
+          if (wikiData[key] && !combinedStats[key]) {
+            combinedStats[key] = wikiData[key];
+          }
+        });
+      }
+    }
+    
+    console.log(`\n📊 FINAL combined data for ${playerName}:`);
+    console.log(`   Position: ${combinedStats.position || 'Not found'}`);
+    console.log(`   Height: ${combinedStats.height || 'Not found'}`);
+    console.log(`   Age: ${combinedStats.age || 'Not found'}`);
+    console.log(`   PPG: ${combinedStats.ppg || 'Not found'}`);
+    console.log(`   RPG: ${combinedStats.rpg || 'Not found'}`);
+    console.log(`   APG: ${combinedStats.apg || 'Not found'}`);
+    
+    return combinedStats;
+    
+  } catch (error) {
+    console.error(`Error getting player data for ${playerName}:`, error.message);
+    return null;
+  }
 }
 
 // Main update function
-async function updatePlayersWithESPN() {
+async function updatePlayersWithMultiSource() {
   try {
-    console.log('🏀 Starting ESPN NBA player data update...');
+    console.log('🏀 Starting MULTI-SOURCE NBA player data update...');
+    console.log('📊 Using ESPN + Yahoo Sports + Wikipedia for comprehensive data');
     
     // Get players that need data
     const playersResult = await pool.query(`
@@ -307,7 +440,7 @@ async function updatePlayersWithESPN() {
       ORDER BY 
         CASE WHEN ppg IS NULL OR ppg = 0 THEN 0 ELSE 1 END,
         name
-      LIMIT 10
+      LIMIT 50
     `);
     
     const players = playersResult.rows;
@@ -322,35 +455,49 @@ async function updatePlayersWithESPN() {
       try {
         console.log(`\n🔍 [${i + 1}/${players.length}] Processing ${player.name}...`);
         
-        const stats = await getESPNPlayerData(player.name);
+        const stats = await getPlayerData(player.name);
         
         if (stats && Object.keys(stats).length > 0) {
-          // Update database
-          await pool.query(`
-            UPDATE players 
-            SET 
-              position = CASE WHEN $1 IS NOT NULL THEN $1 ELSE position END,
-              ppg = CASE WHEN $2 IS NOT NULL THEN $2 ELSE ppg END,
-              rpg = CASE WHEN $3 IS NOT NULL THEN $3 ELSE rpg END,
-              apg = CASE WHEN $4 IS NOT NULL THEN $4 ELSE apg END,
-              age = CASE WHEN $5 IS NOT NULL THEN $5 ELSE age END,
-              height = CASE WHEN $6 IS NOT NULL THEN $6 ELSE height END,
-              last_updated = CURRENT_DATE
-            WHERE id = $7
-          `, [
-            stats.position || null,
-            stats.ppg || null,
-            stats.rpg || null,
-            stats.apg || null,
-            stats.age || null,
-            stats.height || null,
-            player.id
-          ]);
+          // Validate data before database update
+          const validPosition = stats.position && typeof stats.position === 'string' && stats.position.length <= 10 ? stats.position : null;
+          const validPPG = stats.ppg && !isNaN(stats.ppg) && stats.ppg >= 0 && stats.ppg <= 50 ? stats.ppg : null;
+          const validRPG = stats.rpg && !isNaN(stats.rpg) && stats.rpg >= 0 && stats.rpg <= 25 ? stats.rpg : null;
+          const validAPG = stats.apg && !isNaN(stats.apg) && stats.apg >= 0 && stats.apg <= 15 ? stats.apg : null;
+          const validAge = stats.age && !isNaN(stats.age) && stats.age >= 18 && stats.age <= 45 ? stats.age : null;
+          const validHeight = stats.height && typeof stats.height === 'string' && /^\d+'\d+"$/.test(stats.height) ? stats.height : null;
           
-          updated++;
-          console.log(`✅ Updated ${player.name} in database`);
+          // Only update if we have at least one valid piece of data
+          if (validPosition || validPPG || validRPG || validAPG || validAge || validHeight) {
+            await pool.query(`
+              UPDATE players 
+              SET 
+                position = CASE WHEN $1 IS NOT NULL THEN $1 ELSE position END,
+                ppg = CASE WHEN $2 IS NOT NULL THEN $2 ELSE ppg END,
+                rpg = CASE WHEN $3 IS NOT NULL THEN $3 ELSE rpg END,
+                apg = CASE WHEN $4 IS NOT NULL THEN $4 ELSE apg END,
+                age = CASE WHEN $5 IS NOT NULL THEN $5 ELSE age END,
+                height = CASE WHEN $6 IS NOT NULL THEN $6 ELSE height END,
+                last_updated = CURRENT_DATE
+              WHERE id = $7
+            `, [
+              validPosition,
+              validPPG,
+              validRPG,
+              validAPG,
+              validAge,
+              validHeight,
+              player.id
+            ]);
+            
+            updated++;
+            console.log(`✅ Updated ${player.name} in database with valid data`);
+            console.log(`   📊 Updated: Position=${validPosition}, PPG=${validPPG}, RPG=${validRPG}, APG=${validAPG}, Age=${validAge}, Height=${validHeight}`);
+          } else {
+            console.log(`⚠️ No valid data found for ${player.name} across all sources`);
+            failed++;
+          }
         } else {
-          console.log(`⚠️ No ESPN data found for ${player.name}`);
+          console.log(`⚠️ No data found for ${player.name} from any source`);
           failed++;
         }
         
@@ -365,7 +512,7 @@ async function updatePlayersWithESPN() {
       }
     }
     
-    console.log(`\n🎉 ESPN update complete!`);
+    console.log(`\n🎉 Multi-source update complete!`);
     console.log(`   ✅ Updated: ${updated} players`);
     console.log(`   ❌ Failed: ${failed} players`);
     
@@ -391,6 +538,13 @@ async function updatePlayersWithESPN() {
     console.log(`   With height: ${status.with_height} (${Math.round(status.with_height/status.total*100)}%)`);
     console.log(`   Complete basic data: ${status.complete_basic} (${Math.round(status.complete_basic/status.total*100)}%)`);
     
+    const remaining = status.total - status.complete_basic;
+    if (remaining > 0) {
+      console.log(`\n🔄 ${remaining} players still need complete data. Run again to continue!`);
+    } else {
+      console.log(`\n🎉 ALL PLAYERS HAVE COMPLETE DATA!`);
+    }
+    
   } catch (error) {
     console.error('💥 Fatal error:', error.message);
     console.error(error.stack);
@@ -399,9 +553,9 @@ async function updatePlayersWithESPN() {
   }
 }
 
-// Run the ESPN updater
+// Run the multi-source updater
 if (require.main === module) {
-  updatePlayersWithESPN();
+  updatePlayersWithMultiSource();
 }
 
-module.exports = { updatePlayersWithESPN, getESPNPlayerData };
+module.exports = { updatePlayersWithMultiSource, getPlayerData };
