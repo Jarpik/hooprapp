@@ -9,38 +9,38 @@ const pool = new Pool({
   }
 });
 
-// NBA Teams with StatMuse URLs
+// NBA Teams with correct StatMuse URLs
 const nbaTeams = [
   { name: 'Atlanta Hawks', slug: 'atlanta-hawks-1', abbreviation: 'ATL' },
-  { name: 'Boston Celtics', slug: 'boston-celtics-2', abbreviation: 'BOS' },
-  { name: 'Brooklyn Nets', slug: 'brooklyn-nets-17', abbreviation: 'BKN' },
-  { name: 'Charlotte Hornets', slug: 'charlotte-hornets-3', abbreviation: 'CHA' },
-  { name: 'Chicago Bulls', slug: 'chicago-bulls-4', abbreviation: 'CHI' },
-  { name: 'Cleveland Cavaliers', slug: 'cleveland-cavaliers-5', abbreviation: 'CLE' },
-  { name: 'Dallas Mavericks', slug: 'dallas-mavericks-6', abbreviation: 'DAL' },
-  { name: 'Denver Nuggets', slug: 'denver-nuggets-7', abbreviation: 'DEN' },
-  { name: 'Detroit Pistons', slug: 'detroit-pistons-8', abbreviation: 'DET' },
-  { name: 'Golden State Warriors', slug: 'golden-state-warriors-9', abbreviation: 'GSW' },
-  { name: 'Houston Rockets', slug: 'houston-rockets-10', abbreviation: 'HOU' },
-  { name: 'Indiana Pacers', slug: 'indiana-pacers-11', abbreviation: 'IND' },
-  { name: 'LA Clippers', slug: 'la-clippers-12', abbreviation: 'LAC' },
-  { name: 'Los Angeles Lakers', slug: 'los-angeles-lakers-13', abbreviation: 'LAL' },
-  { name: 'Memphis Grizzlies', slug: 'memphis-grizzlies-14', abbreviation: 'MEM' },
-  { name: 'Miami Heat', slug: 'miami-heat-15', abbreviation: 'MIA' },
-  { name: 'Milwaukee Bucks', slug: 'milwaukee-bucks-16', abbreviation: 'MIL' },
-  { name: 'Minnesota Timberwolves', slug: 'minnesota-timberwolves-18', abbreviation: 'MIN' },
-  { name: 'New Orleans Pelicans', slug: 'new-orleans-pelicans-19', abbreviation: 'NOP' },
-  { name: 'New York Knicks', slug: 'new-york-knicks-5', abbreviation: 'NYK' },
-  { name: 'Oklahoma City Thunder', slug: 'oklahoma-city-thunder-20', abbreviation: 'OKC' },
-  { name: 'Orlando Magic', slug: 'orlando-magic-21', abbreviation: 'ORL' },
-  { name: 'Philadelphia 76ers', slug: 'philadelphia-76ers-22', abbreviation: 'PHI' },
-  { name: 'Phoenix Suns', slug: 'phoenix-suns-23', abbreviation: 'PHX' },
-  { name: 'Portland Trail Blazers', slug: 'portland-trail-blazers-24', abbreviation: 'POR' },
-  { name: 'Sacramento Kings', slug: 'sacramento-kings-25', abbreviation: 'SAC' },
-  { name: 'San Antonio Spurs', slug: 'san-antonio-spurs-26', abbreviation: 'SAS' },
-  { name: 'Toronto Raptors', slug: 'toronto-raptors-27', abbreviation: 'TOR' },
-  { name: 'Utah Jazz', slug: 'utah-jazz-28', abbreviation: 'UTA' },
-  { name: 'Washington Wizards', slug: 'washington-wizards-24', abbreviation: 'WAS' }
+  { name: 'Boston Celtics', slug: 'boston-celtics-1', abbreviation: 'BOS' },
+  { name: 'Brooklyn Nets', slug: 'brooklyn-nets-1', abbreviation: 'BKN' },
+  { name: 'Charlotte Hornets', slug: 'charlotte-hornets-1', abbreviation: 'CHA' },
+  { name: 'Chicago Bulls', slug: 'chicago-bulls-1', abbreviation: 'CHI' },
+  { name: 'Cleveland Cavaliers', slug: 'cleveland-cavaliers-1', abbreviation: 'CLE' },
+  { name: 'Dallas Mavericks', slug: 'dallas-mavericks-1', abbreviation: 'DAL' },
+  { name: 'Denver Nuggets', slug: 'denver-nuggets-1', abbreviation: 'DEN' },
+  { name: 'Detroit Pistons', slug: 'detroit-pistons-1', abbreviation: 'DET' },
+  { name: 'Golden State Warriors', slug: 'golden-state-warriors-1', abbreviation: 'GSW' },
+  { name: 'Houston Rockets', slug: 'houston-rockets-1', abbreviation: 'HOU' },
+  { name: 'Indiana Pacers', slug: 'indiana-pacers-1', abbreviation: 'IND' },
+  { name: 'LA Clippers', slug: 'la-clippers-1', abbreviation: 'LAC' },
+  { name: 'Los Angeles Lakers', slug: 'los-angeles-lakers-1', abbreviation: 'LAL' },
+  { name: 'Memphis Grizzlies', slug: 'memphis-grizzlies-1', abbreviation: 'MEM' },
+  { name: 'Miami Heat', slug: 'miami-heat-1', abbreviation: 'MIA' },
+  { name: 'Milwaukee Bucks', slug: 'milwaukee-bucks-1', abbreviation: 'MIL' },
+  { name: 'Minnesota Timberwolves', slug: 'minnesota-timberwolves-1', abbreviation: 'MIN' },
+  { name: 'New Orleans Pelicans', slug: 'new-orleans-pelicans-1', abbreviation: 'NOP' },
+  { name: 'New York Knicks', slug: 'new-york-knicks-1', abbreviation: 'NYK' },
+  { name: 'Oklahoma City Thunder', slug: 'oklahoma-city-thunder-1', abbreviation: 'OKC' },
+  { name: 'Orlando Magic', slug: 'orlando-magic-1', abbreviation: 'ORL' },
+  { name: 'Philadelphia 76ers', slug: 'philadelphia-76ers-1', abbreviation: 'PHI' },
+  { name: 'Phoenix Suns', slug: 'phoenix-suns-1', abbreviation: 'PHX' },
+  { name: 'Portland Trail Blazers', slug: 'portland-trail-blazers-1', abbreviation: 'POR' },
+  { name: 'Sacramento Kings', slug: 'sacramento-kings-1', abbreviation: 'SAC' },
+  { name: 'San Antonio Spurs', slug: 'san-antonio-spurs-1', abbreviation: 'SAS' },
+  { name: 'Toronto Raptors', slug: 'toronto-raptors-1', abbreviation: 'TOR' },
+  { name: 'Utah Jazz', slug: 'utah-jazz-1', abbreviation: 'UTA' },
+  { name: 'Washington Wizards', slug: 'washington-wizards-1', abbreviation: 'WAS' }
 ];
 
 function sleep(ms) {
@@ -80,7 +80,7 @@ async function fetchPage(url) {
 // Extract player URLs from team roster page
 async function getTeamPlayerURLs(team) {
   try {
-    const url = `https://www.statmuse.com/nba/team/${team.slug}/roster/2024`;
+    const url = `https://www.statmuse.com/nba/team/${team.slug}/roster/2025`;
     console.log(`📋 Getting ${team.name} roster...`);
     
     const html = await fetchPage(url);
