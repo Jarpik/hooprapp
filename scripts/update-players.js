@@ -60,7 +60,7 @@ async function makeAPIRequest(endpoint, params = {}) {
 
 // Get all players from Ball Don't Lie API
 async function getAllPlayers() {
-  console.log('🏀 Fetching all NBA players from Ball Don't Lie API...');
+  console.log('🏀 Fetching all NBA players from Ball Dont Lie API...');
   
   const allPlayers = [];
   let page = 1;
@@ -239,7 +239,7 @@ async function ensureColumnsExist() {
 // Update database with API data
 async function updateDatabaseWithAPI() {
   try {
-    console.log('🏀 Starting Ball Don\'t Lie API data update...');
+    console.log('🏀 Starting Ball Dont Lie API data update...');
     
     // Ensure database has required columns
     await ensureColumnsExist();
