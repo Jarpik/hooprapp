@@ -8,287 +8,206 @@ const pool = new Pool({
     rejectUnauthorized: false
   }
 });
-// FIXED Basketball Reference ID generation with CORRECT pattern
-function generateBRefID(playerName) {
-  const parts = playerName.toLowerCase().split(' ');
-  if (parts.length < 2) return null;
+
+// ESPN Player ID mapping for common players
+const playerIDMap = {
+  'lebron james': '1966',
+  'stephen curry': '3975',
+  'kevin durant': '3202',
+  'giannis antetokounmpo': '3032977',
+  'luka doncic': '4066648',
+  'nikola jokic': '3112335',
+  'jayson tatum': '4065648',
+  'joel embiid': '3059318',
+  'damian lillard': '6606',
+  'jimmy butler': '6430',
+  'paul george': '4251',
+  'kawhi leonard': '6450',
+  'russell westbrook': '3468',
+  'chris paul': '2779',
+  'anthony davis': '6583'
+};
+
+// Convert player name to potential ESPN search terms
+function generateESPNSearchTerms(playerName) {
+  const cleaned = playerName.toLowerCase().replace(/[^a-z\s]/g, '');
+  const parts = cleaned.split(' ');
   
-  let firstName = parts[0].replace(/[^a-z]/g, '');
-  let lastName = parts[parts.length - 1].replace(/[^a-z]/g, '');
+  return [
+    cleaned,                           // "lebron james"
+    parts.join('+'),                   // "lebron+james"  
+    parts.join('%20'),                 // "lebron%20james"
+    parts[0] + '+' + parts[parts.length - 1]  // "lebron+james" (first+last)
+  ];
+}
+
+// Get ESPN player data using their search/API
+async function getESPNPlayerData(playerName) {
+  // Check if we have a direct ID mapping
+  const directId = playerIDMap[playerName.toLowerCase()];
+  if (directId) {
+    return await fetchESPNPlayerById(directId, playerName);
+  }
   
-  // Handle suffixes (Jr, Sr, III, etc.)
-  if (lastName === 'jr' || lastName === 'sr' || lastName === 'iii' || lastName === 'ii' || lastName === 'iv') {
-    if (parts.length >= 3) {
-      lastName = parts[parts.length - 2].replace(/[^a-z]/g, '');
+  // Try to search for the player
+  const searchTerms = generateESPNSearchTerms(playerName);
+  
+  for (const term of searchTerms) {
+    try {
+      // Try ESPN's athlete search API
+      const searchUrl = `https://site.api.espn.com/apis/site/v2/sports/basketball/nba/athletes?limit=50`;
+      
+      console.log(`🔍 Searching ESPN API for: ${playerName}`);
+      
+      const response = await fetch(searchUrl, {
+        headers: {
+          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36',
+          'Accept': 'application/json',
+          'Referer': 'https://www.espn.com/',
+        }
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        
+        // Search for our player in the results
+        const foundPlayer = findPlayerInESPNData(data, playerName);
+        if (foundPlayer) {
+          console.log(`✅ Found ${playerName} with ESPN ID: ${foundPlayer.id}`);
+          return await fetchESPNPlayerById(foundPlayer.id, playerName);
+        }
+      }
+      
+      await new Promise(resolve => setTimeout(resolve, 2000)); // 2 second delay
+      
+    } catch (error) {
+      console.log(`⚠️ ESPN search error for ${playerName}: ${error.message}`);
+      continue;
     }
   }
   
-  // Handle hyphenated last names (take first part)
-  if (lastName.includes('-')) {
-    lastName = lastName.split('-')[0];
-  }
-  
-  // Known Basketball Reference exceptions
-  const nameMap = {
-    'paul george': 'georgpa01',
-    'victor wembanyama': 'wembavi01', 
-    'shai gilgeous-alexander': 'gilgesh01',
-    'walker kessler': 'kesslwa01',
-    'trae young': 'youngtr01',
-    'lebron james': 'jamesle01',
-    'stephen curry': 'curryst01',
-    'kevin durant': 'duranke01',
-    'giannis antetokounmpo': 'antetgi01',
-    'luka dončić': 'doncilu01',
-    'luka doncic': 'doncilu01',
-    'nikola jokić': 'jokicni01',
-    'nikola jokic': 'jokicni01',
-    'bogdan bogdanović': 'bogdabo02',
-    'bogdan bogdanovic': 'bogdabo02',
-    'jusuf nurkić': 'nurkiju01',
-    'jusuf nurkic': 'nurkiju01',
-    'kristaps porziņģis': 'porzikr01',
-    'kristaps porzingis': 'porzikr01',
-    'alperen şengün': 'sengual01',
-    'alperen sengun': 'sengual01',
-    'franz wagner': 'wagnefr01',
-    'moritz wagner': 'wagnemo01',
-    'kelly oubre jr': 'oubreke01',
-    'kelly oubre': 'oubreke01',
-    'derrick white': 'whitede01',
-    'coby white': 'whiteco01',
-    'aaron gordon': 'gordoaa01',
-    'anthony davis': 'davisan02',
-    'russell westbrook': 'westbru01',
-    'chris paul': 'paulch01',
-    'kawhi leonard': 'leonaka01',
-    'damian lillard': 'lillada01',
-    'jayson tatum': 'tatumja01',
-    'jaylen brown': 'brownja02',
-    'jimmy butler': 'butleji01',
-    'bam adebayo': 'adebaba01',
-    'adem bona': 'bonaad01',
-    'alex len': 'lenal01'
-  };
-  
-  const fullName = playerName.toLowerCase().replace(/[^a-z\s]/g, '');
-  if (nameMap[fullName]) {
-    return nameMap[fullName];
-  }
-  
-  // CORRECT Basketball Reference format: last name (up to 5 chars) + first name (up to 2 chars) + 01
-  // Examples: Walker Kessler → kesslwa01, Trae Young → youngtr01
-  const lastPart = lastName.substring(0, 5);
-  const firstPart = firstName.substring(0, 2);
-  
-  return `${lastPart}${firstPart}01`;
+  return null;
 }
 
-
-// Multiple ID attempts for hard-to-find players
-function generateAlternativeIDs(playerName) {
-  const baseId = generateBRefID(playerName);
-  const alternatives = [baseId];
+// Find player in ESPN API response
+function findPlayerInESPNData(data, targetName) {
+  if (!data.athletes) return null;
   
-  if (baseId) {
-    // Try with 02, 03 endings for common names
-    alternatives.push(baseId.replace('01', '02'));
-    alternatives.push(baseId.replace('01', '03'));
+  const targetFirst = targetName.split(' ')[0].toLowerCase();
+  const targetLast = targetName.split(' ').pop().toLowerCase();
+  
+  for (const athlete of data.athletes) {
+    if (!athlete.displayName) continue;
     
-    // Try shortened versions
-    const parts = playerName.toLowerCase().split(' ');
-    if (parts.length >= 2) {
-      const shortLast = parts[parts.length - 1].substring(0, 4).padEnd(5, 'x');
-      const shortFirst = parts[0].substring(0, 2);
-      alternatives.push(`${shortLast}${shortFirst}01`);
+    const athleteName = athlete.displayName.toLowerCase();
+    const athleteFirst = athlete.firstName?.toLowerCase() || '';
+    const athleteLast = athlete.lastName?.toLowerCase() || '';
+    
+    // Check for exact match or close match
+    if (athleteName.includes(targetFirst) && athleteName.includes(targetLast)) {
+      return athlete;
+    }
+    
+    if (athleteFirst.includes(targetFirst) && athleteLast.includes(targetLast)) {
+      return athlete;
     }
   }
   
-  return [...new Set(alternatives)].filter(Boolean);
+  return null;
 }
 
-// Improved data extraction with multiple strategies
-function extractPlayerData(html, playerName) {
+// Fetch detailed player data from ESPN by ID
+async function fetchESPNPlayerById(playerId, playerName) {
+  try {
+    // ESPN player profile URL
+    const profileUrl = `https://site.api.espn.com/apis/site/v2/sports/basketball/nba/athletes/${playerId}`;
+    
+    console.log(`📊 Fetching detailed data for ${playerName}...`);
+    
+    const response = await fetch(profileUrl, {
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36',
+        'Accept': 'application/json',
+        'Referer': 'https://www.espn.com/',
+      }
+    });
+    
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}`);
+    }
+    
+    const playerData = await response.json();
+    return extractPlayerStats(playerData, playerName);
+    
+  } catch (error) {
+    console.log(`❌ Error fetching ${playerName} details: ${error.message}`);
+    return null;
+  }
+}
+
+// Extract stats from ESPN player data
+function extractPlayerStats(data, playerName) {
   const stats = {};
   
   try {
-    // Strategy 1: Look for current season stats table
-    const currentSeasonMatch = html.match(/<tr[^>]*id="per_game\.\d{4}"[^>]*>(.*?)<\/tr>/s);
-    if (currentSeasonMatch) {
-      const row = currentSeasonMatch[1];
+    // Basic info
+    if (data.position?.displayName) {
+      stats.position = data.position.displayName;
+    }
+    
+    if (data.height) {
+      stats.height = data.height;
+    }
+    
+    if (data.age) {
+      stats.age = parseInt(data.age);
+    }
+    
+    // Current season stats
+    if (data.statistics && data.statistics.length > 0) {
+      // Get the most recent season stats
+      const currentStats = data.statistics[0].splits?.categories;
       
-      // Extract stats from table row
-      const statCells = row.match(/<td[^>]*data-stat="[^"]*"[^>]*>([^<]*)<\/td>/g);
-      if (statCells) {
-        statCells.forEach(cell => {
-          const statMatch = cell.match(/data-stat="([^"]*)"[^>]*>([^<]*)</);
-          if (statMatch) {
-            const statName = statMatch[1];
-            const statValue = parseFloat(statMatch[2]);
-            
-            if (!isNaN(statValue)) {
-              if (statName === 'pts_per_g') stats.ppg = statValue;
-              if (statName === 'trb_per_g') stats.rpg = statValue;
-              if (statName === 'ast_per_g') stats.apg = statValue;
+      if (currentStats) {
+        for (const category of currentStats) {
+          if (category.name === 'general') {
+            for (const stat of category.stats) {
+              if (stat.name === 'avgPointsPerGame' || stat.displayName === 'PPG') {
+                stats.ppg = parseFloat(stat.value);
+              }
+              if (stat.name === 'avgReboundsPerGame' || stat.displayName === 'RPG') {
+                stats.rpg = parseFloat(stat.value);
+              }
+              if (stat.name === 'avgAssistsPerGame' || stat.displayName === 'APG') {
+                stats.apg = parseFloat(stat.value);
+              }
             }
           }
-        });
-      }
-    }
-    
-    // Strategy 2: Look for summary box stats (your original method as fallback)
-    if (!stats.ppg) {
-      const ptsMatch = html.match(/<span[^>]*data-tip="[^"]*"[^>]*><strong>PTS<\/strong><\/span>\s*<p[^>]*>([0-9.]+)<\/p>/);
-      if (ptsMatch) stats.ppg = parseFloat(ptsMatch[1]);
-    }
-    
-    if (!stats.rpg) {
-      const trbMatch = html.match(/<span[^>]*data-tip="[^"]*"[^>]*><strong>TRB<\/strong><\/span>\s*<p[^>]*>([0-9.]+)<\/p>/);
-      if (trbMatch) stats.rpg = parseFloat(trbMatch[1]);
-    }
-    
-    if (!stats.apg) {
-      const astMatch = html.match(/<span[^>]*data-tip="[^"]*"[^>]*><strong>AST<\/strong><\/span>\s*<p[^>]*>([0-9.]+)<\/p>/);
-      if (astMatch) stats.apg = parseFloat(astMatch[1]);
-    }
-    
-    // Strategy 3: Extract player info from meta section
-    const infoBoxMatch = html.match(/<div[^>]*class="[^"]*players[^"]*"[^>]*>(.*?)<\/div>/s);
-    if (infoBoxMatch) {
-      const infoBox = infoBoxMatch[1];
-      
-      // Position extraction - multiple patterns
-      const positionPatterns = [
-        /Position:\s*<\/strong>\s*([A-Z-]+)/i,
-        /<strong>Position<\/strong>[^>]*>\s*([A-Z-]+)/i,
-        /Position[^>]*>\s*<p[^>]*>([A-Z-]+)<\/p>/i,
-        /<p[^>]*>Position:\s*([A-Z-]+)<\/p>/i
-      ];
-      
-      for (const pattern of positionPatterns) {
-        const match = infoBox.match(pattern);
-        if (match && match[1] && /^[A-Z-]+$/.test(match[1].trim())) {
-          stats.position = match[1].trim();
-          break;
-        }
-      }
-      
-      // Height extraction
-      const heightPatterns = [
-        /Height:\s*<\/strong>\s*([0-9]+-[0-9]+)/i,
-        /<strong>Height<\/strong>[^>]*>\s*([0-9]+-[0-9]+|[0-9]'[0-9]+")/i,
-        /([0-9]+-[0-9]+|\d+'\s*\d+")/
-      ];
-      
-      for (const pattern of heightPatterns) {
-        const match = infoBox.match(pattern);
-        if (match && match[1]) {
-          let height = match[1].trim();
-          if (/^\d+-\d+$/.test(height)) {
-            height = height.replace('-', "'") + '"';
-          }
-          stats.height = height;
-          break;
-        }
-      }
-      
-      // Age extraction
-      const agePatterns = [
-        /Born:[\s\S]*?\(age\s+(\d+)\)/i,
-        /\(age\s+(\d+)\)/i,
-        /Age:\s*(\d+)/i
-      ];
-      
-      for (const pattern of agePatterns) {
-        const match = infoBox.match(pattern);
-        if (match && match[1]) {
-          const age = parseInt(match[1]);
-          if (age >= 18 && age <= 50) {
-            stats.age = age;
-            break;
-          }
         }
       }
     }
     
-    // Strategy 4: Look in page header/title area
-    const headerMatch = html.match(/<h1[^>]*>(.*?)<\/h1>/s);
-    if (headerMatch && !stats.position) {
-      const posMatch = headerMatch[1].match(/([A-Z]{1,2}(?:-[A-Z]{1,2})?)/);
-      if (posMatch && /^(PG|SG|SF|PF|C|G|F)$/i.test(posMatch[1])) {
-        stats.position = posMatch[1];
-      }
-    }
+    console.log(`📊 ESPN data for ${playerName}:`);
+    console.log(`   Position: ${stats.position || 'Not found'}`);
+    console.log(`   Height: ${stats.height || 'Not found'}`);
+    console.log(`   Age: ${stats.age || 'Not found'}`);
+    console.log(`   PPG: ${stats.ppg || 'Not found'}`);
+    console.log(`   RPG: ${stats.rpg || 'Not found'}`);
+    console.log(`   APG: ${stats.apg || 'Not found'}`);
     
   } catch (error) {
-    console.error(`Error extracting data for ${playerName}:`, error.message);
+    console.error(`Error extracting stats for ${playerName}:`, error.message);
   }
   
   return stats;
 }
 
-// Enhanced fetch with better error handling and retries
-async function fetchPlayerPage(url, playerName, retryCount = 0) {
-  const maxRetries = 3;
-  const headers = {
-  'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36',
-  'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8',
-  'Accept-Language': 'en-US,en;q=0.9',
-  'Accept-Encoding': 'gzip, deflate, br, zstd',
-  'Referer': 'https://www.google.com/',
-  'Connection': 'keep-alive',
-  'Upgrade-Insecure-Requests': '1',
-  'Sec-Fetch-Dest': 'document',
-  'Sec-Fetch-Mode': 'navigate',
-  'Sec-Fetch-Site': 'cross-site',
-  'Sec-Fetch-User': '?1',
-  'sec-ch-ua': '"Google Chrome";v="131", "Chromium";v="131", "Not_A Brand";v="24"',
-  'sec-ch-ua-mobile': '?0',
-  'sec-ch-ua-platform': '"Windows"'
-};
-  
+// Main function to update players using ESPN
+async function updatePlayersWithESPN() {
   try {
-    const response = await fetch(url, { headers });
+    console.log('🏀 Starting ESPN NBA player data update...');
     
-    if (response.status === 429) {
-      if (retryCount < maxRetries) {
-        const waitTime = Math.min(60 * Math.pow(2, retryCount), 300); // Exponential backoff, max 5 minutes
-        console.log(`⚠️ Rate limited! Waiting ${waitTime} seconds before retry ${retryCount + 1}...`);
-        await new Promise(resolve => setTimeout(resolve, waitTime * 1000));
-        return fetchPlayerPage(url, playerName, retryCount + 1);
-      } else {
-        throw new Error(`Rate limited after ${maxRetries} retries`);
-      }
-    }
-    
-    if (!response.ok) {
-      throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-    }
-    
-    const html = await response.text();
-    
-    // Verify we got a real player page
-    if (html.includes('Page Not Found') || html.includes('404') || html.length < 1000) {
-      throw new Error('Player page not found or invalid');
-    }
-    
-    return html;
-    
-  } catch (error) {
-    if (retryCount < maxRetries && !error.message.includes('not found')) {
-      console.log(`⚠️ Fetch error: ${error.message}. Retrying in ${10 * (retryCount + 1)} seconds...`);
-      await new Promise(resolve => setTimeout(resolve, 10000 * (retryCount + 1)));
-      return fetchPlayerPage(url, playerName, retryCount + 1);
-    }
-    throw error;
-  }
-}
-
-async function updatePlayersWithEnhancedScraping() {
-  try {
-    console.log('🏀 Starting ENHANCED NBA player data update...');
-    
-    // Get players that need data, prioritizing those with no stats at all
+    // Get players that need data
     const playersResult = await pool.query(`
       SELECT id, name, team 
       FROM players 
@@ -301,7 +220,7 @@ async function updatePlayersWithEnhancedScraping() {
       ORDER BY 
         CASE WHEN ppg IS NULL OR ppg = 0 THEN 0 ELSE 1 END,
         name
-      LIMIT 25
+      LIMIT 15
     `);
     
     const players = playersResult.rows;
@@ -309,7 +228,6 @@ async function updatePlayersWithEnhancedScraping() {
     
     let updated = 0;
     let failed = 0;
-    let skipped = 0;
     
     for (let i = 0; i < players.length; i++) {
       const player = players[i];
@@ -317,60 +235,10 @@ async function updatePlayersWithEnhancedScraping() {
       try {
         console.log(`\n🔍 [${i + 1}/${players.length}] Processing ${player.name}...`);
         
-        // Try multiple Basketball Reference IDs
-        const alternativeIds = generateAlternativeIDs(player.name);
-        let html = null;
-        let successfulUrl = null;
+        const stats = await getESPNPlayerData(player.name);
         
-        for (const brefId of alternativeIds) {
-          if (!brefId) continue;
-          
-          const url = `https://www.basketball-reference.com/players/${brefId.charAt(0)}/${brefId}.html`;
-          console.log(`🔗 Trying: ${url}`);
-          
-          try {
-            html = await fetchPlayerPage(url, player.name);
-            
-            // Verify this is the right player
-            const playerFirstName = player.name.split(' ')[0].toLowerCase();
-            const playerLastName = player.name.split(' ').pop().toLowerCase();
-            
-            if (html.toLowerCase().includes(playerFirstName) && html.toLowerCase().includes(playerLastName)) {
-              successfulUrl = url;
-              console.log(`✅ Found correct page: ${url}`);
-              break;
-            } else {
-              console.log(`❌ Wrong player page, trying next ID...`);
-              html = null;
-            }
-            
-          } catch (fetchError) {
-            console.log(`❌ Failed to fetch ${url}: ${fetchError.message}`);
-            continue;
-          }
-        }
-        
-        if (!html) {
-          console.log(`❌ Could not find Basketball Reference page for ${player.name}`);
-          failed++;
-          // Wait before next attempt
-          await new Promise(resolve => setTimeout(resolve, 5000));
-          continue;
-        }
-        
-        // Extract all available data
-        const stats = extractPlayerData(html, player.name);
-        
-        console.log(`📊 Extracted data for ${player.name}:`);
-        console.log(`   PPG: ${stats.ppg || 'Not found'}`);
-        console.log(`   RPG: ${stats.rpg || 'Not found'}`);
-        console.log(`   APG: ${stats.apg || 'Not found'}`);
-        console.log(`   Position: ${stats.position || 'Not found'}`);
-        console.log(`   Height: ${stats.height || 'Not found'}`);
-        console.log(`   Age: ${stats.age || 'Not found'}`);
-        
-        // Only update if we got some useful data
-        if (stats.ppg || stats.position || stats.age || stats.height) {
+        if (stats && Object.keys(stats).length > 0) {
+          // Update database
           await pool.query(`
             UPDATE players 
             SET 
@@ -395,35 +263,29 @@ async function updatePlayersWithEnhancedScraping() {
           updated++;
           console.log(`✅ Updated ${player.name} in database`);
         } else {
-          console.log(`⚠️ No useful data extracted for ${player.name}`);
-          skipped++;
+          console.log(`⚠️ No data found for ${player.name}`);
+          failed++;
         }
         
-        // Progressive delay - longer waits as we make more requests
-        const delay = Math.min(20 + (i * 2), 60); // Start at 20s, increase by 2s each request, max 60s
-        console.log(`⏳ Waiting ${delay} seconds before next player...`);
-        await new Promise(resolve => setTimeout(resolve, delay * 1000));
+        // Respectful delay
+        console.log(`⏳ Waiting 5 seconds before next player...`);
+        await new Promise(resolve => setTimeout(resolve, 5000));
         
       } catch (playerError) {
         console.error(`❌ Error processing ${player.name}:`, playerError.message);
         failed++;
-        // Wait even on errors
-        await new Promise(resolve => setTimeout(resolve, 10000));
       }
     }
     
-    console.log(`\n🎉 Enhanced update complete!`);
+    console.log(`\n🎉 ESPN update complete!`);
     console.log(`   ✅ Updated: ${updated} players`);
-    console.log(`   ⚠️ Skipped (no data): ${skipped} players`);
     console.log(`   ❌ Failed: ${failed} players`);
     
-    // Show detailed database status
+    // Show current database status
     const statusResult = await pool.query(`
       SELECT 
         COUNT(*) as total,
         COUNT(CASE WHEN ppg > 0 THEN 1 END) as with_ppg,
-        COUNT(CASE WHEN rpg > 0 THEN 1 END) as with_rpg,
-        COUNT(CASE WHEN apg > 0 THEN 1 END) as with_apg,
         COUNT(CASE WHEN position IS NOT NULL AND position != 'N/A' AND position != 'A' THEN 1 END) as with_position,
         COUNT(CASE WHEN age IS NOT NULL AND age > 0 THEN 1 END) as with_age,
         COUNT(CASE WHEN height IS NOT NULL THEN 1 END) as with_height,
@@ -436,19 +298,10 @@ async function updatePlayersWithEnhancedScraping() {
     console.log(`\n📊 Current Database Status:`);
     console.log(`   Total active players: ${status.total}`);
     console.log(`   With PPG: ${status.with_ppg} (${Math.round(status.with_ppg/status.total*100)}%)`);
-    console.log(`   With RPG: ${status.with_rpg} (${Math.round(status.with_rpg/status.total*100)}%)`);
-    console.log(`   With APG: ${status.with_apg} (${Math.round(status.with_apg/status.total*100)}%)`);
     console.log(`   With position: ${status.with_position} (${Math.round(status.with_position/status.total*100)}%)`);
     console.log(`   With age: ${status.with_age} (${Math.round(status.with_age/status.total*100)}%)`);
     console.log(`   With height: ${status.with_height} (${Math.round(status.with_height/status.total*100)}%)`);
     console.log(`   Complete basic data: ${status.complete_basic} (${Math.round(status.complete_basic/status.total*100)}%)`);
-    
-    const remaining = status.total - status.complete_basic;
-    if (remaining > 0) {
-      console.log(`\n🔄 ${remaining} players still need complete data. Run again to continue!`);
-    } else {
-      console.log(`\n🎉 ALL PLAYERS HAVE BASIC COMPLETE DATA!`);
-    }
     
   } catch (error) {
     console.error('💥 Fatal error:', error.message);
@@ -458,9 +311,9 @@ async function updatePlayersWithEnhancedScraping() {
   }
 }
 
-// Run the enhanced updater
+// Run the ESPN updater
 if (require.main === module) {
-  updatePlayersWithEnhancedScraping();
+  updatePlayersWithESPN();
 }
 
-module.exports = { updatePlayersWithEnhancedScraping, generateBRefID, extractPlayerData };
+module.exports = { updatePlayersWithESPN, getESPNPlayerData };
