@@ -1,20 +1,7 @@
-{
-  "name": "hooprapp-scripts",
-  "version": "1.0.0",
-  "description": "NBA player data update scripts for StatleNBA",
-  "main": "enhanced-update-players.js",
-  "scripts": {
-    "update": "node enhanced-update-players.js",
-    "test": "echo \"No tests yet\""
-  },
-  "dependencies": {
-    "pg": "^8.11.0",
-    "node-fetch": "^2.7.0"
-  },
-  "engines": {
-    "node": ">=16.0.0"
-  },
-  "keywords": ["nba", "scraping", "database", "sports"],
-  "author": "StatleNBA",
-  "license": "MIT"
+"scripts": {
+  "dev": "next dev",
+  "build": "next build", 
+  "start": "next start",
+  "lint": "next lint",
+  "db:import": "node scripts/import-players.js"
 }
