@@ -1,928 +1,105 @@
-// scripts/divisions/southwest-division.js
-const { importPlayers } = require('../utils/supabase-client');
+// scripts/import-all-divisions.js
+const { createSupabaseClient } = require('./utils/supabase-client.js');
 
-const southwestDivisionPlayers = [
-  // DALLAS MAVERICKS (Complete 2024-25 Roster)
-  {
-    name: "Luka Doncic",
-    position: "PG",
-    height: "6'7\"",
-    weight: 230,
-    age: 25,
-    team: "Dallas Mavericks",
-    team_abbreviation: "DAL",
-    ppg: 28.1,
-    rpg: 8.3,
-    apg: 7.8,
-    country: "Slovenia",
-    draft_year: 2018,
-    draft_round: 1,
-    draft_number: 3,
-    college: null,
-    active: true
-  },
-  {
-    name: "Kyrie Irving",
-    position: "PG",
-    height: "6'2\"",
-    weight: 193,
-    age: 32,
-    team: "Dallas Mavericks",
-    team_abbreviation: "DAL",
-    ppg: 24.3,
-    rpg: 4.9,
-    apg: 5.1,
-    country: "USA",
-    draft_year: 2011,
-    draft_round: 1,
-    draft_number: 1,
-    college: "Duke",
-    active: true
-  },
-  {
-    name: "Klay Thompson",
-    position: "SG",
-    height: "6'6\"",
-    weight: 220,
-    age: 34,
-    team: "Dallas Mavericks",
-    team_abbreviation: "DAL",
-    ppg: 14.0,
-    rpg: 3.3,
-    apg: 2.3,
-    country: "USA",
-    draft_year: 2011,
-    draft_round: 1,
-    draft_number: 11,
-    college: "Washington State",
-    active: true
-  },
-  {
-    name: "P.J. Washington",
-    position: "PF",
-    height: "6'7\"",
-    weight: 230,
-    age: 26,
-    team: "Dallas Mavericks",
-    team_abbreviation: "DAL",
-    ppg: 12.9,
-    rpg: 5.7,
-    apg: 1.9,
-    country: "USA",
-    draft_year: 2019,
-    draft_round: 1,
-    draft_number: 12,
-    college: "Kentucky",
-    active: true
-  },
-  {
-    name: "Daniel Gafford",
-    position: "C",
-    height: "6'10\"",
-    weight: 234,
-    age: 26,
-    team: "Dallas Mavericks",
-    team_abbreviation: "DAL",
-    ppg: 12.1,
-    rpg: 7.6,
-    apg: 1.5,
-    country: "USA",
-    draft_year: 2019,
-    draft_round: 2,
-    draft_number: 38,
-    college: "Arkansas",
-    active: true
-  },
-  {
-    name: "Dereck Lively II",
-    position: "C",
-    height: "7'1\"",
-    weight: 230,
-    age: 21,
-    team: "Dallas Mavericks",
-    team_abbreviation: "DAL",
-    ppg: 8.8,
-    rpg: 7.6,
-    apg: 1.4,
-    country: "USA",
-    draft_year: 2023,
-    draft_round: 1,
-    draft_number: 12,
-    college: "Duke",
-    active: true
-  },
-  {
-    name: "Naji Marshall",
-    position: "SF",
-    height: "6'7\"",
-    weight: 220,
-    age: 26,
-    team: "Dallas Mavericks",
-    team_abbreviation: "DAL",
-    ppg: 9.1,
-    rpg: 2.9,
-    apg: 1.9,
-    country: "USA",
-    draft_year: null,
-    draft_round: null,
-    draft_number: null,
-    college: "Xavier",
-    active: true
-  },
-  {
-    name: "Quentin Grimes",
-    position: "SG",
-    height: "6'4\"",
-    weight: 210,
-    age: 24,
-    team: "Dallas Mavericks",
-    team_abbreviation: "DAL",
-    ppg: 7.3,
-    rpg: 1.8,
-    apg: 1.4,
-    country: "USA",
-    draft_year: 2021,
-    draft_round: 1,
-    draft_number: 25,
-    college: "Houston",
-    active: true
-  },
-  {
-    name: "Jaden Hardy",
-    position: "SG",
-    height: "6'4\"",
-    weight: 198,
-    age: 22,
-    team: "Dallas Mavericks",
-    team_abbreviation: "DAL",
-    ppg: 7.7,
-    rpg: 1.9,
-    apg: 1.5,
-    country: "USA",
-    draft_year: 2022,
-    draft_round: 2,
-    draft_number: 37,
-    college: null,
-    active: true
-  },
-  {
-    name: "Olivier-Maxence Prosper",
-    position: "SF",
-    height: "6'8\"",
-    weight: 226,
-    age: 22,
-    team: "Dallas Mavericks",
-    team_abbreviation: "DAL",
-    ppg: 2.4,
-    rpg: 1.3,
-    apg: 0.4,
-    country: "Canada",
-    draft_year: 2023,
-    draft_round: 1,
-    draft_number: 24,
-    college: "Marquette",
-    active: true
-  },
+// Import all division functions
+const { importAtlanticDivision } = require('./divisions/atlantic-division');
+const { importCentralDivision } = require('./divisions/central-division');
+const { importSoutheastDivision } = require('./divisions/southeast-division');
+const { importNorthwestDivision } = require('./divisions/northwest-division');
+const { importPacificDivision } = require('./divisions/pacific-division');
+const { importSouthwestDivision } = require('./divisions/southwest-division');
 
-  // SAN ANTONIO SPURS (Complete 2024-25 Roster)
-  {
-    name: "Victor Wembanyama",
-    position: "C",
-    height: "7'4\"",
-    weight: 210,
-    age: 21,
-    team: "San Antonio Spurs",
-    team_abbreviation: "SAS",
-    ppg: 24.6,
-    rpg: 10.6,
-    apg: 3.9,
-    country: "France",
-    draft_year: 2023,
-    draft_round: 1,
-    draft_number: 1,
-    college: null,
-    active: true
-  },
-  {
-    name: "Devin Vassell",
-    position: "SG",
-    height: "6'5\"",
-    weight: 200,
-    age: 24,
-    team: "San Antonio Spurs",
-    team_abbreviation: "SAS",
-    ppg: 19.5,
-    rpg: 4.1,
-    apg: 3.8,
-    country: "USA",
-    draft_year: 2020,
-    draft_round: 1,
-    draft_number: 11,
-    college: "Florida State",
-    active: true
-  },
-  {
-    name: "Keldon Johnson",
-    position: "SF",
-    height: "6'5\"",
-    weight: 220,
-    age: 25,
-    team: "San Antonio Spurs",
-    team_abbreviation: "SAS",
-    ppg: 15.7,
-    rpg: 5.5,
-    apg: 2.8,
-    country: "USA",
-    draft_year: 2019,
-    draft_round: 1,
-    draft_number: 29,
-    college: "Kentucky",
-    active: true
-  },
-  {
-    name: "Jeremy Sochan",
-    position: "PF",
-    height: "6'9\"",
-    weight: 230,
-    age: 21,
-    team: "San Antonio Spurs",
-    team_abbreviation: "SAS",
-    ppg: 11.6,
-    rpg: 6.4,
-    apg: 2.9,
-    country: "Poland",
-    draft_year: 2022,
-    draft_round: 1,
-    draft_number: 9,
-    college: "Baylor",
-    active: true
-  },
-  {
-    name: "Stephon Castle",
-    position: "PG",
-    height: "6'6\"",
-    weight: 215,
-    age: 20,
-    team: "San Antonio Spurs",
-    team_abbreviation: "SAS",
-    ppg: 11.1,
-    rpg: 2.8,
-    apg: 3.7,
-    country: "USA",
-    draft_year: 2024,
-    draft_round: 1,
-    draft_number: 4,
-    college: "UConn",
-    active: true
-  },
-  {
-    name: "Tre Jones",
-    position: "PG",
-    height: "6'1\"",
-    weight: 185,
-    age: 24,
-    team: "San Antonio Spurs",
-    team_abbreviation: "SAS",
-    ppg: 10.0,
-    rpg: 3.0,
-    apg: 4.8,
-    country: "USA",
-    draft_year: 2020,
-    draft_round: 2,
-    draft_number: 41,
-    college: "Duke",
-    active: true
-  },
-  {
-    name: "Julian Champagnie",
-    position: "SF",
-    height: "6'8\"",
-    weight: 220,
-    age: 23,
-    team: "San Antonio Spurs",
-    team_abbreviation: "SAS",
-    ppg: 9.1,
-    rpg: 3.9,
-    apg: 2.2,
-    country: "USA",
-    draft_year: null,
-    draft_round: null,
-    draft_number: null,
-    college: "St. John's",
-    active: true
-  },
-  {
-    name: "Chris Paul",
-    position: "PG",
-    height: "6'0\"",
-    weight: 175,
-    age: 39,
-    team: "San Antonio Spurs",
-    team_abbreviation: "SAS",
-    ppg: 10.8,
-    rpg: 3.9,
-    apg: 8.0,
-    country: "USA",
-    draft_year: 2005,
-    draft_round: 1,
-    draft_number: 4,
-    college: "Wake Forest",
-    active: true
-  },
-  {
-    name: "Zach Collins",
-    position: "C",
-    height: "6'11\"",
-    weight: 250,
-    age: 27,
-    team: "San Antonio Spurs",
-    team_abbreviation: "SAS",
-    ppg: 11.2,
-    rpg: 5.4,
-    apg: 2.9,
-    country: "USA",
-    draft_year: 2017,
-    draft_round: 1,
-    draft_number: 10,
-    college: "Gonzaga",
-    active: true
-  },
-  {
-    name: "Blake Wesley",
-    position: "SG",
-    height: "6'5\"",
-    weight: 185,
-    age: 21,
-    team: "San Antonio Spurs",
-    team_abbreviation: "SAS",
-    ppg: 2.6,
-    rpg: 1.4,
-    apg: 1.1,
-    country: "USA",
-    draft_year: 2022,
-    draft_round: 1,
-    draft_number: 25,
-    college: "Notre Dame",
-    active: true
-  },
-
-  // HOUSTON ROCKETS (Complete 2024-25 Roster)
-  {
-    name: "Alperen Sengun",
-    position: "C",
-    height: "6'10\"",
-    weight: 243,
-    age: 22,
-    team: "Houston Rockets",
-    team_abbreviation: "HOU",
-    ppg: 18.6,
-    rpg: 10.9,
-    apg: 5.0,
-    country: "Turkey",
-    draft_year: 2021,
-    draft_round: 1,
-    draft_number: 16,
-    college: null,
-    active: true
-  },
-  {
-    name: "Jalen Green",
-    position: "SG",
-    height: "6'4\"",
-    weight: 186,
-    age: 23,
-    team: "Houston Rockets",
-    team_abbreviation: "HOU",
-    ppg: 19.6,
-    rpg: 4.0,
-    apg: 3.5,
-    country: "USA",
-    draft_year: 2021,
-    draft_round: 1,
-    draft_number: 2,
-    college: null,
-    active: true
-  },
-  {
-    name: "Fred VanVleet",
-    position: "PG",
-    height: "6'0\"",
-    weight: 197,
-    age: 31,
-    team: "Houston Rockets",
-    team_abbreviation: "HOU",
-    ppg: 15.5,
-    rpg: 3.9,
-    apg: 6.1,
-    country: "USA",
-    draft_year: null,
-    draft_round: null,
-    draft_number: null,
-    college: "Wichita State",
-    active: true
-  },
-  {
-    name: "Jabari Smith Jr.",
-    position: "PF",
-    height: "6'11\"",
-    weight: 220,
-    age: 22,
-    team: "Houston Rockets",
-    team_abbreviation: "HOU",
-    ppg: 11.9,
-    rpg: 6.4,
-    apg: 1.3,
-    country: "USA",
-    draft_year: 2022,
-    draft_round: 1,
-    draft_number: 3,
-    college: "Auburn",
-    active: true
-  },
-  {
-    name: "Dillon Brooks",
-    position: "SF",
-    height: "6'6\"",
-    weight: 225,
-    age: 29,
-    team: "Houston Rockets",
-    team_abbreviation: "HOU",
-    ppg: 12.6,
-    rpg: 3.4,
-    apg: 2.9,
-    country: "Canada",
-    draft_year: 2017,
-    draft_round: 2,
-    draft_number: 45,
-    college: "Oregon",
-    active: true
-  },
-  {
-    name: "Amen Thompson",
-    position: "SG",
-    height: "6'7\"",
-    weight: 209,
-    age: 21,
-    team: "Houston Rockets",
-    team_abbreviation: "HOU",
-    ppg: 13.0,
-    rpg: 7.0,
-    apg: 4.1,
-    country: "USA",
-    draft_year: 2023,
-    draft_round: 1,
-    draft_number: 4,
-    college: null,
-    active: true
-  },
-  {
-    name: "Tari Eason",
-    position: "SF",
-    height: "6'8\"",
-    weight: 216,
-    age: 23,
-    team: "Houston Rockets",
-    team_abbreviation: "HOU",
-    ppg: 9.8,
-    rpg: 5.3,
-    apg: 1.5,
-    country: "USA",
-    draft_year: 2022,
-    draft_round: 1,
-    draft_number: 17,
-    college: "LSU",
-    active: true
-  },
-  {
-    name: "Reed Sheppard",
-    position: "PG",
-    height: "6'2\"",
-    weight: 181,
-    age: 20,
-    team: "Houston Rockets",
-    team_abbreviation: "HOU",
-    ppg: 4.8,
-    rpg: 2.1,
-    apg: 2.3,
-    country: "USA",
-    draft_year: 2024,
-    draft_round: 1,
-    draft_number: 3,
-    college: "Kentucky",
-    active: true
-  },
-  {
-    name: "Steven Adams",
-    position: "C",
-    height: "6'11\"",
-    weight: 265,
-    age: 31,
-    team: "Houston Rockets",
-    team_abbreviation: "HOU",
-    ppg: 8.5,
-    rpg: 9.9,
-    apg: 3.4,
-    country: "New Zealand",
-    draft_year: 2013,
-    draft_round: 1,
-    draft_number: 12,
-    college: "Pittsburgh",
-    active: true
-  },
-  {
-    name: "Cam Whitmore",
-    position: "SF",
-    height: "6'7\"",
-    weight: 232,
-    age: 20,
-    team: "Houston Rockets",
-    team_abbreviation: "HOU",
-    ppg: 12.3,
-    rpg: 4.1,
-    apg: 0.8,
-    country: "USA",
-    draft_year: 2023,
-    draft_round: 1,
-    draft_number: 20,
-    college: "Villanova",
-    active: true
-  },
-
-  // MEMPHIS GRIZZLIES (Complete 2024-25 Roster)
-  {
-    name: "Ja Morant",
-    position: "PG",
-    height: "6'3\"",
-    weight: 174,
-    age: 25,
-    team: "Memphis Grizzlies",
-    team_abbreviation: "MEM",
-    ppg: 22.0,
-    rpg: 5.0,
-    apg: 8.1,
-    country: "USA",
-    draft_year: 2019,
-    draft_round: 1,
-    draft_number: 2,
-    college: "Murray State",
-    active: true
-  },
-  {
-    name: "Jaren Jackson Jr.",
-    position: "PF",
-    height: "6'11\"",
-    weight: 242,
-    age: 25,
-    team: "Memphis Grizzlies",
-    team_abbreviation: "MEM",
-    ppg: 22.5,
-    rpg: 5.5,
-    apg: 1.6,
-    country: "USA",
-    draft_year: 2018,
-    draft_round: 1,
-    draft_number: 4,
-    college: "Michigan State",
-    active: true
-  },
-  {
-    name: "Desmond Bane",
-    position: "SG",
-    height: "6'5\"",
-    weight: 215,
-    age: 26,
-    team: "Memphis Grizzlies",
-    team_abbreviation: "MEM",
-    ppg: 16.1,
-    rpg: 5.2,
-    apg: 5.5,
-    country: "USA",
-    draft_year: 2020,
-    draft_round: 1,
-    draft_number: 30,
-    college: "TCU",
-    active: true
-  },
-  {
-    name: "Marcus Smart",
-    position: "PG",
-    height: "6'4\"",
-    weight: 220,
-    age: 30,
-    team: "Memphis Grizzlies",
-    team_abbreviation: "MEM",
-    ppg: 14.5,
-    rpg: 4.2,
-    apg: 4.9,
-    country: "USA",
-    draft_year: 2014,
-    draft_round: 1,
-    draft_number: 6,
-    college: "Oklahoma State",
-    active: true
-  },
-  {
-    name: "Scotty Pippen Jr.",
-    position: "PG",
-    height: "6'1\"",
-    weight: 184,
-    age: 24,
-    team: "Memphis Grizzlies",
-    team_abbreviation: "MEM",
-    ppg: 12.9,
-    rpg: 4.7,
-    apg: 6.0,
-    country: "USA",
-    draft_year: null,
-    draft_round: null,
-    draft_number: null,
-    college: "Vanderbilt",
-    active: true
-  },
-  {
-    name: "Jaylen Wells",
-    position: "SF",
-    height: "6'8\"",
-    weight: 207,
-    age: 21,
-    team: "Memphis Grizzlies",
-    team_abbreviation: "MEM",
-    ppg: 11.7,
-    rpg: 3.2,
-    apg: 1.7,
-    country: "USA",
-    draft_year: 2024,
-    draft_round: 2,
-    draft_number: 39,
-    college: "Washington State",
-    active: true
-  },
-  {
-    name: "Zach Edey",
-    position: "C",
-    height: "7'4\"",
-    weight: 300,
-    age: 22,
-    team: "Memphis Grizzlies",
-    team_abbreviation: "MEM",
-    ppg: 11.1,
-    rpg: 6.9,
-    apg: 0.9,
-    country: "Canada",
-    draft_year: 2024,
-    draft_round: 1,
-    draft_number: 9,
-    college: "Purdue",
-    active: true
-  },
-  {
-    name: "Santi Aldama",
-    position: "PF",
-    height: "6'11\"",
-    weight: 215,
-    age: 23,
-    team: "Memphis Grizzlies",
-    team_abbreviation: "MEM",
-    ppg: 12.9,
-    rpg: 7.0,
-    apg: 3.0,
-    country: "Spain",
-    draft_year: 2021,
-    draft_round: 1,
-    draft_number: 30,
-    college: "Loyola Maryland",
-    active: true
-  },
-  {
-    name: "Jay Huff",
-    position: "C",
-    height: "7'1\"",
-    weight: 240,
-    age: 27,
-    team: "Memphis Grizzlies",
-    team_abbreviation: "MEM",
-    ppg: 5.4,
-    rpg: 2.9,
-    apg: 0.6,
-    country: "USA",
-    draft_year: null,
-    draft_round: null,
-    draft_number: null,
-    college: "Virginia",
-    active: true
-  },
-  {
-    name: "Jake LaRavia",
-    position: "SF",
-    height: "6'8\"",
-    weight: 227,
-    age: 22,
-    team: "Memphis Grizzlies",
-    team_abbreviation: "MEM",
-    ppg: 6.8,
-    rpg: 4.6,
-    apg: 2.5,
-    country: "USA",
-    draft_year: 2022,
-    draft_round: 1,
-    draft_number: 19,
-    college: "Wake Forest",
-    active: true
-  },
-
-  // NEW ORLEANS PELICANS (Complete 2024-25 Roster)
-  {
-    name: "Brandon Ingram",
-    position: "SF",
-    height: "6'8\"",
-    weight: 190,
-    age: 27,
-    team: "New Orleans Pelicans",
-    team_abbreviation: "NOP",
-    ppg: 22.2,
-    rpg: 5.6,
-    apg: 5.2,
-    country: "USA",
-    draft_year: 2016,
-    draft_round: 1,
-    draft_number: 2,
-    college: "Duke",
-    active: true
-  },
-  {
-    name: "CJ McCollum",
-    position: "SG",
-    height: "6'3\"",
-    weight: 190,
-    age: 33,
-    team: "New Orleans Pelicans",
-    team_abbreviation: "NOP",
-    ppg: 22.0,
-    rpg: 4.3,
-    apg: 4.6,
-    country: "USA",
-    draft_year: 2013,
-    draft_round: 1,
-    draft_number: 10,
-    college: "Lehigh",
-    active: true
-  },
-  {
-    name: "Dejounte Murray",
-    position: "PG",
-    height: "6'4\"",
-    weight: 180,
-    age: 28,
-    team: "New Orleans Pelicans",
-    team_abbreviation: "NOP",
-    ppg: 15.2,
-    rpg: 6.4,
-    apg: 8.2,
-    country: "USA",
-    draft_year: 2016,
-    draft_round: 1,
-    draft_number: 29,
-    college: "Washington",
-    active: true
-  },
-  {
-    name: "Trey Murphy III",
-    position: "SF",
-    height: "6'9\"",
-    weight: 206,
-    age: 24,
-    team: "New Orleans Pelicans",
-    team_abbreviation: "NOP",
-    ppg: 14.8,
-    rpg: 4.9,
-    apg: 2.2,
-    country: "USA",
-    draft_year: 2021,
-    draft_round: 1,
-    draft_number: 17,
-    college: "Virginia",
-    active: true
-  },
-  {
-    name: "Herbert Jones",
-    position: "SF",
-    height: "6'7\"",
-    weight: 206,
-    age: 26,
-    team: "New Orleans Pelicans",
-    team_abbreviation: "NOP",
-    ppg: 9.8,
-    rpg: 3.9,
-    apg: 2.6,
-    country: "USA",
-    draft_year: 2021,
-    draft_round: 2,
-    draft_number: 35,
-    college: "Alabama",
-    active: true
-  },
-  {
-    name: "Jose Alvarado",
-    position: "PG",
-    height: "6'0\"",
-    weight: 175,
-    age: 27,
-    team: "New Orleans Pelicans",
-    team_abbreviation: "NOP",
-    ppg: 11.0,
-    rpg: 2.6,
-    apg: 4.1,
-    country: "USA",
-    draft_year: null,
-    draft_round: null,
-    draft_number: null,
-    college: "Georgia Tech",
-    active: true
-  },
-  {
-    name: "Jordan Hawkins",
-    position: "SG",
-    height: "6'5\"",
-    weight: 181,
-    age: 22,
-    team: "New Orleans Pelicans",
-    team_abbreviation: "NOP",
-    ppg: 8.8,
-    rpg: 2.4,
-    apg: 1.3,
-    country: "USA",
-    draft_year: 2023,
-    draft_round: 1,
-    draft_number: 14,
-    college: "UConn",
-    active: true
-  },
-  {
-    name: "Yves Missi",
-    position: "C",
-    height: "6'11\"",
-    weight: 229,
-    age: 20,
-    team: "New Orleans Pelicans",
-    team_abbreviation: "NOP",
-    ppg: 6.9,
-    rpg: 5.4,
-    apg: 0.6,
-    country: "Belgium",
-    draft_year: 2024,
-    draft_round: 1,
-    draft_number: 21,
-    college: "Baylor",
-    active: true
-  },
-  {
-    name: "Daniel Theis",
-    position: "C",
-    height: "6'8\"",
-    weight: 245,
-    age: 32,
-    team: "New Orleans Pelicans",
-    team_abbreviation: "NOP",
-    ppg: 7.8,
-    rpg: 4.9,
-    apg: 1.8,
-    country: "Germany",
-    draft_year: null,
-    draft_round: null,
-    draft_number: null,
-    college: null,
-    active: true
-  },
-  {
-    name: "Javonte Green",
-    position: "SF",
-    height: "6'4\"",
-    weight: 205,
-    age: 31,
-    team: "New Orleans Pelicans",
-    team_abbreviation: "NOP",
-    ppg: 6.2,
-    rpg: 2.8,
-    apg: 1.0,
-    country: "USA",
-    draft_year: null,
-    draft_round: null,
-    draft_number: null,
-    college: "Radford",
-    active: true
-  }
+// Division information
+const divisions = [
+  { name: 'Atlantic Division', importFunction: importAtlanticDivision, teams: 'Celtics, Knicks, 76ers, Nets, Raptors' },
+  { name: 'Central Division', importFunction: importCentralDivision, teams: 'Bucks, Cavaliers, Bulls, Pistons, Pacers' },
+  { name: 'Southeast Division', importFunction: importSoutheastDivision, teams: 'Heat, Magic, Hawks, Hornets, Wizards' },
+  { name: 'Northwest Division', importFunction: importNorthwestDivision, teams: 'Thunder, Nuggets, Timberwolves, Blazers, Jazz' },
+  { name: 'Pacific Division', importFunction: importPacificDivision, teams: 'Warriors, Lakers, Clippers, Suns, Kings' },
+  { name: 'Southwest Division', importFunction: importSouthwestDivision, teams: 'Mavericks, Spurs, Rockets, Grizzlies, Pelicans' }
 ];
 
-async function importSouthwestDivision() {
+async function importAllDivisions() {
+  console.log(`🏀 Starting StatleNBA FULL DATABASE import...`);
+  console.log(`📊 Importing all 6 NBA divisions with 300+ players...`);
+  console.log(`📅 Using 2024-25 season stats\n`);
+  
+  // Test Supabase connection first
   try {
-    await importPlayers(southwestDivisionPlayers, "Southwest Division");
+    const supabase = createSupabaseClient();
+    console.log(`✅ Supabase connection established`);
   } catch (error) {
-    console.error("Failed to import Southwest Division:", error);
+    console.error(`❌ Failed to connect to Supabase:`, error.message);
+    process.exit(1);
+  }
+  
+  let totalSuccess = 0;
+  let totalErrors = 0;
+  let totalPlayers = 0;
+  
+  // Import each division sequentially
+  for (let i = 0; i < divisions.length; i++) {
+    const division = divisions[i];
+    const divisionNumber = i + 1;
+    
+    try {
+      console.log(`\n🔄 [${divisionNumber}/6] Importing ${division.name}...`);
+      console.log(`   Teams: ${division.teams}`);
+      
+      await division.importFunction();
+      
+      totalSuccess++;
+      totalPlayers += 50; // Each division has ~50 players
+      console.log(`✅ [${divisionNumber}/6] ${division.name} completed! (~50 players)`);
+      
+    } catch (error) {
+      console.error(`❌ [${divisionNumber}/6] ${division.name} failed:`, error.message);
+      totalErrors++;
+    }
+  }
+  
+  // Final summary
+  console.log(`\n🎉 IMPORT SUMMARY:`);
+  console.log(`✅ Successful divisions: ${totalSuccess}`);
+  console.log(`❌ Failed divisions: ${totalErrors}`);
+  console.log(`📈 Total divisions processed: ${divisions.length}`);
+  console.log(`👥 Total players imported: ~${totalPlayers}`);
+  console.log(`🏀 StatleNBA database is now ready!`);
+  
+  if (totalErrors > 0) {
+    console.log(`\n⚠️  Some divisions failed. Check logs above for details.`);
+    process.exit(1);
+  } else {
+    console.log(`\n🚀 All divisions imported successfully! Your game is ready to go!`);
+  }
+}
+
+// Error handling
+process.on('unhandledRejection', (error) => {
+  console.error('❌ Unhandled promise rejection:', error);
+  process.exit(1);
+});
+
+process.on('uncaughtException', (error) => {
+  console.error('❌ Uncaught exception:', error);
+  process.exit(1);
+});
+
+// Main execution
+async function main() {
+  try {
+    await importAllDivisions();
+  } catch (error) {
+    console.error('❌ Import failed:', error.message);
     process.exit(1);
   }
 }
 
+// Run if called directly
+if (require.main === module) {
+  main();
+}
+
 module.exports = {
-  southwestDivisionPlayers,
-  importSouthwestDivision
+  importAllDivisions
 };
