@@ -135,17 +135,17 @@ const AutocompleteInput = ({ onPlayerSelect, placeholder = "Enter NBA player nam
               onClick={() => selectPlayer(player.name)}
               onMouseEnter={() => setSelectedIndex(index)}
             >
-              {/* NEW: Player Headshot */}
+              {/* Player Headshot - TINY SIZE FOR AUTOCOMPLETE */}
               <div className="player-headshot">
                 <PlayerHeadshot 
                   playerName={player.name}
-                  size="small"
+                  size="tiny"
                   showBorder={false}
                   showAnimation={false}
                 />
               </div>
               
-              {/* Updated: Player Info Container */}
+              {/* Player Info Container */}
               <div className="player-info">
                 <span className="player-name">{player.name}</span>
                 <span className="player-details">
@@ -154,7 +154,7 @@ const AutocompleteInput = ({ onPlayerSelect, placeholder = "Enter NBA player nam
                 </span>
               </div>
               
-              {/* NEW: Selection indicator */}
+              {/* Selection indicator */}
               <div className={`selection-indicator ${index === selectedIndex ? 'active' : ''}`}>
                 ⭐
               </div>
