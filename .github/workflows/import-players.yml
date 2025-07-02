@@ -30,11 +30,9 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '18'
-          cache: 'npm'
 
       - name: 📥 Install Dependencies
         run: |
-          npm ci
           npm install @supabase/supabase-js
 
       - name: 🔍 Verify Environment Variables
