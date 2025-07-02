@@ -57,8 +57,6 @@ const AutocompleteInput = ({ onPlayerSelect, placeholder = "Enter NBA player nam
 
   // Handle ALL keyboard events here
   const handleKeyDown = (e) => {
-    console.log('Key event:', e.key, 'Code:', e.code, 'Suggestions visible:', showSuggestions);
-    
     // Don't do anything if no suggestions are visible
     if (!showSuggestions || suggestions.length === 0) {
       if (e.key === 'Enter' && input.trim()) {
@@ -70,10 +68,8 @@ const AutocompleteInput = ({ onPlayerSelect, placeholder = "Enter NBA player nam
     // Handle navigation keys
     if (e.key === 'ArrowDown' || e.code === 'ArrowDown') {
       e.preventDefault();
-      console.log('Down arrow detected');
       setSelectedIndex(prev => {
         const newIndex = prev >= suggestions.length - 1 ? 0 : prev + 1;
-        console.log('New index:', newIndex);
         return newIndex;
       });
       return;
@@ -81,10 +77,8 @@ const AutocompleteInput = ({ onPlayerSelect, placeholder = "Enter NBA player nam
 
     if (e.key === 'ArrowUp' || e.code === 'ArrowUp') {
       e.preventDefault();
-      console.log('Up arrow detected');
       setSelectedIndex(prev => {
         const newIndex = prev <= 0 ? suggestions.length - 1 : prev - 1;
-        console.log('New index:', newIndex);
         return newIndex;
       });
       return;
@@ -92,7 +86,6 @@ const AutocompleteInput = ({ onPlayerSelect, placeholder = "Enter NBA player nam
 
     if (e.key === 'Enter' || e.code === 'Enter') {
       e.preventDefault();
-      console.log('Enter detected, selectedIndex:', selectedIndex);
       if (selectedIndex >= 0 && suggestions[selectedIndex]) {
         selectPlayer(suggestions[selectedIndex].name);
       } else if (input.trim()) {
@@ -149,11 +142,6 @@ const AutocompleteInput = ({ onPlayerSelect, placeholder = "Enter NBA player nam
           ))}
         </div>
       )}
-      
-      {/* Debug info */}
-      <div style={{fontSize: '10px', color: '#999', marginTop: '2px'}}>
-        Selected: {selectedIndex}, Total: {suggestions.length}, Visible: {showSuggestions.toString()}
-      </div>
     </div>
   );
 };
