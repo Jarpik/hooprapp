@@ -204,7 +204,23 @@ Play at: hooprapp.com`;
       // Submit to backend if user is logged in
       submitGameResult(finalScore, finalGuessCount, finalHintsUsed, true);
     } else {
-      setHintsRevealed(hintsRevealed + 1);
+      // Check if maximum guesses reached
+      if (newGuesses.length >= 5) {
+        // Game over - player failed
+        setGameStats({
+          guessCount: newGuesses.length,
+          hintsUsed: hintsRevealed,
+          score: 0,
+          rating: { text: "💔 GAME OVER!", color: "#ef4444" },
+          playerName: dailyPlayer.name
+        });
+        setGameWon(true); // Use same win state to show results
+        
+        // Submit failed game to backend if user is logged in
+        submitGameResult(0, newGuesses.length, hintsRevealed, false);
+      } else {
+        setHintsRevealed(hintsRevealed + 1);
+      }
     }
   };
 
@@ -297,7 +313,7 @@ Play at: hooprapp.com`;
         <div className="header-top">
           <div className="title-section">
             <h1>🏀 StatleNBA</h1>
-            <p className="subtitle">Guess today's NBA player!</p>
+            <p className="subtitle">Guess today's NBA player from the 2024-2025 season!</p>
           </div>
           <div className="auth-section">
             {user ? (
@@ -326,7 +342,6 @@ Play at: hooprapp.com`;
             <div className="hints-section">
               <h3 className="hints-title">
                 🔍 Hints
-                <span className="guess-counter">{hintsRevealed}/8</span>
               </h3>
               <div className="hints-grid">
                 {getHints().map((hint, index) => (
@@ -355,7 +370,7 @@ Play at: hooprapp.com`;
               <div className="guesses-section">
                 <h3 className="guesses-title">
                   ❌ Incorrect Guesses
-                  <span className="guess-counter">{guesses.length}</span>
+                  <span className="guess-counter">{guesses.length}/5</span>
                 </h3>
                 {guesses.map((g, index) => (
                   <div key={index} className="guess-item">
@@ -373,7 +388,11 @@ Play at: hooprapp.com`;
                 {gameStats.rating.text}
               </h2>
               <p className="win-subtitle">
-                You guessed <strong>{gameStats.playerName}</strong>!
+                {gameStats.score > 0 ? (
+                  <>You guessed <strong>{gameStats.playerName}</strong>!</>
+                ) : (
+                  <>The answer was <strong>{gameStats.playerName}</strong>!</>
+                )}
               </p>
               
               <div className="score-stats">
@@ -384,10 +403,6 @@ Play at: hooprapp.com`;
                 <div className="score-item">
                   <div className="score-number">{gameStats.guessCount}</div>
                   <div className="score-label">Guess{gameStats.guessCount !== 1 ? 'es' : ''}</div>
-                </div>
-                <div className="score-item">
-                  <div className="score-number">{gameStats.hintsUsed}</div>
-                  <div className="score-label">Hint{gameStats.hintsUsed !== 1 ? 's' : ''}</div>
                 </div>
               </div>
             </div>
