@@ -361,13 +361,15 @@ h1 {
   }
 }
 
+/* UPDATED: Suggestion item with flexbox layout for headshots */
 .suggestion-item {
   padding: 16px 20px;
   cursor: pointer;
   border-bottom: 1px solid rgba(255, 255, 255, 0.05);
   transition: all 0.2s ease;
-  display: flex;
-  flex-direction: column;
+  display: flex !important;
+  align-items: center !important;
+  gap: 12px !important;
   position: relative;
   overflow: hidden;
 }
@@ -399,26 +401,91 @@ h1 {
   width: 4px;
 }
 
-.player-name {
-  font-size: 16px;
-  font-weight: 600;
-  color: white;
-  margin-bottom: 2px;
-  transition: color 0.2s ease;
+/* NEW: Player headshot container in suggestions */
+.player-headshot {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.player-details {
-  font-size: 14px;
-  color: rgba(255, 255, 255, 0.6);
+/* NEW: Player info container */
+.player-info {
+  flex: 1;
+  min-width: 0; /* Allows text to truncate */
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+/* UPDATED: Player name styles */
+.player-name {
+  font-size: 16px !important;
+  font-weight: 600 !important;
+  color: white !important;
+  margin-bottom: 2px;
   transition: color 0.2s ease;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* UPDATED: Player details styles */
+.player-details {
+  font-size: 14px !important;
+  color: rgba(255, 255, 255, 0.6) !important;
+  transition: color 0.2s ease;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .suggestion-item.active .player-name {
-  color: #f97316;
+  color: #f97316 !important;
 }
 
 .suggestion-item.active .player-details {
-  color: rgba(249, 115, 22, 0.8);
+  color: rgba(249, 115, 22, 0.8) !important;
+}
+
+/* NEW: Selection indicator (star) */
+.selection-indicator {
+  flex-shrink: 0;
+  font-size: 16px;
+  color: #f97316;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.selection-indicator.active {
+  opacity: 1;
+}
+
+/* NEW: Player headshot container in win screen */
+.player-headshot-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 24px;
+  animation: bounceIn 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.player-headshot-win {
+  animation: headshot-entrance 1s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes headshot-entrance {
+  0% {
+    opacity: 0;
+    transform: scale(0.3) rotate(-10deg);
+  }
+  50% {
+    transform: scale(1.1) rotate(5deg);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) rotate(0deg);
+  }
 }
 
 .guesses-section {
@@ -1066,6 +1133,20 @@ h1 {
   .stat-card {
     padding: 16px;
   }
+  
+  /* Mobile autocomplete adjustments */
+  .suggestion-item {
+    gap: 8px !important;
+    padding: 10px 12px !important;
+  }
+  
+  .player-name {
+    font-size: 15px !important;
+  }
+  
+  .player-details {
+    font-size: 13px !important;
+  }
 }
 
 @media (max-width: 480px) {
@@ -1105,12 +1186,12 @@ h1 {
 }
 
 .suggestions-dropdown::-webkit-scrollbar-thumb {
-  background: rgba(249, 115, 22, 0.5);
+  background: rgba(249, 115, 22, 0.6);
   border-radius: 3px;
 }
 
 .suggestions-dropdown::-webkit-scrollbar-thumb:hover {
-  background: rgba(249, 115, 22, 0.7);
+  background: rgba(249, 115, 22, 0.8);
 }
 
 /* Additional micro-interactions */
