@@ -8,7 +8,7 @@ function App() {
   const [dailyPlayer, setDailyPlayer] = useState(null);
   const [guesses, setGuesses] = useState([]);
   const [gameWon, setGameWon] = useState(false);
-  const [hintsRevealed, setHintsRevealed] = useState(0);
+  const [hintsRevealed, setHintsRevealed] = useState(1); // Start with 1 hint revealed
   const [gameStats, setGameStats] = useState(null);
   const [shareText, setShareText] = useState('');
   const [copySuccess, setCopySuccess] = useState(false);
@@ -60,8 +60,9 @@ function App() {
       score -= (guessCount - 1) * 15;
     }
     
-    // Deduct points for each hint used
-    score -= hintsUsed * 10;
+    // Deduct points for each hint used (subtract 1 since first hint is free)
+    const paidHints = Math.max(hintsUsed - 1, 0);
+    score -= paidHints * 10;
     
     // Ensure score doesn't go below 10
     score = Math.max(score, 10);
@@ -96,10 +97,11 @@ function App() {
     // Add correct guess (green square)
     visual += '🟩';
     
-    // Add hint indicators (yellow squares for hints used)
-    if (hintsUsed > 0) {
+    // Add hint indicators (yellow squares for hints used, subtract 1 for free first hint)
+    const paidHints = Math.max(hintsUsed - 1, 0);
+    if (paidHints > 0) {
       visual += ' ';
-      for (let i = 0; i < hintsUsed; i++) {
+      for (let i = 0; i < paidHints; i++) {
         visual += '🟨';
       }
     }
@@ -228,7 +230,7 @@ Play at: hooprapp.com`;
   const resetGame = () => {
     setGuesses([]);
     setGameWon(false);
-    setHintsRevealed(0);
+    setHintsRevealed(1); // Reset to 1 to show first hint
     setGameStats(null);
     setShareText('');
     setCopySuccess(false);
@@ -240,21 +242,41 @@ Play at: hooprapp.com`;
       });
   };
 
+  // Helper function to check if a value exists and is not null/undefined/empty
+  const hasValue = (value) => {
+    return value !== null && value !== undefined && value !== '' && value !== 'null';
+  };
+
+  // Helper function to format draft year display
+  const formatDraftYear = (draftYear) => {
+    if (!hasValue(draftYear)) return null;
+    return `Draft Year: ${draftYear}`;
+  };
+
   const getHints = () => {
     if (!dailyPlayer) return [];
     
-    const allHints = [
-      `Team: ${dailyPlayer.team}`,
-      `Position: ${dailyPlayer.position}`,
-      `Height: ${dailyPlayer.height}`,
-      `Age: ${dailyPlayer.age}`,
-      `Points Per Game: ${dailyPlayer.ppg}`,
-      `Rebounds Per Game: ${dailyPlayer.rpg}`,
-      `Assists Per Game: ${dailyPlayer.apg}`,
-      `Championships: ${dailyPlayer.championships}`
+    // Define all possible hints with null checking
+    const allPossibleHints = [
+      hasValue(dailyPlayer.team) ? `Team: ${dailyPlayer.team}` : null,
+      hasValue(dailyPlayer.position) ? `Position: ${dailyPlayer.position}` : null,
+      hasValue(dailyPlayer.height) ? `Height: ${dailyPlayer.height}` : null,
+      hasValue(dailyPlayer.age) ? `Age: ${dailyPlayer.age}` : null,
+      hasValue(dailyPlayer.ppg) ? `Points Per Game: ${dailyPlayer.ppg}` : null,
+      hasValue(dailyPlayer.rpg) ? `Rebounds Per Game: ${dailyPlayer.rpg}` : null,
+      hasValue(dailyPlayer.apg) ? `Assists Per Game: ${dailyPlayer.apg}` : null,
+      formatDraftYear(dailyPlayer.draft_year), // Using draft_year instead of championships
+      hasValue(dailyPlayer.college) ? `College: ${dailyPlayer.college}` : null,
+      hasValue(dailyPlayer.country) ? `Country: ${dailyPlayer.country}` : null,
+      hasValue(dailyPlayer.weight) ? `Weight: ${dailyPlayer.weight} lbs` : null,
+      hasValue(dailyPlayer.draft_round) ? `Draft Round: ${dailyPlayer.draft_round}` : null
     ];
     
-    return allHints.slice(0, hintsRevealed);
+    // Filter out null values to get only valid hints
+    const validHints = allPossibleHints.filter(hint => hint !== null);
+    
+    // Return the number of hints that should be revealed
+    return validHints.slice(0, hintsRevealed);
   };
 
   if (!dailyPlayer) {
@@ -304,9 +326,7 @@ Play at: hooprapp.com`;
             <div className="hints-section">
               <h3 className="hints-title">
                 🔍 Hints
-                {hintsRevealed > 0 && (
-                  <span className="guess-counter">{hintsRevealed}/8</span>
-                )}
+                <span className="guess-counter">{hintsRevealed}/8</span>
               </h3>
               <div className="hints-grid">
                 {getHints().map((hint, index) => (
@@ -315,9 +335,9 @@ Play at: hooprapp.com`;
                   </div>
                 ))}
               </div>
-              {hintsRevealed === 0 && (
+              {hintsRevealed === 1 && (
                 <div className="no-hints">
-                  Make your first guess to reveal hints about the mystery player!
+                  Use the hint above to make your first guess! Wrong guesses reveal more hints.
                 </div>
               )}
             </div>
@@ -390,38 +410,66 @@ Play at: hooprapp.com`;
             <div className="win-stats">
               <h3 className="stats-title">📊 Player Stats</h3>
               <div className="stats-grid">
-                <div className="stat-item">
-                  <div className="stat-label">Team</div>
-                  <div className="stat-value">{dailyPlayer.team}</div>
-                </div>
-                <div className="stat-item">
-                  <div className="stat-label">Position</div>
-                  <div className="stat-value">{dailyPlayer.position}</div>
-                </div>
-                <div className="stat-item">
-                  <div className="stat-label">Height</div>
-                  <div className="stat-value">{dailyPlayer.height}</div>
-                </div>
-                <div className="stat-item">
-                  <div className="stat-label">Age</div>
-                  <div className="stat-value">{dailyPlayer.age}</div>
-                </div>
-                <div className="stat-item">
-                  <div className="stat-label">Points Per Game</div>
-                  <div className="stat-value">{dailyPlayer.ppg}</div>
-                </div>
-                <div className="stat-item">
-                  <div className="stat-label">Rebounds Per Game</div>
-                  <div className="stat-value">{dailyPlayer.rpg}</div>
-                </div>
-                <div className="stat-item">
-                  <div className="stat-label">Assists Per Game</div>
-                  <div className="stat-value">{dailyPlayer.apg}</div>
-                </div>
-                <div className="stat-item">
-                  <div className="stat-label">Championships</div>
-                  <div className="stat-value">{dailyPlayer.championships}</div>
-                </div>
+                {hasValue(dailyPlayer.team) && (
+                  <div className="stat-item">
+                    <div className="stat-label">Team</div>
+                    <div className="stat-value">{dailyPlayer.team}</div>
+                  </div>
+                )}
+                {hasValue(dailyPlayer.position) && (
+                  <div className="stat-item">
+                    <div className="stat-label">Position</div>
+                    <div className="stat-value">{dailyPlayer.position}</div>
+                  </div>
+                )}
+                {hasValue(dailyPlayer.height) && (
+                  <div className="stat-item">
+                    <div className="stat-label">Height</div>
+                    <div className="stat-value">{dailyPlayer.height}</div>
+                  </div>
+                )}
+                {hasValue(dailyPlayer.age) && (
+                  <div className="stat-item">
+                    <div className="stat-label">Age</div>
+                    <div className="stat-value">{dailyPlayer.age}</div>
+                  </div>
+                )}
+                {hasValue(dailyPlayer.ppg) && (
+                  <div className="stat-item">
+                    <div className="stat-label">Points Per Game</div>
+                    <div className="stat-value">{dailyPlayer.ppg}</div>
+                  </div>
+                )}
+                {hasValue(dailyPlayer.rpg) && (
+                  <div className="stat-item">
+                    <div className="stat-label">Rebounds Per Game</div>
+                    <div className="stat-value">{dailyPlayer.rpg}</div>
+                  </div>
+                )}
+                {hasValue(dailyPlayer.apg) && (
+                  <div className="stat-item">
+                    <div className="stat-label">Assists Per Game</div>
+                    <div className="stat-value">{dailyPlayer.apg}</div>
+                  </div>
+                )}
+                {hasValue(dailyPlayer.draft_year) && (
+                  <div className="stat-item">
+                    <div className="stat-label">Draft Year</div>
+                    <div className="stat-value">{dailyPlayer.draft_year}</div>
+                  </div>
+                )}
+                {hasValue(dailyPlayer.college) && (
+                  <div className="stat-item">
+                    <div className="stat-label">College</div>
+                    <div className="stat-value">{dailyPlayer.college}</div>
+                  </div>
+                )}
+                {hasValue(dailyPlayer.country) && (
+                  <div className="stat-item">
+                    <div className="stat-label">Country</div>
+                    <div className="stat-value">{dailyPlayer.country}</div>
+                  </div>
+                )}
               </div>
             </div>
 
