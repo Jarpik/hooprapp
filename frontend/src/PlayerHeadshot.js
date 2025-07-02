@@ -1,8 +1,9 @@
-// src/PlayerHeadshot.js - Fixed version with proper sizing
+// src/PlayerHeadshot.js - Expanded with most commonly guessed players
 import React, { useState, useEffect } from 'react';
 
-// Manual mapping of player photos - you can expand this list
+// EXPANDED PLAYER PHOTOS - focusing on most commonly searched/guessed players
 const PLAYER_PHOTOS = {
+  // YOUR EXISTING WORKING PLAYERS (keeping these exactly the same)
   "LeBron James": "https://cdn.nba.com/headshots/nba/latest/1040x760/2544.png",
   "Stephen Curry": "https://cdn.nba.com/headshots/nba/latest/1040x760/201939.png",
   "Kevin Durant": "https://cdn.nba.com/headshots/nba/latest/1040x760/201142.png",
@@ -19,7 +20,90 @@ const PLAYER_PHOTOS = {
   "Devin Booker": "https://cdn.nba.com/headshots/nba/latest/1040x760/1626164.png",
   "Ja Morant": "https://cdn.nba.com/headshots/nba/latest/1040x760/1629630.png",
   "Trae Young": "https://cdn.nba.com/headshots/nba/latest/1040x760/1629027.png",
-  "Zion Williamson": "https://cdn.nba.com/headshots/nba/latest/1040x760/1629627.png"
+  "Zion Williamson": "https://cdn.nba.com/headshots/nba/latest/1040x760/1629627.png",
+
+  // MOST COMMONLY GUESSED SUPERSTARS (same NBA CDN pattern)
+  "Kawhi Leonard": "https://cdn.nba.com/headshots/nba/latest/1040x760/202695.png",
+  "Paul George": "https://cdn.nba.com/headshots/nba/latest/1040x760/202331.png",
+  "Russell Westbrook": "https://cdn.nba.com/headshots/nba/latest/1040x760/201566.png",
+  "Chris Paul": "https://cdn.nba.com/headshots/nba/latest/1040x760/101108.png",
+  "Klay Thompson": "https://cdn.nba.com/headshots/nba/latest/1040x760/202691.png",
+  "Draymond Green": "https://cdn.nba.com/headshots/nba/latest/1040x760/203110.png",
+  "Bradley Beal": "https://cdn.nba.com/headshots/nba/latest/1040x760/203078.png",
+  "Karl-Anthony Towns": "https://cdn.nba.com/headshots/nba/latest/1040x760/1626157.png",
+  "Rudy Gobert": "https://cdn.nba.com/headshots/nba/latest/1040x760/203497.png",
+  "Ben Simmons": "https://cdn.nba.com/headshots/nba/latest/1040x760/1627732.png",
+
+  // TOP YOUNG PLAYERS (frequently guessed)
+  "Shai Gilgeous-Alexander": "https://cdn.nba.com/headshots/nba/latest/1040x760/1628983.png",
+  "Victor Wembanyama": "https://cdn.nba.com/headshots/nba/latest/1040x760/1641705.png",
+  "Paolo Banchero": "https://cdn.nba.com/headshots/nba/latest/1040x760/1630567.png",
+  "Scottie Barnes": "https://cdn.nba.com/headshots/nba/latest/1040x760/1630567.png",
+  "Cade Cunningham": "https://cdn.nba.com/headshots/nba/latest/1040x760/1630595.png",
+  "Evan Mobley": "https://cdn.nba.com/headshots/nba/latest/1040x760/1630596.png",
+  "LaMelo Ball": "https://cdn.nba.com/headshots/nba/latest/1040x760/1630163.png",
+  "Anthony Edwards": "https://cdn.nba.com/headshots/nba/latest/1040x760/1630162.png",
+  "Tyler Herro": "https://cdn.nba.com/headshots/nba/latest/1040x760/1629639.png",
+  "RJ Barrett": "https://cdn.nba.com/headshots/nba/latest/1040x760/1629628.png",
+  "Donovan Mitchell": "https://cdn.nba.com/headshots/nba/latest/1040x760/1628378.png",
+  "Jalen Green": "https://cdn.nba.com/headshots/nba/latest/1040x760/1630224.png",
+  "Franz Wagner": "https://cdn.nba.com/headshots/nba/latest/1040x760/1630532.png",
+  "Alperen Şengün": "https://cdn.nba.com/headshots/nba/latest/1040x760/1630578.png",
+
+  // POPULAR VETERANS & ALL-STARS (often searched)
+  "DeMar DeRozan": "https://cdn.nba.com/headshots/nba/latest/1040x760/201942.png",
+  "Kyle Lowry": "https://cdn.nba.com/headshots/nba/latest/1040x760/200768.png",
+  "Al Horford": "https://cdn.nba.com/headshots/nba/latest/1040x760/201143.png",
+  "Blake Griffin": "https://cdn.nba.com/headshots/nba/latest/1040x760/201933.png",
+  "Andre Drummond": "https://cdn.nba.com/headshots/nba/latest/1040x760/203083.png",
+  "CJ McCollum": "https://cdn.nba.com/headshots/nba/latest/1040x760/203468.png",
+  "Tobias Harris": "https://cdn.nba.com/headshots/nba/latest/1040x760/202699.png",
+  "Khris Middleton": "https://cdn.nba.com/headshots/nba/latest/1040x760/203114.png",
+  "Jrue Holiday": "https://cdn.nba.com/headshots/nba/latest/1040x760/201950.png",
+  "Marcus Smart": "https://cdn.nba.com/headshots/nba/latest/1040x760/203935.png",
+
+  // ROLE PLAYERS & BREAKOUT STARS (commonly searched)
+  "Austin Reaves": "https://cdn.nba.com/headshots/nba/latest/1040x760/1630559.png",
+  "Jalen Brunson": "https://cdn.nba.com/headshots/nba/latest/1040x760/1628973.png",
+  "Mikal Bridges": "https://cdn.nba.com/headshots/nba/latest/1040x760/1628969.png",
+  "OG Anunoby": "https://cdn.nba.com/headshots/nba/latest/1040x760/1628384.png",
+  "Jarrett Allen": "https://cdn.nba.com/headshots/nba/latest/1040x760/1628386.png",
+  "Darius Garland": "https://cdn.nba.com/headshots/nba/latest/1040x760/1629636.png",
+  "Desmond Bane": "https://cdn.nba.com/headshots/nba/latest/1040x760/1630217.png",
+  "Tyrese Haliburton": "https://cdn.nba.com/headshots/nba/latest/1040x760/1630169.png",
+  "Anfernee Simons": "https://cdn.nba.com/headshots/nba/latest/1040x760/1629014.png",
+  "Tyrese Maxey": "https://cdn.nba.com/headshots/nba/latest/1040x760/1630178.png",
+
+  // INTERNATIONAL STARS (popular globally)
+  "Lauri Markkanen": "https://cdn.nba.com/headshots/nba/latest/1040x760/1628374.png",
+  "Jonas Valančiūnas": "https://cdn.nba.com/headshots/nba/latest/1040x760/202685.png",
+  "Kristaps Porziņģis": "https://cdn.nba.com/headshots/nba/latest/1040x760/204001.png",
+  "Bogdan Bogdanović": "https://cdn.nba.com/headshots/nba/latest/1040x760/203992.png",
+  "Nikola Vučević": "https://cdn.nba.com/headshots/nba/latest/1040x760/202696.png",
+  "Domantas Sabonis": "https://cdn.nba.com/headshots/nba/latest/1040x760/1627734.png",
+  "Rui Hachimura": "https://cdn.nba.com/headshots/nba/latest/1040x760/1629060.png",
+  "Dennis Schröder": "https://cdn.nba.com/headshots/nba/latest/1040x760/203471.png",
+
+  // DEFENSIVE SPECIALISTS & KEY ROLE PLAYERS
+  "Robert Williams III": "https://cdn.nba.com/headshots/nba/latest/1040x760/1629057.png",
+  "Matisse Thybulle": "https://cdn.nba.com/headshots/nba/latest/1040x760/1629680.png",
+  "Lu Dort": "https://cdn.nba.com/headshots/nba/latest/1040x760/1629472.png",
+  "Alex Caruso": "https://cdn.nba.com/headshots/nba/latest/1040x760/1627936.png",
+  "Derrick White": "https://cdn.nba.com/headshots/nba/latest/1040x760/1628401.png",
+  "Gary Trent Jr.": "https://cdn.nba.com/headshots/nba/latest/1040x760/1629018.png",
+
+  // BENCH STARS & SIXTH MAN CANDIDATES
+  "Jordan Clarkson": "https://cdn.nba.com/headshots/nba/latest/1040x760/203903.png",
+  "Jordan Poole": "https://cdn.nba.com/headshots/nba/latest/1040x760/1629673.png",
+  "Immanuel Quickley": "https://cdn.nba.com/headshots/nba/latest/1040x760/1630193.png",
+  "Cam Thomas": "https://cdn.nba.com/headshots/nba/latest/1040x760/1630214.png",
+  "Malik Monk": "https://cdn.nba.com/headshots/nba/latest/1040x760/1628370.png",
+
+  // CLASSIC VETERANS (still popular)
+  "Kevin Love": "https://cdn.nba.com/headshots/nba/latest/1040x760/201567.png",
+  "Gordon Hayward": "https://cdn.nba.com/headshots/nba/latest/1040x760/202330.png",
+  "Mike Conley": "https://cdn.nba.com/headshots/nba/latest/1040x760/201144.png",
+  "D'Angelo Russell": "https://cdn.nba.com/headshots/nba/latest/1040x760/1626156.png"
 };
 
 const PlayerHeadshot = ({ 
