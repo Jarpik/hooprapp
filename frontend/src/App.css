@@ -164,6 +164,7 @@ h1 {
   overflow: hidden;
   transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
   backdrop-filter: blur(10px);
+  z-index: 50; /* Lower z-index than input section */
 }
 
 .hints-section:hover {
@@ -290,6 +291,9 @@ h1 {
   gap: 16px;
   align-items: stretch;
   animation: slideInUp 0.6s ease-out 0.2s both;
+  position: relative;
+  z-index: 500; /* Higher z-index than guesses section */
+  margin-bottom: 1.5rem; /* Extra spacing */
 }
 
 .input-wrapper {
@@ -300,6 +304,7 @@ h1 {
 .autocomplete-container {
   position: relative;
   width: 100%;
+  z-index: 1000; /* High z-index for the container */
 }
 
 .player-input {
@@ -315,6 +320,7 @@ h1 {
   transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
   font-family: inherit;
   position: relative;
+  z-index: 501; /* Above other elements but below dropdown */
 }
 
 .player-input:focus {
@@ -340,11 +346,11 @@ h1 {
   right: 0;
   background: rgba(15, 23, 42, 0.95);
   backdrop-filter: blur(20px);
-  border: 2px solid rgba(249, 115, 22, 0.2);
+  border: 2px solid rgba(249, 115, 22, 0.4);
   border-top: none;
   border-radius: 0 0 20px 20px;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-  z-index: 1000;
+  z-index: 1001; /* Highest z-index for dropdown */
   max-height: 300px;
   overflow-y: auto;
   animation: dropdownSlide 0.3s ease-out;
@@ -401,7 +407,7 @@ h1 {
   width: 4px;
 }
 
-/* FIXED: Player headshot container in suggestions - proper sizing */
+/* CRITICAL FIX: Player headshot sizing in autocomplete */
 .player-headshot {
   flex-shrink: 0;
   display: flex;
@@ -409,37 +415,62 @@ h1 {
   justify-content: center;
 }
 
-/* CRITICAL FIX: Override headshot size specifically in autocomplete */
-.suggestion-item .player-headshot {
-  width: 32px !important;
-  height: 32px !important;
-  flex-shrink: 0;
-}
-
-.suggestion-item .player-headshot > div {
+/* Force exact sizing for autocomplete headshots */
+.suggestion-item .player-headshot,
+.autocomplete-option .player-headshot {
   width: 32px !important;
   height: 32px !important;
   min-width: 32px !important;
   min-height: 32px !important;
+  max-width: 32px !important;
+  max-height: 32px !important;
+  flex-shrink: 0;
 }
 
-.suggestion-item .player-headshot img {
+.suggestion-item .player-headshot > div,
+.autocomplete-option .player-headshot > div {
   width: 32px !important;
   height: 32px !important;
+  min-width: 32px !important;
+  min-height: 32px !important;
+  max-width: 32px !important;
+  max-height: 32px !important;
+}
+
+.suggestion-item .player-headshot img,
+.autocomplete-option .player-headshot img {
+  width: 32px !important;
+  height: 32px !important;
+  min-width: 32px !important;
+  min-height: 32px !important;
+  max-width: 32px !important;
+  max-height: 32px !important;
   object-fit: cover !important;
 }
 
-/* NEW: Player info container */
+/* Force tiny size override */
+.player-headshot.size-tiny,
+.player-headshot.size-tiny > div,
+.player-headshot.size-tiny img {
+  width: 32px !important;
+  height: 32px !important;
+  min-width: 32px !important;
+  min-height: 32px !important;
+  max-width: 32px !important;
+  max-height: 32px !important;
+}
+
+/* Player info container */
 .player-info {
   flex: 1;
-  min-width: 0; /* Allows text to truncate */
+  min-width: 0;
   display: flex;
   flex-direction: column;
   gap: 2px;
   overflow: hidden;
 }
 
-/* UPDATED: Player name styles */
+/* Player name styles */
 .player-name {
   font-size: 14px !important;
   font-weight: 600 !important;
@@ -452,7 +483,7 @@ h1 {
   line-height: 1.2 !important;
 }
 
-/* UPDATED: Player details styles */
+/* Player details styles */
 .player-details {
   font-size: 12px !important;
   color: rgba(255, 255, 255, 0.6) !important;
@@ -471,7 +502,7 @@ h1 {
   color: rgba(249, 115, 22, 0.8) !important;
 }
 
-/* NEW: Selection indicator (star) */
+/* Selection indicator */
 .selection-indicator {
   flex-shrink: 0;
   font-size: 16px;
@@ -484,7 +515,7 @@ h1 {
   opacity: 1;
 }
 
-/* NEW: Player headshot container in win screen */
+/* Player headshot container in win screen */
 .player-headshot-container {
   display: flex;
   justify-content: center;
@@ -511,7 +542,9 @@ h1 {
   }
 }
 
-.guesses-section {
+.guesses-section,
+.wrong-guesses,
+.failed-attempts {
   background: linear-gradient(135deg, rgba(220, 38, 38, 0.15), rgba(239, 68, 68, 0.1));
   border-radius: 24px;
   padding: 32px;
@@ -520,9 +553,12 @@ h1 {
   overflow: hidden;
   animation: slideInUp 0.6s ease-out;
   backdrop-filter: blur(10px);
+  z-index: 100; /* Lower z-index than input section */
+  margin-top: 1.5rem; /* Extra spacing from input */
 }
 
-.guesses-section::before {
+.guesses-section::before,
+.wrong-guesses::before {
   content: '';
   position: absolute;
   top: 0;
@@ -552,7 +588,8 @@ h1 {
   border: 1px solid rgba(220, 38, 38, 0.3);
 }
 
-.guess-item {
+.guess-item,
+.failed-attempt {
   background: linear-gradient(135deg, rgba(220, 38, 38, 0.2), rgba(220, 38, 38, 0.1));
   margin: 12px 0;
   padding: 18px 20px;
@@ -565,12 +602,14 @@ h1 {
   backdrop-filter: blur(5px);
 }
 
-.guess-item:hover {
+.guess-item:hover,
+.failed-attempt:hover {
   transform: translateX(4px);
   border-color: rgba(220, 38, 38, 0.5);
 }
 
-.guess-item::before {
+.guess-item::before,
+.failed-attempt::before {
   content: '❌';
   margin-right: 12px;
   animation: bounce 0.5s ease-out;
@@ -965,6 +1004,7 @@ h1 {
     0 0 0 1px rgba(255, 255, 255, 0.2);
   border: 1px solid rgba(255, 255, 255, 0.2);
   animation: modalSlideIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  z-index: 2001;
 }
 
 @keyframes modalSlideIn {
@@ -1060,6 +1100,58 @@ h1 {
   100% { opacity: 1; transform: translateX(0); }
 }
 
+/* Stats section styling */
+.stats-title {
+  color: #10b981;
+  margin-bottom: 24px;
+  font-size: 1.5rem;
+  font-weight: 700;
+  animation: slideInLeft 0.6s ease-out;
+}
+
+.stats-grid {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+}
+
+.stat-item {
+  background: rgba(0, 0, 0, 0.3);
+  padding: 20px;
+  border-radius: 16px;
+  border: 1px solid rgba(16, 185, 129, 0.2);
+  text-align: left;
+  transition: all 0.3s ease;
+  animation: statCardIn 0.5s ease-out;
+  animation-delay: calc(var(--stat-index) * 0.1s);
+  animation-fill-mode: both;
+  backdrop-filter: blur(5px);
+}
+
+.stat-item:hover {
+  transform: translateY(-4px);
+  border-color: rgba(16, 185, 129, 0.4);
+  box-shadow: 0 8px 24px rgba(16, 185, 129, 0.2);
+}
+
+.stat-item:nth-child(1) { --stat-index: 1; }
+.stat-item:nth-child(2) { --stat-index: 2; }
+.stat-item:nth-child(3) { --stat-index: 3; }
+.stat-item:nth-child(4) { --stat-index: 4; }
+.stat-item:nth-child(5) { --stat-index: 5; }
+.stat-item:nth-child(6) { --stat-index: 6; }
+
+@keyframes statCardIn {
+  from { 
+    opacity: 0; 
+    transform: translateY(20px) scale(0.9); 
+  }
+  to { 
+    opacity: 1; 
+    transform: translateY(0) scale(1); 
+  }
+}
+
 /* Enhanced Mobile Responsiveness */
 @media (max-width: 768px) {
   .App-header {
@@ -1120,22 +1212,50 @@ h1 {
     font-size: 11px !important;
   }
   
-  /* Mobile headshot sizing */
-  .suggestion-item .player-headshot {
-    width: 28px !important;
-    height: 28px !important;
-  }
-  
-  .suggestion-item .player-headshot > div {
+  /* Mobile headshot sizing - smaller for better fit */
+  .suggestion-item .player-headshot,
+  .autocomplete-option .player-headshot {
     width: 28px !important;
     height: 28px !important;
     min-width: 28px !important;
     min-height: 28px !important;
+    max-width: 28px !important;
+    max-height: 28px !important;
   }
   
-  .suggestion-item .player-headshot img {
+  .suggestion-item .player-headshot > div,
+  .autocomplete-option .player-headshot > div {
     width: 28px !important;
     height: 28px !important;
+    min-width: 28px !important;
+    min-height: 28px !important;
+    max-width: 28px !important;
+    max-height: 28px !important;
+  }
+  
+  .suggestion-item .player-headshot img,
+  .autocomplete-option .player-headshot img {
+    width: 28px !important;
+    height: 28px !important;
+    min-width: 28px !important;
+    min-height: 28px !important;
+    max-width: 28px !important;
+    max-height: 28px !important;
+  }
+  
+  /* Mobile dropdown sizing */
+  .suggestions-dropdown {
+    max-height: 250px;
+  }
+  
+  /* Extra spacing for mobile */
+  .game-container > * + * {
+    margin-top: 1.25rem;
+  }
+  
+  .guesses-section,
+  .wrong-guesses {
+    margin-top: 1.25rem;
   }
 }
 
@@ -1162,6 +1282,37 @@ h1 {
   .win-stats,
   .score-summary {
     padding: 24px;
+  }
+  
+  /* Even smaller headshots for very small screens */
+  .suggestion-item .player-headshot,
+  .autocomplete-option .player-headshot {
+    width: 24px !important;
+    height: 24px !important;
+    min-width: 24px !important;
+    min-height: 24px !important;
+    max-width: 24px !important;
+    max-height: 24px !important;
+  }
+  
+  .suggestion-item .player-headshot > div,
+  .autocomplete-option .player-headshot > div {
+    width: 24px !important;
+    height: 24px !important;
+    min-width: 24px !important;
+    min-height: 24px !important;
+    max-width: 24px !important;
+    max-height: 24px !important;
+  }
+  
+  .suggestion-item .player-headshot img,
+  .autocomplete-option .player-headshot img {
+    width: 24px !important;
+    height: 24px !important;
+    min-width: 24px !important;
+    min-height: 24px !important;
+    max-width: 24px !important;
+    max-height: 24px !important;
   }
 }
 
@@ -1202,6 +1353,23 @@ h1 {
   outline-offset: 2px;
 }
 
+/* Enhanced autocomplete focus states */
+.suggestion-item:focus,
+.suggestion-item[aria-selected="true"] {
+  background: rgba(249, 115, 22, 0.2);
+  outline: 2px solid #f97316;
+  outline-offset: -2px;
+}
+
+/* Ensure proper layering order */
+.game-container {
+  position: relative;
+}
+
+.game-container > * {
+  position: relative;
+}
+
 /* Reduced motion support */
 @media (prefers-reduced-motion: reduce) {
   *,
@@ -1211,55 +1379,4 @@ h1 {
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
   }
-}s-title {
-  color: #10b981;
-  margin-bottom: 24px;
-  font-size: 1.5rem;
-  font-weight: 700;
-  animation: slideInLeft 0.6s ease-out;
 }
-
-.stats-grid {
-  display: grid;
-  gap: 16px;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-}
-
-.stat-item {
-  background: rgba(0, 0, 0, 0.3);
-  padding: 20px;
-  border-radius: 16px;
-  border: 1px solid rgba(16, 185, 129, 0.2);
-  text-align: left;
-  transition: all 0.3s ease;
-  animation: statCardIn 0.5s ease-out;
-  animation-delay: calc(var(--stat-index) * 0.1s);
-  animation-fill-mode: both;
-  backdrop-filter: blur(5px);
-}
-
-.stat-item:hover {
-  transform: translateY(-4px);
-  border-color: rgba(16, 185, 129, 0.4);
-  box-shadow: 0 8px 24px rgba(16, 185, 129, 0.2);
-}
-
-.stat-item:nth-child(1) { --stat-index: 1; }
-.stat-item:nth-child(2) { --stat-index: 2; }
-.stat-item:nth-child(3) { --stat-index: 3; }
-.stat-item:nth-child(4) { --stat-index: 4; }
-.stat-item:nth-child(5) { --stat-index: 5; }
-.stat-item:nth-child(6) { --stat-index: 6; }
-
-@keyframes statCardIn {
-  from { 
-    opacity: 0; 
-    transform: translateY(20px) scale(0.9); 
-  }
-  to { 
-    opacity: 1; 
-    transform: translateY(0) scale(1); 
-  }
-}
-
-.stat
