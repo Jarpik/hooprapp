@@ -3,6 +3,7 @@ import './App.css';
 import AutocompleteInput from './AutocompleteInput';
 import AuthModal from './AuthModal';
 import UserStats from './UserStats';
+import PlayerHeadshot from './PlayerHeadshot';
 
 function App() {
   const [dailyPlayer, setDailyPlayer] = useState(null);
@@ -382,6 +383,15 @@ Play at: hooprapp.com`;
           </div>
         ) : (
           <div className="win-container">
+            {/* Player Headshot - Added at the top of win screen */}
+            <div className="player-headshot-container" style={{ textAlign: 'center', marginBottom: '24px' }}>
+              <PlayerHeadshot 
+                playerName={gameStats.playerName}
+                size="xlarge"
+                className="player-headshot-win"
+              />
+            </div>
+
             {/* Score Summary Section */}
             <div className="score-summary">
               <h2 className="win-title" style={{ color: gameStats.rating.color }}>
