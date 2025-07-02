@@ -1,28 +1,25 @@
-// src/PlayerHeadshot.js
+// src/PlayerHeadshot.js - Simple version with direct photo URLs
 import React, { useState, useEffect } from 'react';
 
-// Starting with a small set of popular players - we'll expand this
-const PLAYER_PHOTO_MAPPING = {
-  "LeBron James": "2544",
-  "Stephen Curry": "201939", 
-  "Kevin Durant": "201142",
-  "Giannis Antetokounmpo": "203507",
-  "Luka Dončić": "1629029",
-  "Jayson Tatum": "1628369",
-  "Joel Embiid": "203954",
-  "Nikola Jokić": "203999",
-  "Jimmy Butler": "202710",
-  "Kawhi Leonard": "202695",
-  "Anthony Davis": "203076",
-  "Damian Lillard": "203081",
-  "Russell Westbrook": "201566",
-  "Chris Paul": "101108",
-  "James Harden": "201935",
-  "Kyrie Irving": "202681",
-  "Paul George": "202331",
-  "Klay Thompson": "202691",
-  "Draymond Green": "203110",
-  "Devin Booker": "1626164"
+// Manual mapping of player photos - you can expand this list
+const PLAYER_PHOTOS = {
+  "LeBron James": "https://cdn.nba.com/headshots/nba/latest/1040x760/2544.png",
+  "Stephen Curry": "https://cdn.nba.com/headshots/nba/latest/1040x760/201939.png",
+  "Kevin Durant": "https://cdn.nba.com/headshots/nba/latest/1040x760/201142.png",
+  "Giannis Antetokounmpo": "https://cdn.nba.com/headshots/nba/latest/1040x760/203507.png",
+  "Luka Dončić": "https://cdn.nba.com/headshots/nba/latest/1040x760/1629029.png",
+  "Jayson Tatum": "https://cdn.nba.com/headshots/nba/latest/1040x760/1628369.png",
+  "Joel Embiid": "https://cdn.nba.com/headshots/nba/latest/1040x760/203954.png",
+  "Nikola Jokić": "https://cdn.nba.com/headshots/nba/latest/1040x760/203999.png",
+  "Jimmy Butler": "https://cdn.nba.com/headshots/nba/latest/1040x760/202710.png",
+  "Anthony Davis": "https://cdn.nba.com/headshots/nba/latest/1040x760/203076.png",
+  "Damian Lillard": "https://cdn.nba.com/headshots/nba/latest/1040x760/203081.png",
+  "James Harden": "https://cdn.nba.com/headshots/nba/latest/1040x760/201935.png",
+  "Kyrie Irving": "https://cdn.nba.com/headshots/nba/latest/1040x760/202681.png",
+  "Devin Booker": "https://cdn.nba.com/headshots/nba/latest/1040x760/1626164.png",
+  "Ja Morant": "https://cdn.nba.com/headshots/nba/latest/1040x760/1629630.png",
+  "Trae Young": "https://cdn.nba.com/headshots/nba/latest/1040x760/1629027.png",
+  "Zion Williamson": "https://cdn.nba.com/headshots/nba/latest/1040x760/1629627.png"
 };
 
 const PlayerHeadshot = ({ 
@@ -40,33 +37,28 @@ const PlayerHeadshot = ({
     setIsLoading(true);
     setHasError(false);
     
-    // Check if we have a known player ID
-    const playerId = PLAYER_PHOTO_MAPPING[playerName];
+    // Check if we have a direct photo URL for this player
+    const photoUrl = PLAYER_PHOTOS[playerName];
     
-    if (playerId) {
-      // Use NBA.com official headshots
-      const nbaUrl = `https://cdn.nba.com/headshots/nba/latest/1040x760/${playerId}.png`;
-      tryLoadImage(nbaUrl);
+    if (photoUrl) {
+      // Test if the image loads
+      const img = new Image();
+      img.onload = () => {
+        setImageSrc(photoUrl);
+        setIsLoading(false);
+        setHasError(false);
+      };
+      img.onerror = () => {
+        setHasError(true);
+        setIsLoading(false);
+      };
+      img.src = photoUrl;
     } else {
-      // For unknown players, go straight to fallback
+      // No photo available for this player
       setHasError(true);
       setIsLoading(false);
     }
   }, [playerName]);
-
-  const tryLoadImage = (url) => {
-    const img = new Image();
-    img.onload = () => {
-      setImageSrc(url);
-      setIsLoading(false);
-      setHasError(false);
-    };
-    img.onerror = () => {
-      setHasError(true);
-      setIsLoading(false);
-    };
-    img.src = url;
-  };
 
   const sizeClasses = {
     small: "w-12 h-12",
