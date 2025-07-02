@@ -1,4 +1,4 @@
-// src/PlayerHeadshot.js - Simple version with direct photo URLs
+// src/PlayerHeadshot.js - Fixed version with proper sizing
 import React, { useState, useEffect } from 'react';
 
 // Manual mapping of player photos - you can expand this list
@@ -60,14 +60,20 @@ const PlayerHeadshot = ({
     }
   }, [playerName]);
 
-  const sizeClasses = {
-    small: "w-12 h-12",
-    medium: "w-20 h-20", 
-    large: "w-32 h-32",
-    xlarge: "w-48 h-48"
+  // FIXED: Use inline styles instead of Tailwind classes for precise control
+  const getSizeStyles = (size) => {
+    const sizes = {
+      tiny: { width: '32px', height: '32px' },
+      small: { width: '48px', height: '48px' },
+      medium: { width: '80px', height: '80px' },
+      large: { width: '128px', height: '128px' },
+      xlarge: { width: '192px', height: '192px' }
+    };
+    return sizes[size] || sizes.large;
   };
 
-  const borderClass = showBorder ? "border-2 border-orange-400" : "";
+  const sizeStyles = getSizeStyles(size);
+  const borderStyle = showBorder ? '2px solid #f97316' : 'none';
 
   // Generate initials for fallback
   const getInitials = (name) => {
@@ -78,49 +84,95 @@ const PlayerHeadshot = ({
       .toUpperCase();
   };
 
+  const baseStyles = {
+    ...sizeStyles,
+    borderRadius: '50%',
+    border: borderStyle,
+    boxShadow: '0 4px 12px rgba(0, 0, 0, 0.3)',
+    transition: 'all 0.3s ease',
+    position: 'relative',
+    overflow: 'hidden'
+  };
+
   // Fallback avatar with initials
   if (hasError || !imageSrc) {
     const initials = getInitials(playerName);
     return (
-      <div className={`${sizeClasses[size]} ${className} relative group`}>
-        <div className={`w-full h-full bg-gradient-to-br from-orange-500 to-red-600 rounded-full flex items-center justify-center ${borderClass} shadow-lg transition-all duration-300 ${showAnimation ? 'group-hover:scale-105' : ''}`}>
-          <span className="text-white font-bold text-lg">
-            {initials}
-          </span>
-        </div>
-        {showAnimation && (
-          <div className="absolute -inset-1 bg-gradient-to-r from-orange-400 to-red-500 rounded-full opacity-0 group-hover:opacity-30 transition-opacity duration-300"></div>
-        )}
+      <div 
+        className={`${className} ${showAnimation ? 'group' : ''}`}
+        style={{
+          ...baseStyles,
+          background: 'linear-gradient(135deg, #f97316, #dc2626)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          cursor: showAnimation ? 'pointer' : 'default'
+        }}
+        onMouseEnter={(e) => {
+          if (showAnimation) {
+            e.target.style.transform = 'scale(1.05)';
+          }
+        }}
+        onMouseLeave={(e) => {
+          if (showAnimation) {
+            e.target.style.transform = 'scale(1)';
+          }
+        }}
+      >
+        <span 
+          style={{
+            color: 'white',
+            fontWeight: 'bold',
+            fontSize: size === 'tiny' ? '12px' : size === 'small' ? '14px' : '18px'
+          }}
+        >
+          {initials}
+        </span>
       </div>
     );
   }
 
   return (
-    <div className={`${sizeClasses[size]} ${className} relative group`}>
+    <div className={`${className} ${showAnimation ? 'group' : ''}`}>
       {isLoading && (
-        <div className={`absolute inset-0 bg-gradient-to-br from-gray-200 to-gray-300 animate-pulse rounded-full ${borderClass}`} />
+        <div 
+          style={{
+            ...baseStyles,
+            background: 'linear-gradient(135deg, #e5e7eb, #d1d5db)',
+            animation: 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite'
+          }}
+        />
       )}
       
       <img
         src={imageSrc}
         alt={`${playerName} headshot`}
-        className={`
-          w-full h-full object-cover rounded-full ${borderClass} shadow-xl 
-          transition-all duration-500 ease-out
-          ${isLoading ? 'opacity-0 scale-95' : 'opacity-100 scale-100'}
-          ${showAnimation ? 'group-hover:scale-105 group-hover:shadow-2xl' : ''}
-        `}
+        style={{
+          ...baseStyles,
+          objectFit: 'cover',
+          opacity: isLoading ? 0 : 1,
+          transform: isLoading ? 'scale(0.95)' : 'scale(1)',
+          cursor: showAnimation ? 'pointer' : 'default'
+        }}
         onLoad={() => setIsLoading(false)}
         onError={() => {
           setHasError(true);
           setIsLoading(false);
         }}
+        onMouseEnter={(e) => {
+          if (showAnimation && !isLoading) {
+            e.target.style.transform = 'scale(1.05)';
+            e.target.style.boxShadow = '0 8px 24px rgba(0, 0, 0, 0.4)';
+          }
+        }}
+        onMouseLeave={(e) => {
+          if (showAnimation && !isLoading) {
+            e.target.style.transform = 'scale(1)';
+            e.target.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.3)';
+          }
+        }}
         loading="lazy"
       />
-      
-      {showAnimation && !isLoading && !hasError && (
-        <div className="absolute -inset-1 bg-gradient-to-r from-orange-400 via-red-500 to-orange-400 rounded-full opacity-0 group-hover:opacity-40 transition-opacity duration-300"></div>
-      )}
     </div>
   );
 };
