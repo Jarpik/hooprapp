@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import PlayerHeadshot from './PlayerHeadshot';
 
 const AutocompleteInput = ({ onPlayerSelect, placeholder = "Enter NBA player name..." }) => {
   const [input, setInput] = useState('');
@@ -134,10 +135,29 @@ const AutocompleteInput = ({ onPlayerSelect, placeholder = "Enter NBA player nam
               onClick={() => selectPlayer(player.name)}
               onMouseEnter={() => setSelectedIndex(index)}
             >
-              <span className="player-name">{player.name}</span>
-              <span className="player-details">
-                {player.team} • {player.position}
-              </span>
+              {/* NEW: Player Headshot */}
+              <div className="player-headshot">
+                <PlayerHeadshot 
+                  playerName={player.name}
+                  size="small"
+                  showBorder={false}
+                  showAnimation={false}
+                />
+              </div>
+              
+              {/* Updated: Player Info Container */}
+              <div className="player-info">
+                <span className="player-name">{player.name}</span>
+                <span className="player-details">
+                  {player.team} • {player.position}
+                  {player.ppg && ` • ${player.ppg} PPG`}
+                </span>
+              </div>
+              
+              {/* NEW: Selection indicator */}
+              <div className={`selection-indicator ${index === selectedIndex ? 'active' : ''}`}>
+                ⭐
+              </div>
             </div>
           ))}
         </div>
