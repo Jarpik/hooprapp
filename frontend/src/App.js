@@ -4,7 +4,8 @@ import AutocompleteInput from './AutocompleteInput';
 import AuthModal from './AuthModal';
 import UserStats from './UserStats';
 import PlayerHeadshot from './PlayerHeadshot';
-import ConfettiAnimation from './ConfettiAnimation'; // NEW: Import confetti component
+import ConfettiAnimation from './ConfettiAnimation';
+import ProgressVisualization from './ProgressVisualization'; // NEW: Import progress visualization
 
 function App() {
   const [dailyPlayer, setDailyPlayer] = useState(null);
@@ -14,7 +15,7 @@ function App() {
   const [gameStats, setGameStats] = useState(null);
   const [shareText, setShareText] = useState('');
   const [copySuccess, setCopySuccess] = useState(false);
-  const [showConfetti, setShowConfetti] = useState(false); // NEW: Confetti state
+  const [showConfetti, setShowConfetti] = useState(false);
   
   // User authentication states
   const [user, setUser] = useState(null);
@@ -73,6 +74,39 @@ function App() {
     score = Math.max(score, 10);
     
     return score;
+  };
+
+  // NEW: Calculate current score preview for progress visualization
+  const calculateCurrentScore = () => {
+    if (gameWon) {
+      return gameStats?.score || 0;
+    }
+    // Calculate preview score based on current state
+    const currentGuessCount = guesses.length > 0 ? guesses.length + 1 : 1; // +1 for the guess they're about to make
+    return calculateScore(currentGuessCount, hintsRevealed);
+  };
+
+  // NEW: Get maximum hints available for this player
+  const getMaxHints = () => {
+    if (!dailyPlayer) return 12;
+    
+    // Count all valid hints (same logic as getHints())
+    const allPossibleHints = [
+      hasValue(dailyPlayer.team) ? `Team: ${dailyPlayer.team}` : null,
+      hasValue(dailyPlayer.position) ? `Position: ${dailyPlayer.position}` : null,
+      hasValue(dailyPlayer.height) ? `Height: ${dailyPlayer.height}` : null,
+      hasValue(dailyPlayer.age) ? `Age: ${dailyPlayer.age}` : null,
+      hasValue(dailyPlayer.ppg) ? `Points Per Game: ${dailyPlayer.ppg}` : null,
+      hasValue(dailyPlayer.rpg) ? `Rebounds Per Game: ${dailyPlayer.rpg}` : null,
+      hasValue(dailyPlayer.apg) ? `Assists Per Game: ${dailyPlayer.apg}` : null,
+      formatDraftYear(dailyPlayer.draft_year),
+      hasValue(dailyPlayer.college) ? `College: ${dailyPlayer.college}` : null,
+      hasValue(dailyPlayer.country) ? `Country: ${dailyPlayer.country}` : null,
+      hasValue(dailyPlayer.weight) ? `Weight: ${dailyPlayer.weight} lbs` : null,
+      hasValue(dailyPlayer.draft_round) ? `Draft Round: ${dailyPlayer.draft_round}` : null
+    ];
+    
+    return allPossibleHints.filter(hint => hint !== null).length;
   };
 
   // Get performance rating
@@ -202,11 +236,11 @@ Play at: hooprapp.com`;
         score: finalScore,
         rating: rating,
         playerName: dailyPlayer.name,
-        playerPhotoUrl: dailyPlayer.headshot_url // ADDED: Store photo URL in game stats
+        playerPhotoUrl: dailyPlayer.headshot_url
       });
       
       setGameWon(true);
-      setShowConfetti(true); // NEW: Trigger confetti on win!
+      setShowConfetti(true);
       
       // Submit to backend if user is logged in
       submitGameResult(finalScore, finalGuessCount, finalHintsUsed, true);
@@ -220,7 +254,7 @@ Play at: hooprapp.com`;
           score: 0,
           rating: { text: "💔 GAME OVER!", color: "#ef4444" },
           playerName: dailyPlayer.name,
-          playerPhotoUrl: dailyPlayer.headshot_url // ADDED: Store photo URL for game over too
+          playerPhotoUrl: dailyPlayer.headshot_url
         });
         setGameWon(true); // Use same win state to show results
         
@@ -260,7 +294,7 @@ Play at: hooprapp.com`;
     setGameStats(null);
     setShareText('');
     setCopySuccess(false);
-    setShowConfetti(false); // NEW: Reset confetti state
+    setShowConfetti(false);
     
     // Fetch a new daily player
     fetch('https://hooprapp.onrender.com/api/daily-player')
@@ -294,7 +328,7 @@ Play at: hooprapp.com`;
       hasValue(dailyPlayer.ppg) ? `Points Per Game: ${dailyPlayer.ppg}` : null,
       hasValue(dailyPlayer.rpg) ? `Rebounds Per Game: ${dailyPlayer.rpg}` : null,
       hasValue(dailyPlayer.apg) ? `Assists Per Game: ${dailyPlayer.apg}` : null,
-      formatDraftYear(dailyPlayer.draft_year), // Using draft_year instead of championships
+      formatDraftYear(dailyPlayer.draft_year),
       hasValue(dailyPlayer.college) ? `College: ${dailyPlayer.college}` : null,
       hasValue(dailyPlayer.country) ? `Country: ${dailyPlayer.country}` : null,
       hasValue(dailyPlayer.weight) ? `Weight: ${dailyPlayer.weight} lbs` : null,
@@ -352,6 +386,17 @@ Play at: hooprapp.com`;
         
         {!gameWon ? (
           <div className="game-container">
+            {/* NEW: Progress Visualization Component */}
+            <ProgressVisualization 
+              guessCount={guesses.length}
+              maxGuesses={5}
+              hintsRevealed={hintsRevealed}
+              maxHints={getMaxHints()}
+              currentScore={calculateCurrentScore()}
+              gameWon={gameWon}
+              gameFailed={guesses.length >= 5 && !gameWon}
+            />
+            
             <div className="hints-section">
               <h3 className="hints-title">
                 🔍 Hints
@@ -395,11 +440,11 @@ Play at: hooprapp.com`;
           </div>
         ) : (
           <div className="win-container">
-            {/* UPDATED: Player Headshot - Now uses database photo URL */}
+            {/* Player Headshot */}
             <div className="player-headshot-container" style={{ textAlign: 'center', marginBottom: '24px' }}>
               <PlayerHeadshot 
                 playerName={gameStats.playerName}
-                photoUrl={gameStats.playerPhotoUrl} // ADDED: Pass database photo URL
+                photoUrl={gameStats.playerPhotoUrl}
                 size="xlarge"
                 className="player-headshot-win"
               />
@@ -524,7 +569,7 @@ Play at: hooprapp.com`;
           </div>
         )}
 
-        {/* NEW: Confetti Animation Component */}
+        {/* Confetti Animation Component */}
         <ConfettiAnimation 
           isActive={showConfetti}
           intensity={gameStats?.score >= 100 ? 'intense' : gameStats?.score >= 80 ? 'normal' : 'light'}
