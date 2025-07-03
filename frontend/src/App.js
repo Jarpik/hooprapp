@@ -391,7 +391,7 @@ Play at: hooprapp.com`;
               guessCount={guesses.length}
               maxGuesses={5}
               hintsRevealed={hintsRevealed}
-              maxHints={getMaxHints()}
+              maxHints={5}
               currentScore={calculateCurrentScore()}
               gameWon={gameWon}
               gameFailed={guesses.length >= 5 && !gameWon}
