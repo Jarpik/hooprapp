@@ -66,17 +66,14 @@ jobs:
           }
 
           // Generate potential NBA player IDs
-          function generatePotentialPlayerIds(playerName, age, yearsPro) {
+          function generatePotentialPlayerIds(playerName, age) {
             const potentialIds = [];
             const currentYear = new Date().getFullYear();
             
-            // Estimate NBA entry year
-            let entryYear = currentYear - (yearsPro || 5);
-            if (age && !yearsPro) {
-              entryYear = currentYear - Math.max(age - 19, 1);
-            }
+            // Estimate NBA entry year based on age (most players enter around age 19-22)
+            let entryYear = currentYear - Math.max((age || 25) - 20, 1);
             
-            // Generate IDs based on entry year
+            // Generate IDs based on estimated entry year
             if (entryYear < 2005) {
               // Older players: 6-digit IDs
               for (let i = 200000; i <= 209999; i += 200) {
@@ -117,7 +114,7 @@ jobs:
               const limitClause = maxPlayers > 0 ? `LIMIT ${maxPlayers}` : '';
               
               const result = await pool.query(`
-                SELECT id, name, age, years_pro 
+                SELECT id, name, age 
                 FROM players 
                 WHERE active = true AND (headshot_url IS NULL OR headshot_url = '')
                 ORDER BY name
@@ -135,7 +132,7 @@ jobs:
                 const player = playersWithoutPhotos[i];
                 console.log(`[${i + 1}/${playersWithoutPhotos.length}] Searching: ${player.name}`);
                 
-                const potentialIds = generatePotentialPlayerIds(player.name, player.age, player.years_pro);
+                const potentialIds = generatePotentialPlayerIds(player.name, player.age);
                 let foundUrl = null;
                 
                 // Test potential IDs
