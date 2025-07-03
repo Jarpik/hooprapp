@@ -19,26 +19,26 @@ const BasketballLogo = ({ size = 'medium', className = '' }) => {
         viewBox="0 0 100 100" 
         className="basketball-svg"
       >
-        {/* Basketball base gradient */}
         <defs>
-          <radialGradient id="basketballGradient" cx="0.3" cy="0.3" r="0.8">
-            <stop offset="0%" stopColor="#ff8c42" />
-            <stop offset="30%" stopColor="#ff6b1a" />
-            <stop offset="70%" stopColor="#e55100" />
-            <stop offset="100%" stopColor="#bf360c" />
+          {/* Basketball gradient - more realistic orange */}
+          <radialGradient id="basketballGradient" cx="0.35" cy="0.35" r="0.8">
+            <stop offset="0%" stopColor="#ff9500" />
+            <stop offset="20%" stopColor="#ff7800" />
+            <stop offset="60%" stopColor="#e55100" />
+            <stop offset="100%" stopColor="#cc4400" />
           </radialGradient>
           
-          {/* Shadow gradient */}
-          <radialGradient id="shadowGradient" cx="0.7" cy="0.7" r="0.4">
+          {/* Inner shadow */}
+          <radialGradient id="innerShadow" cx="0.6" cy="0.6" r="0.5">
             <stop offset="0%" stopColor="rgba(0,0,0,0)" />
-            <stop offset="70%" stopColor="rgba(0,0,0,0.1)" />
+            <stop offset="80%" stopColor="rgba(0,0,0,0.1)" />
             <stop offset="100%" stopColor="rgba(0,0,0,0.3)" />
           </radialGradient>
           
-          {/* Highlight gradient */}
-          <radialGradient id="highlightGradient" cx="0.2" cy="0.2" r="0.3">
-            <stop offset="0%" stopColor="rgba(255,255,255,0.4)" />
-            <stop offset="50%" stopColor="rgba(255,255,255,0.2)" />
+          {/* Highlight */}
+          <radialGradient id="highlight" cx="0.3" cy="0.3" r="0.4">
+            <stop offset="0%" stopColor="rgba(255,255,255,0.6)" />
+            <stop offset="40%" stopColor="rgba(255,255,255,0.3)" />
             <stop offset="100%" stopColor="rgba(255,255,255,0)" />
           </radialGradient>
         </defs>
@@ -47,93 +47,61 @@ const BasketballLogo = ({ size = 'medium', className = '' }) => {
         <circle 
           cx="50" 
           cy="50" 
-          r="48" 
+          r="45" 
           fill="url(#basketballGradient)"
-          className="basketball-main"
+          stroke="#cc4400"
+          strokeWidth="1"
         />
         
-        {/* Basketball seam lines */}
-        <g className="basketball-lines">
-          {/* Vertical center line */}
-          <path 
-            d="M 50 2 Q 50 25 50 50 Q 50 75 50 98" 
-            stroke="#bf360c" 
-            strokeWidth="2" 
-            fill="none"
-            className="center-line"
-          />
+        {/* Basketball seam lines - the classic curved lines */}
+        <g stroke="#aa3300" strokeWidth="2.5" fill="none" strokeLinecap="round">
+          {/* Left curved seam */}
+          <path d="M 15 50 Q 35 20, 50 50 Q 35 80, 15 50" />
           
-          {/* Horizontal center line */}
-          <path 
-            d="M 2 50 Q 25 50 50 50 Q 75 50 98 50" 
-            stroke="#bf360c" 
-            strokeWidth="2" 
-            fill="none"
-            className="center-line"
-          />
+          {/* Right curved seam */}
+          <path d="M 85 50 Q 65 20, 50 50 Q 65 80, 85 50" />
           
-          {/* Curved seam lines */}
-          <path 
-            d="M 20 15 Q 50 35 80 15" 
-            stroke="#bf360c" 
-            strokeWidth="1.5" 
-            fill="none"
-            className="seam-line"
-          />
+          {/* Top curved seam */}
+          <path d="M 50 15 Q 20 35, 50 50 Q 80 35, 50 15" />
           
-          <path 
-            d="M 20 85 Q 50 65 80 85" 
-            stroke="#bf360c" 
-            strokeWidth="1.5" 
-            fill="none"
-            className="seam-line"
-          />
-          
-          <path 
-            d="M 15 20 Q 35 50 15 80" 
-            stroke="#bf360c" 
-            strokeWidth="1.5" 
-            fill="none"
-            className="seam-line"
-          />
-          
-          <path 
-            d="M 85 20 Q 65 50 85 80" 
-            stroke="#bf360c" 
-            strokeWidth="1.5" 
-            fill="none"
-            className="seam-line"
-          />
+          {/* Bottom curved seam */}
+          <path d="M 50 85 Q 20 65, 50 50 Q 80 65, 50 85" />
         </g>
         
-        {/* Shadow overlay */}
+        {/* Inner shadow overlay */}
         <circle 
           cx="50" 
           cy="50" 
-          r="48" 
-          fill="url(#shadowGradient)"
-          className="basketball-shadow"
+          r="45" 
+          fill="url(#innerShadow)"
         />
         
-        {/* Highlight */}
+        {/* Highlight overlay */}
         <circle 
           cx="50" 
           cy="50" 
-          r="48" 
-          fill="url(#highlightGradient)"
-          className="basketball-highlight"
+          r="45" 
+          fill="url(#highlight)"
         />
         
-        {/* Subtle texture dots */}
-        <g className="basketball-texture">
-          <circle cx="25" cy="25" r="0.5" fill="rgba(191, 54, 12, 0.3)" />
-          <circle cx="75" cy="25" r="0.5" fill="rgba(191, 54, 12, 0.3)" />
-          <circle cx="25" cy="75" r="0.5" fill="rgba(191, 54, 12, 0.3)" />
-          <circle cx="75" cy="75" r="0.5" fill="rgba(191, 54, 12, 0.3)" />
-          <circle cx="35" cy="40" r="0.5" fill="rgba(191, 54, 12, 0.2)" />
-          <circle cx="65" cy="40" r="0.5" fill="rgba(191, 54, 12, 0.2)" />
-          <circle cx="35" cy="60" r="0.5" fill="rgba(191, 54, 12, 0.2)" />
-          <circle cx="65" cy="60" r="0.5" fill="rgba(191, 54, 12, 0.2)" />
+        {/* Basketball texture - subtle pebbled surface */}
+        <g fill="rgba(170, 51, 0, 0.15)">
+          <circle cx="30" cy="30" r="1" />
+          <circle cx="70" cy="30" r="1" />
+          <circle cx="30" cy="70" r="1" />
+          <circle cx="70" cy="70" r="1" />
+          <circle cx="40" cy="25" r="0.8" />
+          <circle cx="60" cy="25" r="0.8" />
+          <circle cx="40" cy="75" r="0.8" />
+          <circle cx="60" cy="75" r="0.8" />
+          <circle cx="25" cy="40" r="0.8" />
+          <circle cx="75" cy="40" r="0.8" />
+          <circle cx="25" cy="60" r="0.8" />
+          <circle cx="75" cy="60" r="0.8" />
+          <circle cx="50" cy="35" r="0.6" />
+          <circle cx="50" cy="65" r="0.6" />
+          <circle cx="35" cy="50" r="0.6" />
+          <circle cx="65" cy="50" r="0.6" />
         </g>
       </svg>
     </div>
