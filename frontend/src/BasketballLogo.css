@@ -2,121 +2,71 @@
 .basketball-logo {
   display: inline-block;
   position: relative;
-  animation: basketballFloat 3s ease-in-out infinite;
+  animation: basketballFloat 4s ease-in-out infinite;
   transition: transform 0.3s ease;
 }
 
 .basketball-logo:hover {
-  transform: scale(1.1) rotate(5deg);
+  transform: scale(1.05) rotate(3deg);
   animation-play-state: paused;
 }
 
 .basketball-svg {
   width: 100%;
   height: 100%;
-  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.2));
+  filter: drop-shadow(0 3px 6px rgba(0, 0, 0, 0.3));
   transition: filter 0.3s ease;
 }
 
 .basketball-logo:hover .basketball-svg {
-  filter: drop-shadow(0 6px 12px rgba(0, 0, 0, 0.3));
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.4));
 }
 
-/* Basketball main circle animation */
-.basketball-main {
-  transition: all 0.3s ease;
+/* Integration with title */
+.basketball-logo.title-logo {
+  margin-right: 12px;
+  vertical-align: middle;
+  display: inline-block;
 }
 
-.basketball-logo:hover .basketball-main {
-  filter: brightness(1.1);
+/* Active state for game interactions */
+.basketball-logo.active {
+  animation: basketballSpin 1.5s ease-in-out;
 }
 
-/* Basketball lines animations */
-.basketball-lines {
-  transition: all 0.3s ease;
+@keyframes basketballSpin {
+  0% { transform: rotate(0deg) scale(1); }
+  50% { transform: rotate(180deg) scale(1.1); }
+  100% { transform: rotate(360deg) scale(1); }
 }
 
-.center-line {
-  stroke-dasharray: 5, 3;
-  stroke-dashoffset: 0;
-  animation: dashMove 2s linear infinite;
+/* Celebration state */
+.basketball-logo.celebration {
+  animation: basketballCelebrate 3s ease-in-out;
 }
 
-.seam-line {
-  stroke-dasharray: 3, 2;
-  stroke-dashoffset: 0;
-  animation: dashMove 3s linear infinite reverse;
+@keyframes basketballCelebrate {
+  0%, 100% { transform: scale(1) rotate(0deg); }
+  20% { transform: scale(1.15) rotate(72deg); }
+  40% { transform: scale(1.1) rotate(144deg); }
+  60% { transform: scale(1.15) rotate(216deg); }
+  80% { transform: scale(1.1) rotate(288deg); }
 }
 
-.basketball-logo:hover .center-line {
-  stroke-width: 2.5;
-  stroke: #a0360a;
-}
-
-.basketball-logo:hover .seam-line {
-  stroke-width: 2;
-  stroke: #a0360a;
-}
-
-/* Shadow and highlight effects */
-.basketball-shadow {
-  transition: opacity 0.3s ease;
-}
-
-.basketball-highlight {
-  transition: opacity 0.3s ease;
-}
-
-.basketball-logo:hover .basketball-shadow {
-  opacity: 0.8;
-}
-
-.basketball-logo:hover .basketball-highlight {
-  opacity: 1.2;
-}
-
-/* Texture dots animation */
-.basketball-texture {
-  transition: opacity 0.3s ease;
-}
-
-.basketball-logo:hover .basketball-texture {
-  opacity: 0.6;
-}
-
-.basketball-texture circle {
-  animation: textureShimmer 4s ease-in-out infinite;
-}
-
-.basketball-texture circle:nth-child(odd) {
-  animation-delay: 0.5s;
-}
-
-.basketball-texture circle:nth-child(even) {
-  animation-delay: 1s;
-}
-
-/* Keyframe animations */
+/* Floating animation */
 @keyframes basketballFloat {
   0%, 100% { 
     transform: translateY(0) rotate(0deg); 
   }
-  33% { 
-    transform: translateY(-2px) rotate(1deg); 
+  25% { 
+    transform: translateY(-1px) rotate(1deg); 
   }
-  66% { 
-    transform: translateY(1px) rotate(-1deg); 
+  50% { 
+    transform: translateY(-2px) rotate(0deg); 
   }
-}
-
-@keyframes dashMove {
-  0% { stroke-dashoffset: 0; }
-  100% { stroke-dashoffset: 8; }
-}
-
-@keyframes textureShimmer {
-  0%, 100% { opacity: 0.3; }
-  50% { opacity: 0.6; }
+  75% { 
+    transform: translateY(-1px) rotate(-1deg); 
+  }
 }
 
 /* Size variations */
@@ -140,36 +90,6 @@
   height: 80px;
 }
 
-/* Integration with title */
-.basketball-logo.title-logo {
-  margin-right: 8px;
-  vertical-align: middle;
-  display: inline-block;
-}
-
-/* Active state for game interactions */
-.basketball-logo.active {
-  animation: basketballSpin 1s ease-in-out;
-}
-
-@keyframes basketballSpin {
-  0% { transform: rotate(0deg) scale(1); }
-  50% { transform: rotate(180deg) scale(1.1); }
-  100% { transform: rotate(360deg) scale(1); }
-}
-
-/* Celebration state */
-.basketball-logo.celebration {
-  animation: basketballCelebrate 2s ease-in-out;
-}
-
-@keyframes basketballCelebrate {
-  0%, 100% { transform: scale(1) rotate(0deg); }
-  25% { transform: scale(1.2) rotate(90deg); }
-  50% { transform: scale(1.1) rotate(180deg); }
-  75% { transform: scale(1.2) rotate(270deg); }
-}
-
 /* Reduced motion support */
 @media (prefers-reduced-motion: reduce) {
   .basketball-logo {
@@ -180,9 +100,8 @@
     transform: scale(1.05);
   }
   
-  .center-line,
-  .seam-line,
-  .basketball-texture circle {
+  .basketball-logo.active,
+  .basketball-logo.celebration {
     animation: none;
   }
 }
@@ -190,12 +109,12 @@
 /* Mobile responsiveness */
 @media (max-width: 768px) {
   .basketball-logo.title-logo {
-    margin-right: 6px;
+    margin-right: 8px;
   }
 }
 
 @media (max-width: 480px) {
   .basketball-logo.title-logo {
-    margin-right: 4px;
+    margin-right: 6px;
   }
 }
