@@ -6,6 +6,7 @@ import UserStats from './UserStats';
 import PlayerHeadshot from './PlayerHeadshot';
 import ConfettiAnimation from './ConfettiAnimation';
 import ProgressVisualization from './ProgressVisualization';
+import BasketballLogo from './BasketballLogo'; // Basketball logo component
 
 function App() {
   const [dailyPlayer, setDailyPlayer] = useState(null);
@@ -359,7 +360,13 @@ Play at: hooprapp.com`;
       <div className="App-header">
         <div className="header-top">
           <div className="title-section">
-            <h1>🏀 StatleNBA</h1>
+            <h1>
+              <BasketballLogo 
+                size="large" 
+                className={`title-logo ${gameWon && gameStats?.score > 0 ? 'celebration' : ''}`}
+              />
+              StatleNBA
+            </h1>
             <p className="subtitle">Guess today's NBA player from the 2024-2025 season!</p>
           </div>
           <div className="auth-section">
