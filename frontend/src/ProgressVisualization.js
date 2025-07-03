@@ -12,7 +12,6 @@ const ProgressVisualization = ({
 }) => {
   // Calculate progress percentages
   const guessProgress = (guessCount / maxGuesses) * 100;
-  const hintProgress = (hintsRevealed / maxHints) * 100;
   
   // Determine status colors
   const getGuessStatusColor = () => {
@@ -23,56 +22,8 @@ const ProgressVisualization = ({
     return '#8b5cf6'; // Purple for early game
   };
 
-  const getScoreColor = () => {
-    if (currentScore >= 80) return '#10b981';
-    if (currentScore >= 60) return '#3b82f6';
-    if (currentScore >= 40) return '#f59e0b';
-    return '#ef4444';
-  };
-
   return (
     <div className="progress-visualization">
-      {/* Main Progress Header */}
-      <div className="progress-header">
-        <div className="progress-section">
-          <div className="progress-label">
-            <span className="progress-icon">🎯</span>
-            <span className="progress-text">Guesses</span>
-          </div>
-          <div className="progress-counter">
-            <span className="current-count">{guessCount}</span>
-            <span className="max-count">/{maxGuesses}</span>
-          </div>
-        </div>
-
-        <div className="progress-section">
-          <div className="progress-label">
-            <span className="progress-icon">🔍</span>
-            <span className="progress-text">Hints</span>
-          </div>
-          <div className="progress-counter">
-            <span className="current-count">{hintsRevealed}</span>
-            <span className="max-count">/{maxHints}</span>
-          </div>
-        </div>
-
-        <div className="progress-section">
-          <div className="progress-label">
-            <span className="progress-icon">⭐</span>
-            <span className="progress-text">Score</span>
-          </div>
-          <div className="progress-counter">
-            <span 
-              className="current-score"
-              style={{ color: getScoreColor() }}
-            >
-              {currentScore}
-            </span>
-            <span className="max-count">/100</span>
-          </div>
-        </div>
-      </div>
-
       {/* Guess Progress Bar */}
       <div className="progress-bar-container">
         <div className="progress-bar-label">
@@ -118,39 +69,6 @@ const ProgressVisualization = ({
               className={`hint-progress-cell ${index < hintsRevealed ? 'revealed' : 'hidden'}`}
             />
           ))}
-        </div>
-      </div>
-
-      {/* Circular Progress Ring (for dramatic effect) */}
-      <div className="circular-progress">
-        <svg className="circular-progress-svg" viewBox="0 0 120 120">
-          {/* Background circle */}
-          <circle
-            className="circular-progress-bg"
-            cx="60"
-            cy="60"
-            r="54"
-            fill="none"
-            stroke="rgba(255, 255, 255, 0.1)"
-            strokeWidth="4"
-          />
-          {/* Progress circle */}
-          <circle
-            className="circular-progress-fill"
-            cx="60"
-            cy="60"
-            r="54"
-            fill="none"
-            stroke={getGuessStatusColor()}
-            strokeWidth="4"
-            strokeLinecap="round"
-            strokeDasharray={`${2 * Math.PI * 54}`}
-            strokeDashoffset={`${2 * Math.PI * 54 * (1 - guessProgress / 100)}`}
-          />
-        </svg>
-        <div className="circular-progress-content">
-          <div className="circular-progress-number">{guessCount}</div>
-          <div className="circular-progress-label">of {maxGuesses}</div>
         </div>
       </div>
 
