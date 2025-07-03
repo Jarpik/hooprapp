@@ -1,0 +1,318 @@
+# .github/workflows/find-player-photos.yml
+name: Find Missing Player Photos
+
+on:
+  # Manual trigger
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'Dry run (show SQL but don\'t update database)'
+        required: false
+        default: 'false'
+        type: choice
+        options:
+          - 'false'
+          - 'true'
+      max_players:
+        description: 'Maximum players to process (for testing)'
+        required: false
+        default: '0'
+        type: string
+
+jobs:
+  find-photos:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: 🏀 Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: 📦 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: 📥 Install Dependencies
+        run: |
+          npm install pg https
+
+      - name: 🔍 Create Photo Finder Script
+        run: |
+          cat > find-photos.js << 'EOF'
+          const { Pool } = require('pg');
+          const https = require('https');
+
+          // Database connection using environment variables
+          const pool = new Pool({
+            connectionString: process.env.DATABASE_URL,
+            ssl: {
+              rejectUnauthorized: false
+            }
+          });
+
+          // Function to test if an image URL exists
+          function testImageUrl(url) {
+            return new Promise((resolve) => {
+              const request = https.get(url, (response) => {
+                resolve(response.statusCode === 200 && response.headers['content-type']?.startsWith('image/'));
+              });
+              
+              request.on('error', () => resolve(false));
+              request.setTimeout(3000, () => {
+                request.destroy();
+                resolve(false);
+              });
+            });
+          }
+
+          // Generate potential NBA player IDs
+          function generatePotentialPlayerIds(playerName, age, yearsPro) {
+            const potentialIds = [];
+            const currentYear = new Date().getFullYear();
+            
+            // Estimate NBA entry year
+            let entryYear = currentYear - (yearsPro || 5);
+            if (age && !yearsPro) {
+              entryYear = currentYear - Math.max(age - 19, 1);
+            }
+            
+            // Generate IDs based on entry year
+            if (entryYear < 2005) {
+              // Older players: 6-digit IDs
+              for (let i = 200000; i <= 209999; i += 200) {
+                potentialIds.push(i.toString());
+              }
+              for (let i = 101000; i <= 109999; i += 200) {
+                potentialIds.push(i.toString());
+              }
+            } else if (entryYear < 2015) {
+              // Mid-era players
+              for (let i = 1625000; i <= 1629999; i += 100) {
+                potentialIds.push(i.toString());
+              }
+              for (let i = 202000; i <= 204999; i += 100) {
+                potentialIds.push(i.toString());
+              }
+            } else if (entryYear < 2020) {
+              // Recent players
+              for (let i = 1628000; i <= 1629999; i += 50) {
+                potentialIds.push(i.toString());
+              }
+            } else {
+              // Very recent players
+              for (let i = 1630000; i <= 1642000; i += 25) {
+                potentialIds.push(i.toString());
+              }
+            }
+            
+            return potentialIds.slice(0, 80); // Limit attempts
+          }
+
+          async function findPhotosForAllPlayers() {
+            try {
+              console.log('🔍 Finding players without photos...\n');
+              
+              // Get players without photos
+              const maxPlayers = process.env.MAX_PLAYERS ? parseInt(process.env.MAX_PLAYERS) : 0;
+              const limitClause = maxPlayers > 0 ? `LIMIT ${maxPlayers}` : '';
+              
+              const result = await pool.query(`
+                SELECT id, name, age, years_pro 
+                FROM players 
+                WHERE active = true AND (headshot_url IS NULL OR headshot_url = '')
+                ORDER BY name
+                ${limitClause}
+              `);
+              
+              const playersWithoutPhotos = result.rows;
+              console.log(`Found ${playersWithoutPhotos.length} players without photos\n`);
+              
+              const foundPhotos = [];
+              const sqlStatements = [];
+              
+              // Process each player
+              for (let i = 0; i < playersWithoutPhotos.length; i++) {
+                const player = playersWithoutPhotos[i];
+                console.log(`[${i + 1}/${playersWithoutPhotos.length}] Searching: ${player.name}`);
+                
+                const potentialIds = generatePotentialPlayerIds(player.name, player.age, player.years_pro);
+                let foundUrl = null;
+                
+                // Test potential IDs
+                for (const playerId of potentialIds) {
+                  const testUrl = `https://cdn.nba.com/headshots/nba/latest/1040x760/${playerId}.png`;
+                  
+                  const isValid = await testImageUrl(testUrl);
+                  if (isValid) {
+                    console.log(`   ✅ Found: ID ${playerId}`);
+                    foundUrl = testUrl;
+                    foundPhotos.push({
+                      id: player.id,
+                      name: player.name,
+                      url: foundUrl,
+                      nbaId: playerId
+                    });
+                    
+                    // Generate SQL statement
+                    sqlStatements.push(`UPDATE players SET headshot_url = '${foundUrl}' WHERE id = ${player.id}; -- ${player.name} (NBA ID: ${playerId})`);
+                    break;
+                  }
+                  
+                  // Small delay
+                  await new Promise(resolve => setTimeout(resolve, 100));
+                }
+                
+                if (!foundUrl) {
+                  console.log(`   ❌ No photo found`);
+                }
+                
+                // Progress update
+                if ((i + 1) % 20 === 0) {
+                  console.log(`\n📊 Progress: ${i + 1}/${playersWithoutPhotos.length} processed, ${foundPhotos.length} photos found\n`);
+                }
+              }
+              
+              console.log('\n🎉 Search Complete!');
+              console.log(`📊 Results: ${foundPhotos.length}/${playersWithoutPhotos.length} photos found\n`);
+              
+              if (foundPhotos.length > 0) {
+                console.log('📝 Generated SQL Statements:\n');
+                sqlStatements.forEach(sql => console.log(sql));
+                
+                // Execute updates if not dry run
+                if (process.env.DRY_RUN !== 'true') {
+                  console.log('\n🔄 Updating database...');
+                  
+                  for (const photo of foundPhotos) {
+                    try {
+                      await pool.query(
+                        'UPDATE players SET headshot_url = $1 WHERE id = $2',
+                        [photo.url, photo.id]
+                      );
+                      console.log(`✅ Updated ${photo.name}`);
+                    } catch (error) {
+                      console.log(`❌ Failed to update ${photo.name}: ${error.message}`);
+                    }
+                  }
+                  
+                  console.log(`\n🎉 Database updated! ${foundPhotos.length} new photos added.`);
+                } else {
+                  console.log('\n🔍 DRY RUN - No database changes made');
+                  console.log('💡 Set dry_run to "false" to actually update the database');
+                }
+              }
+              
+            } catch (error) {
+              console.error('❌ Error:', error);
+              process.exit(1);
+            } finally {
+              await pool.end();
+            }
+          }
+
+          // Run the script
+          findPhotosForAllPlayers();
+          EOF
+
+      - name: 🗄️ Check Current Photo Coverage
+        env:
+          DATABASE_URL: postgresql://postgres.sdpvfaoekjckxbwcxfjj:Legoboy99!!@aws-0-us-east-1.pooler.supabase.com:5432/postgres
+        run: |
+          cat > check_coverage.js << 'EOF'
+          const { Pool } = require('pg');
+          
+          const pool = new Pool({
+            connectionString: process.env.DATABASE_URL,
+            ssl: { rejectUnauthorized: false }
+          });
+          
+          async function checkCoverage() {
+            try {
+              const totalResult = await pool.query('SELECT COUNT(*) FROM players WHERE active = true');
+              const photosResult = await pool.query('SELECT COUNT(*) FROM players WHERE active = true AND headshot_url IS NOT NULL');
+              
+              const total = parseInt(totalResult.rows[0].count);
+              const withPhotos = parseInt(photosResult.rows[0].count);
+              const percentage = ((withPhotos / total) * 100).toFixed(1);
+              
+              console.log('📊 Current Photo Coverage:');
+              console.log(`   Total active players: ${total}`);
+              console.log(`   Players with photos: ${withPhotos}`);
+              console.log(`   Coverage: ${percentage}%`);
+              console.log(`   Missing photos: ${total - withPhotos}`);
+              
+            } catch (error) {
+              console.error('Error:', error);
+            } finally {
+              await pool.end();
+            }
+          }
+          
+          checkCoverage();
+          EOF
+          
+          node check_coverage.js
+
+      - name: 🔍 Find Missing Player Photos
+        env:
+          DATABASE_URL: postgresql://postgres.sdpvfaoekjckxbwcxfjj:Legoboy99!!@aws-0-us-east-1.pooler.supabase.com:5432/postgres
+          DRY_RUN: ${{ github.event.inputs.dry_run }}
+          MAX_PLAYERS: ${{ github.event.inputs.max_players }}
+        run: |
+          echo "🚀 Starting photo search..."
+          echo "Settings:"
+          echo "  - Dry run: $DRY_RUN"
+          echo "  - Max players: ${MAX_PLAYERS:-'All'}"
+          echo ""
+          
+          node find-photos.js
+
+      - name: 📊 Final Coverage Report
+        if: always()
+        env:
+          DATABASE_URL: postgresql://postgres.sdpvfaoekjckxbwcxfjj:Legoboy99!!@aws-0-us-east-1.pooler.supabase.com:5432/postgres
+        run: |
+          cat > final_report.js << 'EOF'
+          const { Pool } = require('pg');
+          
+          const pool = new Pool({
+            connectionString: process.env.DATABASE_URL,
+            ssl: { rejectUnauthorized: false }
+          });
+          
+          async function finalReport() {
+            try {
+              const totalResult = await pool.query('SELECT COUNT(*) FROM players WHERE active = true');
+              const photosResult = await pool.query('SELECT COUNT(*) FROM players WHERE active = true AND headshot_url IS NOT NULL');
+              
+              const total = parseInt(totalResult.rows[0].count);
+              const withPhotos = parseInt(photosResult.rows[0].count);
+              const percentage = ((withPhotos / total) * 100).toFixed(1);
+              
+              console.log('🎉 Final Photo Coverage Report:');
+              console.log('=====================================');
+              console.log(`📊 Total active players: ${total}`);
+              console.log(`🖼️  Players with photos: ${withPhotos}`);
+              console.log(`📈 Coverage percentage: ${percentage}%`);
+              console.log(`❌ Still missing: ${total - withPhotos}`);
+              console.log('=====================================');
+              
+              if (percentage >= 80) {
+                console.log('✅ Excellent coverage! Your StatleNBA game will look great!');
+              } else if (percentage >= 60) {
+                console.log('👍 Good coverage! Most popular players should have photos.');
+              } else {
+                console.log('⚠️  Consider running this workflow again to find more photos.');
+              }
+              
+            } catch (error) {
+              console.error('Error:', error);
+            } finally {
+              await pool.end();
+            }
+          }
+          
+          finalReport();
+          EOF
+          
+          node final_report.js
