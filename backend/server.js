@@ -33,10 +33,23 @@ app.get('/', (req, res) => {
   res.json({ message: 'StatleNBA API is running!' });
 });
 
-// Get all players from database
+// UPDATED: Get all players from database - now includes headshot_url
 app.get('/api/players', async (req, res) => {
   try {
-    const result = await pool.query('SELECT * FROM players WHERE active = true ORDER BY name');
+    // MODIFIED: Added headshot_url to the SELECT query
+    const result = await pool.query(`
+      SELECT id, name, team, position, height, weight, age, points_per_game, 
+             rebounds_per_game, assists_per_game, field_goal_percentage, 
+             three_point_percentage, years_pro, college, active, headshot_url
+      FROM players 
+      WHERE active = true 
+      ORDER BY name
+    `);
+    
+    // Log how many players have photos (for debugging)
+    const playersWithPhotos = result.rows.filter(player => player.headshot_url).length;
+    console.log(`Returning ${result.rows.length} players, ${playersWithPhotos} with photos`);
+    
     res.json({ players: result.rows });
   } catch (error) {
     console.error('Error fetching players:', error);
@@ -44,11 +57,18 @@ app.get('/api/players', async (req, res) => {
   }
 });
 
-// Daily player endpoint with date-based selection
+// UPDATED: Daily player endpoint - now includes headshot_url
 app.get('/api/daily-player', async (req, res) => {
   try {
-    // Get all active players
-    const result = await pool.query('SELECT * FROM players WHERE active = true');
+    // MODIFIED: Added headshot_url to the SELECT query
+    const result = await pool.query(`
+      SELECT id, name, team, position, height, weight, age, points_per_game, 
+             rebounds_per_game, assists_per_game, field_goal_percentage, 
+             three_point_percentage, years_pro, college, active, headshot_url
+      FROM players 
+      WHERE active = true
+    `);
+    
     const players = result.rows;
     
     if (players.length === 0) {
@@ -71,7 +91,9 @@ app.get('/api/daily-player', async (req, res) => {
     const playerIndex = Math.abs(hash) % players.length;
     const dailyPlayer = players[playerIndex];
     
-    console.log(`Daily player for ${dateString}: ${dailyPlayer.name} (index: ${playerIndex})`);
+    // Log whether daily player has a photo (for debugging)
+    const hasPhoto = dailyPlayer.headshot_url ? 'with photo' : 'without photo';
+    console.log(`Daily player for ${dateString}: ${dailyPlayer.name} (index: ${playerIndex}) ${hasPhoto}`);
     
     res.json({ 
       player: dailyPlayer,
@@ -80,6 +102,27 @@ app.get('/api/daily-player', async (req, res) => {
   } catch (error) {
     console.error('Error fetching daily player:', error);
     res.status(500).json({ error: 'Failed to fetch daily player' });
+  }
+});
+
+// NEW: Optional endpoint to get players with photos only (for testing)
+app.get('/api/players/with-photos', async (req, res) => {
+  try {
+    const result = await pool.query(`
+      SELECT id, name, team, position, headshot_url
+      FROM players 
+      WHERE active = true AND headshot_url IS NOT NULL
+      ORDER BY name
+    `);
+    
+    res.json({ 
+      players: result.rows,
+      count: result.rows.length,
+      message: `Found ${result.rows.length} players with photos`
+    });
+  } catch (error) {
+    console.error('Error fetching players with photos:', error);
+    res.status(500).json({ error: 'Failed to fetch players with photos' });
   }
 });
 
