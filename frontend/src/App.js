@@ -4,6 +4,7 @@ import AutocompleteInput from './AutocompleteInput';
 import AuthModal from './AuthModal';
 import UserStats from './UserStats';
 import PlayerHeadshot from './PlayerHeadshot';
+import ConfettiAnimation from './ConfettiAnimation'; // NEW: Import confetti component
 
 function App() {
   const [dailyPlayer, setDailyPlayer] = useState(null);
@@ -13,6 +14,7 @@ function App() {
   const [gameStats, setGameStats] = useState(null);
   const [shareText, setShareText] = useState('');
   const [copySuccess, setCopySuccess] = useState(false);
+  const [showConfetti, setShowConfetti] = useState(false); // NEW: Confetti state
   
   // User authentication states
   const [user, setUser] = useState(null);
@@ -204,6 +206,7 @@ Play at: hooprapp.com`;
       });
       
       setGameWon(true);
+      setShowConfetti(true); // NEW: Trigger confetti on win!
       
       // Submit to backend if user is logged in
       submitGameResult(finalScore, finalGuessCount, finalHintsUsed, true);
@@ -220,6 +223,8 @@ Play at: hooprapp.com`;
           playerPhotoUrl: dailyPlayer.headshot_url // ADDED: Store photo URL for game over too
         });
         setGameWon(true); // Use same win state to show results
+        
+        // No confetti for game over (only for wins)
         
         // Submit failed game to backend if user is logged in
         submitGameResult(0, newGuesses.length, hintsRevealed, false);
@@ -255,6 +260,8 @@ Play at: hooprapp.com`;
     setGameStats(null);
     setShareText('');
     setCopySuccess(false);
+    setShowConfetti(false); // NEW: Reset confetti state
+    
     // Fetch a new daily player
     fetch('https://hooprapp.onrender.com/api/daily-player')
       .then(response => response.json())
@@ -516,6 +523,14 @@ Play at: hooprapp.com`;
             </button>
           </div>
         )}
+
+        {/* NEW: Confetti Animation Component */}
+        <ConfettiAnimation 
+          isActive={showConfetti}
+          intensity={gameStats?.score >= 100 ? 'intense' : gameStats?.score >= 80 ? 'normal' : 'light'}
+          duration={4000}
+          colors={['#f97316', '#ea580c', '#dc2626', '#3b82f6', '#10b981', '#8b5cf6', '#f59e0b']}
+        />
 
         {/* Auth Modal */}
         <AuthModal 
