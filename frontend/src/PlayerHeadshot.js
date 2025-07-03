@@ -1,173 +1,200 @@
-import React, { useState, useEffect, useRef } from 'react';
-import PlayerHeadshot from './PlayerHeadshot';
+// src/PlayerHeadshot.js - Updated to use database URLs
+import React, { useState, useEffect } from 'react';
 
-const AutocompleteInput = ({ onPlayerSelect, placeholder = "Enter NBA player name..." }) => {
-  const [input, setInput] = useState('');
-  const [suggestions, setSuggestions] = useState([]);
-  const [allPlayers, setAllPlayers] = useState([]);
-  const [showSuggestions, setShowSuggestions] = useState(false);
-  const [selectedIndex, setSelectedIndex] = useState(-1);
-  const inputRef = useRef(null);
-  const dropdownRef = useRef(null);
+// FALLBACK mapping - only used if database doesn't have a URL
+const FALLBACK_PLAYER_PHOTOS = {
+  "LeBron James": "https://cdn.nba.com/headshots/nba/latest/1040x760/2544.png",
+  "Stephen Curry": "https://cdn.nba.com/headshots/nba/latest/1040x760/201939.png",
+  "Kevin Durant": "https://cdn.nba.com/headshots/nba/latest/1040x760/201142.png",
+  "Giannis Antetokounmpo": "https://cdn.nba.com/headshots/nba/latest/1040x760/203507.png",
+  "Luka Dončić": "https://cdn.nba.com/headshots/nba/latest/1040x760/1629029.png",
+  "Jayson Tatum": "https://cdn.nba.com/headshots/nba/latest/1040x760/1628369.png",
+  "Joel Embiid": "https://cdn.nba.com/headshots/nba/latest/1040x760/203954.png",
+  "Nikola Jokić": "https://cdn.nba.com/headshots/nba/latest/1040x760/203999.png",
+  "Jimmy Butler": "https://cdn.nba.com/headshots/nba/latest/1040x760/202710.png",
+  "Anthony Davis": "https://cdn.nba.com/headshots/nba/latest/1040x760/203076.png",
+  "Damian Lillard": "https://cdn.nba.com/headshots/nba/latest/1040x760/203081.png",
+  "James Harden": "https://cdn.nba.com/headshots/nba/latest/1040x760/201935.png",
+  "Kyrie Irving": "https://cdn.nba.com/headshots/nba/latest/1040x760/202681.png",
+  "Devin Booker": "https://cdn.nba.com/headshots/nba/latest/1040x760/1626164.png",
+  "Ja Morant": "https://cdn.nba.com/headshots/nba/latest/1040x760/1629630.png",
+  "Trae Young": "https://cdn.nba.com/headshots/nba/latest/1040x760/1629027.png",
+  "Zion Williamson": "https://cdn.nba.com/headshots/nba/latest/1040x760/1629627.png"
+};
 
-  // Fetch all players when component mounts
+const PlayerHeadshot = ({ 
+  playerName, 
+  photoUrl = null, // NEW: Accept photoUrl prop from database
+  size = "large", 
+  className = "",
+  showBorder = true,
+  showAnimation = true 
+}) => {
+  const [imageSrc, setImageSrc] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [hasError, setHasError] = useState(false);
+
   useEffect(() => {
-    fetch('https://hooprapp.onrender.com/api/players')
-      .then(response => response.json())
-      .then(data => {
-        console.log('Fetched players for autocomplete:', data.players.length); // Debug log
-        // Debug: Check if players have headshot_url
-        const playersWithPhotos = data.players.filter(p => p.headshot_url).length;
-        console.log(`Players with photos in autocomplete: ${playersWithPhotos}/${data.players.length}`);
-        setAllPlayers(data.players);
-      })
-      .catch(error => {
-        console.error('Error fetching players:', error);
-      });
-  }, []);
-
-  // Filter players based on input
-  const filterPlayers = (searchTerm) => {
-    if (!searchTerm.trim()) return [];
+    setIsLoading(true);
+    setHasError(false);
     
-    const filtered = allPlayers.filter(player => 
-      player.name.toLowerCase().includes(searchTerm.toLowerCase())
-    );
+    // PRIORITY 1: Use database URL if provided
+    let photoToTest = photoUrl;
     
-    return filtered.slice(0, 8); // Show more results for better selection
-  };
-
-  const handleInputChange = (e) => {
-    const value = e.target.value;
-    setInput(value);
-    setSelectedIndex(-1);
+    // PRIORITY 2: Fall back to hardcoded mapping if no database URL
+    if (!photoToTest) {
+      photoToTest = FALLBACK_PLAYER_PHOTOS[playerName];
+    }
     
-    if (value.trim()) {
-      const filtered = filterPlayers(value);
-      setSuggestions(filtered);
-      setShowSuggestions(filtered.length > 0);
+    if (photoToTest) {
+      // Test if the image loads
+      const img = new Image();
+      img.onload = () => {
+        setImageSrc(photoToTest);
+        setIsLoading(false);
+        setHasError(false);
+      };
+      img.onerror = () => {
+        // If database URL fails, try fallback
+        if (photoUrl && FALLBACK_PLAYER_PHOTOS[playerName]) {
+          const fallbackImg = new Image();
+          fallbackImg.onload = () => {
+            setImageSrc(FALLBACK_PLAYER_PHOTOS[playerName]);
+            setIsLoading(false);
+            setHasError(false);
+          };
+          fallbackImg.onerror = () => {
+            setHasError(true);
+            setIsLoading(false);
+          };
+          fallbackImg.src = FALLBACK_PLAYER_PHOTOS[playerName];
+        } else {
+          setHasError(true);
+          setIsLoading(false);
+        }
+      };
+      img.src = photoToTest;
     } else {
-      setSuggestions([]);
-      setShowSuggestions(false);
+      // No photo available for this player
+      setHasError(true);
+      setIsLoading(false);
     }
-  };
+  }, [playerName, photoUrl]);
 
-  const selectPlayer = (playerName) => {
-    setInput('');
-    setShowSuggestions(false);
-    setSelectedIndex(-1);
-    setSuggestions([]);
-    onPlayerSelect(playerName);
-  };
-
-  // Handle ALL keyboard events here
-  const handleKeyDown = (e) => {
-    // Don't do anything if no suggestions are visible
-    if (!showSuggestions || suggestions.length === 0) {
-      if (e.key === 'Enter' && input.trim()) {
-        selectPlayer(input);
-      }
-      return;
-    }
-
-    // Handle navigation keys
-    if (e.key === 'ArrowDown' || e.code === 'ArrowDown') {
-      e.preventDefault();
-      setSelectedIndex(prev => {
-        const newIndex = prev >= suggestions.length - 1 ? 0 : prev + 1;
-        return newIndex;
-      });
-      return;
-    }
-
-    if (e.key === 'ArrowUp' || e.code === 'ArrowUp') {
-      e.preventDefault();
-      setSelectedIndex(prev => {
-        const newIndex = prev <= 0 ? suggestions.length - 1 : prev - 1;
-        return newIndex;
-      });
-      return;
-    }
-
-    if (e.key === 'Enter' || e.code === 'Enter') {
-      e.preventDefault();
-      if (selectedIndex >= 0 && suggestions[selectedIndex]) {
-        selectPlayer(suggestions[selectedIndex].name);
-      } else if (input.trim()) {
-        selectPlayer(input);
-      }
-      return;
-    }
-
-    if (e.key === 'Escape' || e.code === 'Escape') {
-      setShowSuggestions(false);
-      setSelectedIndex(-1);
-      return;
-    }
-  };
-
-  // Add event listener to the document to catch all key events
-  useEffect(() => {
-    const handleDocumentKeyDown = (e) => {
-      if (document.activeElement === inputRef.current) {
-        handleKeyDown(e);
-      }
+  // Rest of your component code stays the same...
+  const getSizeStyles = (size) => {
+    const sizes = {
+      tiny: { width: '32px', height: '32px' },
+      small: { width: '48px', height: '48px' },
+      medium: { width: '80px', height: '80px' },
+      large: { width: '128px', height: '128px' },
+      xlarge: { width: '192px', height: '192px' }
     };
+    return sizes[size] || sizes.large;
+  };
 
-    document.addEventListener('keydown', handleDocumentKeyDown);
-    return () => document.removeEventListener('keydown', handleDocumentKeyDown);
-  }, [showSuggestions, suggestions, selectedIndex, input]);
+  const sizeStyles = getSizeStyles(size);
+  const borderStyle = showBorder ? '2px solid #f97316' : 'none';
+
+  const getInitials = (name) => {
+    return name.split(' ')
+      .map(n => n[0])
+      .join('')
+      .substring(0, 2)
+      .toUpperCase();
+  };
+
+  const baseStyles = {
+    ...sizeStyles,
+    borderRadius: '50%',
+    border: borderStyle,
+    boxShadow: '0 4px 12px rgba(0, 0, 0, 0.3)',
+    transition: 'all 0.3s ease',
+    position: 'relative',
+    overflow: 'hidden'
+  };
+
+  // Fallback avatar with initials
+  if (hasError || !imageSrc) {
+    const initials = getInitials(playerName);
+    return (
+      <div 
+        className={`${className} ${showAnimation ? 'group' : ''}`}
+        style={{
+          ...baseStyles,
+          background: 'linear-gradient(135deg, #f97316, #dc2626)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          cursor: showAnimation ? 'pointer' : 'default'
+        }}
+        onMouseEnter={(e) => {
+          if (showAnimation) {
+            e.target.style.transform = 'scale(1.05)';
+          }
+        }}
+        onMouseLeave={(e) => {
+          if (showAnimation) {
+            e.target.style.transform = 'scale(1)';
+          }
+        }}
+      >
+        <span 
+          style={{
+            color: 'white',
+            fontWeight: 'bold',
+            fontSize: size === 'tiny' ? '12px' : size === 'small' ? '14px' : '18px'
+          }}
+        >
+          {initials}
+        </span>
+      </div>
+    );
+  }
 
   return (
-    <div className="autocomplete-container">
-      <input
-        ref={inputRef}
-        type="text"
-        value={input}
-        onChange={handleInputChange}
-        placeholder={placeholder}
-        className="player-input"
-        autoComplete="off"
-      />
-      
-      {showSuggestions && suggestions.length > 0 && (
-        <div className="suggestions-dropdown" ref={dropdownRef}>
-          {suggestions.map((player, index) => (
-            <div
-              key={player.name}
-              className={`suggestion-item ${index === selectedIndex ? 'active' : ''}`}
-              onClick={() => selectPlayer(player.name)}
-              onMouseEnter={() => setSelectedIndex(index)}
-            >
-              {/* UPDATED: Player Headshot - Now uses database photo URL */}
-              <div className="player-headshot">
-                <PlayerHeadshot 
-                  playerName={player.name}
-                  photoUrl={player.headshot_url} // ADDED: Pass database photo URL
-                  size="tiny"
-                  showBorder={false}
-                  showAnimation={false}
-                />
-              </div>
-              
-              {/* SIMPLIFIED: Player Info Container - Just name, no hints */}
-              <div className="player-info">
-                <span className="player-name">{player.name}</span>
-                {/* REMOVED: Team and position details since they're hints */}
-                {/* OLD: {player.team} • {player.position} • {player.ppg} PPG */}
-                {/* NEW: Just showing player name to avoid spoiling hints */}
-              </div>
-              
-              {/* Selection indicator */}
-              <div className={`selection-indicator ${index === selectedIndex ? 'active' : ''}`}>
-                ⭐
-              </div>
-            </div>
-          ))}
-        </div>
+    <div className={`${className} ${showAnimation ? 'group' : ''}`}>
+      {isLoading && (
+        <div 
+          style={{
+            ...baseStyles,
+            background: 'linear-gradient(135deg, #e5e7eb, #d1d5db)',
+            animation: 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite'
+          }}
+        />
       )}
+      
+      <img
+        src={imageSrc}
+        alt={`${playerName} headshot`}
+        style={{
+          ...baseStyles,
+          objectFit: 'cover',
+          opacity: isLoading ? 0 : 1,
+          transform: isLoading ? 'scale(0.95)' : 'scale(1)',
+          cursor: showAnimation ? 'pointer' : 'default'
+        }}
+        onLoad={() => setIsLoading(false)}
+        onError={() => {
+          setHasError(true);
+          setIsLoading(false);
+        }}
+        onMouseEnter={(e) => {
+          if (showAnimation && !isLoading) {
+            e.target.style.transform = 'scale(1.05)';
+            e.target.style.boxShadow = '0 8px 24px rgba(0, 0, 0, 0.4)';
+          }
+        }}
+        onMouseLeave={(e) => {
+          if (showAnimation && !isLoading) {
+            e.target.style.transform = 'scale(1)';
+            e.target.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.3)';
+          }
+        }}
+        loading="lazy"
+      />
     </div>
   );
 };
 
-export default AutocompleteInput;
+export default PlayerHeadshot;
