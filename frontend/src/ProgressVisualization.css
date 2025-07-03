@@ -22,63 +22,7 @@
   animation: pulse 2s ease-in-out infinite;
 }
 
-/* Progress Header */
-.progress-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 20px;
-  gap: 16px;
-}
-
-.progress-section {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 8px;
-  flex: 1;
-}
-
-.progress-label {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 14px;
-  color: rgba(255, 255, 255, 0.8);
-  font-weight: 500;
-}
-
-.progress-icon {
-  font-size: 16px;
-  animation: bounce 2s ease-in-out infinite;
-}
-
-.progress-counter {
-  display: flex;
-  align-items: baseline;
-  gap: 2px;
-  font-weight: 700;
-}
-
-.current-count {
-  font-size: 24px;
-  color: #f97316;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-  animation: numberPulse 0.5s ease-out;
-}
-
-.current-score {
-  font-size: 24px;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-  animation: numberPulse 0.5s ease-out;
-  font-weight: 800;
-}
-
-.max-count {
-  font-size: 16px;
-  color: rgba(255, 255, 255, 0.6);
-  margin-left: 2px;
-}
+/* Removed progress header styles for cleaner layout */
 
 /* Progress Bar */
 .progress-bar-container {
@@ -210,48 +154,7 @@
   animation: cellShimmer 1s ease-in-out infinite;
 }
 
-/* Circular Progress */
-.circular-progress {
-  position: relative;
-  width: 80px;
-  height: 80px;
-  margin: 0 auto 20px;
-  animation: circularFadeIn 1s ease-out;
-}
-
-.circular-progress-svg {
-  width: 100%;
-  height: 100%;
-  transform: rotate(-90deg);
-}
-
-.circular-progress-fill {
-  transition: stroke-dashoffset 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-  filter: drop-shadow(0 0 4px rgba(255, 255, 255, 0.3));
-}
-
-.circular-progress-content {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  text-align: center;
-}
-
-.circular-progress-number {
-  font-size: 24px;
-  font-weight: 800;
-  color: #f97316;
-  line-height: 1;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-}
-
-.circular-progress-label {
-  font-size: 10px;
-  color: rgba(255, 255, 255, 0.6);
-  font-weight: 500;
-  margin-top: 2px;
-}
+/* Removed circular progress styles for cleaner layout */
 
 /* Status Messages */
 .progress-status {
@@ -329,12 +232,7 @@
   60% { transform: translateY(-2px); }
 }
 
-@keyframes numberPulse {
-  0% { transform: scale(1); }
-  50% { transform: scale(1.1); }
-  100% { transform: scale(1); }
-}
-
+/* Simplified animations */
 @keyframes shimmer {
   0% { transform: translateX(-100%); }
   100% { transform: translateX(100%); }
@@ -355,11 +253,6 @@
   100% { transform: translateX(100%); }
 }
 
-@keyframes circularFadeIn {
-  0% { opacity: 0; transform: scale(0.8); }
-  100% { opacity: 1; transform: scale(1); }
-}
-
 @keyframes statusFadeIn {
   0% { opacity: 0; transform: translateY(10px); }
   100% { opacity: 1; transform: translateY(0); }
@@ -373,33 +266,8 @@
 
 /* Mobile Responsiveness */
 @media (max-width: 768px) {
-  .progress-header {
-    flex-direction: column;
-    gap: 12px;
-  }
-  
-  .progress-section {
-    flex-direction: row;
-    width: 100%;
-    justify-content: space-between;
-  }
-  
-  .current-count,
-  .current-score {
-    font-size: 20px;
-  }
-  
   .hint-progress-grid {
     grid-template-columns: repeat(8, 1fr);
-  }
-  
-  .circular-progress {
-    width: 60px;
-    height: 60px;
-  }
-  
-  .circular-progress-number {
-    font-size: 18px;
   }
   
   .status-message {
@@ -413,22 +281,8 @@
     padding: 16px;
   }
   
-  .current-count,
-  .current-score {
-    font-size: 18px;
-  }
-  
   .hint-progress-grid {
     grid-template-columns: repeat(6, 1fr);
-  }
-  
-  .circular-progress {
-    width: 50px;
-    height: 50px;
-  }
-  
-  .circular-progress-number {
-    font-size: 16px;
   }
 }
 
