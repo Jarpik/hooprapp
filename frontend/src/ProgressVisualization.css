@@ -125,7 +125,7 @@
 
 .hint-progress-grid {
   display: grid;
-  grid-template-columns: repeat(12, 1fr);
+  grid-template-columns: repeat(5, 1fr);
   gap: 4px;
   height: 8px;
 }
@@ -267,7 +267,7 @@
 /* Mobile Responsiveness */
 @media (max-width: 768px) {
   .hint-progress-grid {
-    grid-template-columns: repeat(8, 1fr);
+    grid-template-columns: repeat(5, 1fr);
   }
   
   .status-message {
@@ -282,7 +282,7 @@
   }
   
   .hint-progress-grid {
-    grid-template-columns: repeat(6, 1fr);
+    grid-template-columns: repeat(5, 1fr);
   }
 }
 
