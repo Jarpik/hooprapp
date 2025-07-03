@@ -15,6 +15,10 @@ const AutocompleteInput = ({ onPlayerSelect, placeholder = "Enter NBA player nam
     fetch('https://hooprapp.onrender.com/api/players')
       .then(response => response.json())
       .then(data => {
+        console.log('Fetched players for autocomplete:', data.players.length); // Debug log
+        // Debug: Check if players have headshot_url
+        const playersWithPhotos = data.players.filter(p => p.headshot_url).length;
+        console.log(`Players with photos in autocomplete: ${playersWithPhotos}/${data.players.length}`);
         setAllPlayers(data.players);
       })
       .catch(error => {
@@ -30,7 +34,7 @@ const AutocompleteInput = ({ onPlayerSelect, placeholder = "Enter NBA player nam
       player.name.toLowerCase().includes(searchTerm.toLowerCase())
     );
     
-    return filtered.slice(0, 5);
+    return filtered.slice(0, 8); // Show more results for better selection
   };
 
   const handleInputChange = (e) => {
@@ -135,23 +139,23 @@ const AutocompleteInput = ({ onPlayerSelect, placeholder = "Enter NBA player nam
               onClick={() => selectPlayer(player.name)}
               onMouseEnter={() => setSelectedIndex(index)}
             >
-              {/* Player Headshot - TINY SIZE FOR AUTOCOMPLETE */}
+              {/* UPDATED: Player Headshot - Now uses database photo URL */}
               <div className="player-headshot">
                 <PlayerHeadshot 
                   playerName={player.name}
+                  photoUrl={player.headshot_url} // ADDED: Pass database photo URL
                   size="tiny"
                   showBorder={false}
                   showAnimation={false}
                 />
               </div>
               
-              {/* Player Info Container */}
+              {/* SIMPLIFIED: Player Info Container - Just name, no hints */}
               <div className="player-info">
                 <span className="player-name">{player.name}</span>
-                <span className="player-details">
-                  {player.team} • {player.position}
-                  {player.ppg && ` • ${player.ppg} PPG`}
-                </span>
+                {/* REMOVED: Team and position details since they're hints */}
+                {/* OLD: <span className="player-details">{player.team} • {player.position} • {player.ppg} PPG</span> */}
+                {/* NEW: Clean display with just player name to avoid spoiling hints */}
               </div>
               
               {/* Selection indicator */}
