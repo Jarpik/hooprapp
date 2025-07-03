@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
     inputs:
       dry_run:
-        description: 'Dry run (show SQL but don\'t update database)'
+        description: 'Dry run (show SQL but do not update database)'
         required: false
         default: 'false'
         type: choice
