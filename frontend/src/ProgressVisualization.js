@@ -47,7 +47,7 @@ const ProgressVisualization = ({
                   index === guessCount - 1 && !gameWon && !gameFailed ? 'current' : ''
                 }`}
                 style={{
-                  left: `${(index / (maxGuesses - 1)) * 100}%`,
+                  left: `${(index * 20)}%`,
                   backgroundColor: index < guessCount ? getGuessStatusColor() : '#374151'
                 }}
               />
