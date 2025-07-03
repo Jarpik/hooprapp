@@ -386,7 +386,7 @@ Play at: hooprapp.com`;
         
         {!gameWon ? (
           <div className="game-container">
-            {/* NEW: Progress Visualization Component */}
+            {/* Progress Visualization Component */}
             <ProgressVisualization 
               guessCount={guesses.length}
               maxGuesses={5}
@@ -408,19 +408,15 @@ Play at: hooprapp.com`;
                   </div>
                 ))}
               </div>
-              {hintsRevealed === 1 && (
-                <div className="no-hints">
-                  Use the hint above to make your first guess! Wrong guesses reveal more hints.
+              
+              {/* Input section moved into hints box */}
+              <div className="input-section-embedded">
+                <div className="input-wrapper">
+                  <AutocompleteInput 
+                    onPlayerSelect={handlePlayerSelect}
+                    placeholder="Enter NBA player name..."
+                  />
                 </div>
-              )}
-            </div>
-            
-            <div className="input-section">
-              <div className="input-wrapper">
-                <AutocompleteInput 
-                  onPlayerSelect={handlePlayerSelect}
-                  placeholder="Enter NBA player name..."
-                />
               </div>
             </div>
             
