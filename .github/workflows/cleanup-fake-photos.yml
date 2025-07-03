@@ -1,0 +1,280 @@
+# .github/workflows/cleanup-fake-photos.yml
+name: Clean Up Fake Photo URLs
+
+on:
+  workflow_dispatch:
+    inputs:
+      action_type:
+        description: 'Action to perform'
+        required: true
+        default: 'test_urls'
+        type: choice
+        options:
+          - 'test_urls'
+          - 'cleanup_fake'
+
+jobs:
+  cleanup-photos:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: 🏀 Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: 📦 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: 📥 Install Dependencies
+        run: |
+          npm install pg https
+
+      - name: 🔍 Create Photo Cleanup Script
+        run: |
+          cat > cleanup-photos.js << 'EOF'
+          const { Pool } = require('pg');
+          const https = require('https');
+
+          const pool = new Pool({
+            connectionString: process.env.DATABASE_URL,
+            ssl: { rejectUnauthorized: false }
+          });
+
+          // Function to test if an image URL returns a real photo or generic silhouette
+          function testImageIsReal(url) {
+            return new Promise((resolve) => {
+              const request = https.get(url, (response) => {
+                if (response.statusCode !== 200) {
+                  resolve(false);
+                  return;
+                }
+
+                let data = [];
+                response.on('data', chunk => data.push(chunk));
+                response.on('end', () => {
+                  const buffer = Buffer.concat(data);
+                  const size = buffer.length;
+                  
+                  // Generic NBA silhouettes are typically around 2-4KB
+                  // Real player photos are typically 15-50KB
+                  // This is a heuristic to detect generic vs real photos
+                  const isRealPhoto = size > 8000; // 8KB threshold
+                  
+                  console.log(`  Size: ${Math.round(size/1024)}KB - ${isRealPhoto ? '✅ REAL' : '❌ GENERIC'}`);
+                  resolve(isRealPhoto);
+                });
+              });
+              
+              request.on('error', () => resolve(false));
+              request.setTimeout(5000, () => {
+                request.destroy();
+                resolve(false);
+              });
+            });
+          }
+
+          async function testAllPhotoUrls() {
+            try {
+              console.log('🔍 Testing all photo URLs in database...\n');
+              
+              const result = await pool.query(`
+                SELECT id, name, headshot_url 
+                FROM players 
+                WHERE active = true AND headshot_url IS NOT NULL
+                ORDER BY name
+              `);
+              
+              console.log(`Found ${result.rows.length} players with photo URLs\n`);
+              
+              const realPhotos = [];
+              const fakePhotos = [];
+              
+              for (let i = 0; i < result.rows.length; i++) {
+                const player = result.rows[i];
+                console.log(`[${i + 1}/${result.rows.length}] Testing: ${player.name}`);
+                console.log(`  URL: ${player.headshot_url}`);
+                
+                const isReal = await testImageIsReal(player.headshot_url);
+                
+                if (isReal) {
+                  realPhotos.push(player);
+                  console.log(`  ✅ REAL PHOTO`);
+                } else {
+                  fakePhotos.push(player);
+                  console.log(`  ❌ GENERIC/FAKE`);
+                }
+                
+                console.log(''); // Empty line for readability
+                
+                // Small delay to avoid overwhelming the server
+                await new Promise(resolve => setTimeout(resolve, 200));
+                
+                // Progress update every 20 players
+                if ((i + 1) % 20 === 0) {
+                  console.log(`📊 Progress: ${i + 1}/${result.rows.length} tested`);
+                  console.log(`   Real photos: ${realPhotos.length}`);
+                  console.log(`   Fake/Generic: ${fakePhotos.length}\n`);
+                }
+              }
+              
+              console.log('🎉 Testing Complete!\n');
+              console.log('📊 Final Results:');
+              console.log(`   Total players tested: ${result.rows.length}`);
+              console.log(`   Real photos: ${realPhotos.length}`);
+              console.log(`   Fake/Generic photos: ${fakePhotos.length}`);
+              console.log(`   Real photo percentage: ${Math.round(realPhotos.length / result.rows.length * 100)}%\n`);
+              
+              if (realPhotos.length > 0) {
+                console.log('✅ Players with REAL photos:');
+                realPhotos.forEach((player, index) => {
+                  console.log(`${index + 1}. ${player.name}`);
+                });
+                console.log('');
+              }
+              
+              if (fakePhotos.length > 0) {
+                console.log('❌ Players with FAKE/GENERIC photos:');
+                fakePhotos.slice(0, 20).forEach((player, index) => {
+                  console.log(`${index + 1}. ${player.name}`);
+                });
+                if (fakePhotos.length > 20) {
+                  console.log(`... and ${fakePhotos.length - 20} more`);
+                }
+                console.log('');
+              }
+              
+              console.log('💡 Next steps:');
+              if (fakePhotos.length > 0) {
+                console.log('   - Run this workflow again with action_type: "cleanup_fake" to remove fake URLs');
+                console.log('   - This will set headshot_url to NULL for players with generic photos');
+                console.log('   - Players will then show initials instead of generic silhouettes');
+              } else {
+                console.log('   - All photos look good! No cleanup needed.');
+              }
+              
+            } catch (error) {
+              console.error('Error:', error);
+              process.exit(1);
+            } finally {
+              await pool.end();
+            }
+          }
+
+          async function cleanupFakePhotos() {
+            try {
+              console.log('🧹 Cleaning up fake photo URLs...\n');
+              
+              const result = await pool.query(`
+                SELECT id, name, headshot_url 
+                FROM players 
+                WHERE active = true AND headshot_url IS NOT NULL
+                ORDER BY name
+              `);
+              
+              console.log(`Testing ${result.rows.length} players...\n`);
+              
+              const playersToCleanup = [];
+              
+              for (let i = 0; i < result.rows.length; i++) {
+                const player = result.rows[i];
+                console.log(`[${i + 1}/${result.rows.length}] Testing: ${player.name}`);
+                
+                const isReal = await testImageIsReal(player.headshot_url);
+                
+                if (!isReal) {
+                  playersToCleanup.push(player);
+                  console.log(`  ❌ FAKE - will remove`);
+                } else {
+                  console.log(`  ✅ REAL - will keep`);
+                }
+                
+                await new Promise(resolve => setTimeout(resolve, 200));
+                
+                if ((i + 1) % 20 === 0) {
+                  console.log(`📊 Progress: ${i + 1}/${result.rows.length} tested, ${playersToCleanup.length} to cleanup\n`);
+                }
+              }
+              
+              console.log(`\n🧹 Cleaning up ${playersToCleanup.length} fake photo URLs...\n`);
+              
+              for (const player of playersToCleanup) {
+                try {
+                  await pool.query('UPDATE players SET headshot_url = NULL WHERE id = $1', [player.id]);
+                  console.log(`✅ Removed fake URL for ${player.name}`);
+                } catch (error) {
+                  console.log(`❌ Failed to update ${player.name}: ${error.message}`);
+                }
+              }
+              
+              console.log(`\n🎉 Cleanup complete! Removed ${playersToCleanup.length} fake photo URLs.`);
+              console.log('Players with fake URLs will now show initials instead of generic silhouettes.');
+              
+            } catch (error) {
+              console.error('Error:', error);
+              process.exit(1);
+            } finally {
+              await pool.end();
+            }
+          }
+
+          // Run based on action type
+          if (process.env.ACTION_TYPE === 'cleanup_fake') {
+            cleanupFakePhotos();
+          } else {
+            testAllPhotoUrls();
+          }
+          EOF
+
+      - name: 🔍 Run Photo URL Test/Cleanup
+        env:
+          DATABASE_URL: postgresql://postgres.sdpvfaoekjckxbwcxfjj:Legoboy99!!@aws-0-us-east-1.pooler.supabase.com:5432/postgres
+          ACTION_TYPE: ${{ github.event.inputs.action_type }}
+        run: |
+          echo "🚀 Starting photo cleanup..."
+          echo "Action type: $ACTION_TYPE"
+          echo ""
+          
+          node cleanup-photos.js
+
+      - name: 📊 Final Report
+        if: always()
+        env:
+          DATABASE_URL: postgresql://postgres.sdpvfaoekjckxbwcxfjj:Legoboy99!!@aws-0-us-east-1.pooler.supabase.com:5432/postgres
+        run: |
+          cat > final_report.js << 'EOF'
+          const { Pool } = require('pg');
+          
+          const pool = new Pool({
+            connectionString: process.env.DATABASE_URL,
+            ssl: { rejectUnauthorized: false }
+          });
+          
+          async function finalReport() {
+            try {
+              const totalResult = await pool.query('SELECT COUNT(*) FROM players WHERE active = true');
+              const photosResult = await pool.query('SELECT COUNT(*) FROM players WHERE active = true AND headshot_url IS NOT NULL');
+              
+              const total = parseInt(totalResult.rows[0].count);
+              const withPhotos = parseInt(photosResult.rows[0].count);
+              const percentage = ((withPhotos / total) * 100).toFixed(1);
+              
+              console.log('🎉 Final Database State:');
+              console.log('========================');
+              console.log(`📊 Total active players: ${total}`);
+              console.log(`🖼️  Players with photo URLs: ${withPhotos}`);
+              console.log(`📈 Coverage percentage: ${percentage}%`);
+              console.log(`❌ Players without photos: ${total - withPhotos}`);
+              console.log('========================');
+              
+            } catch (error) {
+              console.error('Error:', error);
+            } finally {
+              await pool.end();
+            }
+          }
+          
+          finalReport();
+          EOF
+          
+          node final_report.js
