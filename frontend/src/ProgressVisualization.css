@@ -127,12 +127,12 @@
   display: grid;
   grid-template-columns: repeat(12, 1fr);
   gap: 4px;
-  height: 6px;
+  height: 8px;
 }
 
 .hint-progress-cell {
   background: rgba(255, 255, 255, 0.1);
-  border-radius: 2px;
+  border-radius: 4px;
   transition: all 0.3s ease;
   position: relative;
   overflow: hidden;
@@ -288,8 +288,8 @@
 
 /* Embedded Input Section (inside hints box) */
 .input-section-embedded {
-  margin-top: 24px;
-  padding-top: 24px;
+  margin-top: 20px;
+  padding-top: 20px;
   border-top: 1px solid rgba(255, 255, 255, 0.1);
 }
 
