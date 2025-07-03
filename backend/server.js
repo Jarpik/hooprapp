@@ -33,14 +33,12 @@ app.get('/', (req, res) => {
   res.json({ message: 'StatleNBA API is running!' });
 });
 
-// UPDATED: Get all players from database - now includes headshot_url
+// FIXED: Get all players - only using columns that exist
 app.get('/api/players', async (req, res) => {
   try {
-    // MODIFIED: Added headshot_url to the SELECT query
+    // SIMPLIFIED: Only select columns that definitely exist + headshot_url
     const result = await pool.query(`
-      SELECT id, name, team, position, height, weight, age, points_per_game, 
-             rebounds_per_game, assists_per_game, field_goal_percentage, 
-             three_point_percentage, years_pro, college, active, headshot_url
+      SELECT id, name, team, position, height, weight, age, active, headshot_url
       FROM players 
       WHERE active = true 
       ORDER BY name
@@ -57,14 +55,12 @@ app.get('/api/players', async (req, res) => {
   }
 });
 
-// UPDATED: Daily player endpoint - now includes headshot_url
+// FIXED: Daily player endpoint - only using columns that exist
 app.get('/api/daily-player', async (req, res) => {
   try {
-    // MODIFIED: Added headshot_url to the SELECT query
+    // SIMPLIFIED: Only select columns that definitely exist + headshot_url
     const result = await pool.query(`
-      SELECT id, name, team, position, height, weight, age, points_per_game, 
-             rebounds_per_game, assists_per_game, field_goal_percentage, 
-             three_point_percentage, years_pro, college, active, headshot_url
+      SELECT id, name, team, position, height, weight, age, active, headshot_url
       FROM players 
       WHERE active = true
     `);
