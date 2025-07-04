@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import PlayerHeadshot from './PlayerHeadshot';
+import PlayerHeadshot from './playerheadshot';
 
 const AutocompleteInput = ({ onPlayerSelect, placeholder = "Enter NBA player name..." }) => {
   const [input, setInput] = useState('');
