@@ -1,14 +1,10 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import BasketballLogo from '../components/basketballlogo';
-import './HomePage.css';
+import BasketballLogo from '../components/basketballlogo.js'; // Added .js extension for explicit resolution
+import './HomePage.css'; // Adjusted path to match your current code and explicit relative path
 
 const HomePage = () => {
   const navigate = useNavigate();
-
-  const handlePlayStatleNBA = () => {
-    navigate('/StatleNBA');
-  };
 
   return (
     <div className="home-page">
@@ -19,36 +15,40 @@ const HomePage = () => {
             <h1 className="home-title">HooprApp</h1>
             <p className="home-subtitle">NBA Games Collection</p>
           </div>
-          
+
           <div className="home-content">
             <p className="home-description">
-              Test your NBA knowledge with our collection of basketball games. 
+              Test your NBA knowledge with our collection of basketball games.
               Challenge yourself with player statistics, team trivia, and more!
             </p>
-            
+
             <div className="games-grid">
+              {/* Existing StatleNBA Game Card */}
               <div className="game-card">
                 <h3 className="game-title">StatleNBA</h3>
                 <p className="game-description">
-                  Guess the NBA player based on their career statistics. 
+                  Guess the NBA player based on their career statistics.
                   You have 5 guesses and hints to help you along the way.
                 </p>
-                <button 
+                <button
                   className="play-button"
-                  onClick={handlePlayStatleNBA}
+                  onClick={() => navigate('/StatleNBA')}
                 >
                   Play StatleNBA
                 </button>
               </div>
-              
-              <div className="game-card coming-soon">
-                <h3 className="game-title">Coming Soon</h3>
+
+              {/* New Draft Duel Game Card - replaces "Coming Soon" */}
+              <div className="game-card">
+                <h3 className="game-title">Draft Duel</h3>
                 <p className="game-description">
-                  More exciting NBA games are on the way! 
-                  Stay tuned for updates.
+                  Compare NBA rookies and test your draft knowledge in a head-to-head challenge!
                 </p>
-                <button className="play-button disabled" disabled>
-                  Coming Soon
+                <button
+                  className="play-button"
+                  onClick={() => navigate('/DraftDuel')}
+                >
+                  Play Draft Duel
                 </button>
               </div>
             </div>
