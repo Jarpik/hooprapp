@@ -1,8 +1,8 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import HomePage from './pages/HomePage';
-import StatleNBAPage from './pages/StatleNBAPage';
-import DraftDuelPage from './pages/DraftDuelPage'; 
+import StatleNBAPage from './pages/StatleNBAPage.js';
+import DraftDuelPage from './pages/DraftDuelPage.js'; 
 import './styles/index.css';
 
 function App() {
