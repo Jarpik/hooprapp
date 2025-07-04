@@ -1,8 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import BasketballLogo from '../components/basketballlogo.js';
 import DraftDuelMain from '../games/draft-duel/DraftDuelMain.js';
-import './../styles/app.css';
 
 const DraftDuelPage = () => {
   const navigate = useNavigate();
@@ -12,51 +10,31 @@ const DraftDuelPage = () => {
   };
 
   return (
-    <div className="App">
-      <div className="App-header draft-duel-app-header">
-        <div className="header-top">
-          <div className="title-section">
-            <h1>
-              <BasketballLogo size="large" />
-              <span onClick={handleTitleClick} style={{ cursor: 'pointer' }}>
-                Draft Duel
-              </span>
-            </h1>
-            <p className="subtitle">Test your NBA rookie knowledge!</p>
-          </div>
-        </div>
-        <div className="game-content draft-duel-game-content">
-          <DraftDuelMain />
-        </div>
+    <div style={{ position: 'relative', minHeight: '100vh' }}>
+      {/* Minimal HooprApp branding overlay */}
+      <div style={{
+        position: 'absolute',
+        top: '1rem',
+        left: '1rem',
+        zIndex: 1000,
+        background: 'rgba(0, 0, 0, 0.7)',
+        padding: '0.5rem 1rem',
+        borderRadius: '0.5rem',
+        backdropFilter: 'blur(10px)',
+        cursor: 'pointer'
+      }} onClick={handleTitleClick}>
+        <span style={{
+          color: '#f97316',
+          fontWeight: 'bold',
+          fontSize: '1.2rem',
+          fontFamily: 'Inter, sans-serif'
+        }}>
+          ← HooprApp
+        </span>
       </div>
-      
-      <style jsx>{`
-        .draft-duel-app-header {
-          max-width: 1400px;
-          padding: 2rem;
-          background: rgba(15, 23, 42, 0.7);
-        }
-        
-        .draft-duel-game-content {
-          margin-top: 2rem;
-        }
-        
-        /* Override App-header constraints for Draft Duel */
-        .draft-duel-app-header .game-content {
-          max-width: none;
-          width: 100%;
-        }
-        
-        @media (max-width: 768px) {
-          .draft-duel-app-header {
-            padding: 1rem;
-          }
-          
-          .draft-duel-game-content {
-            margin-top: 1rem;
-          }
-        }
-      `}</style>
+
+      {/* Full Draft Duel Game */}
+      <DraftDuelMain />
     </div>
   );
 };
