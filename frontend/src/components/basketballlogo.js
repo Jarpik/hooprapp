@@ -1,5 +1,5 @@
 import React from 'react';
-import './BasketballLogo.css';
+import './basketballlogo.css';
 
 const BasketballLogo = ({ size = 'medium', className = '' }) => {
   const sizeMap = {
