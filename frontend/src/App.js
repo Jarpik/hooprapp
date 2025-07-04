@@ -2,6 +2,7 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import HomePage from './pages/HomePage';
 import StatleNBAPage from './pages/StatleNBAPage';
+import DraftDuelPage from './pages/DraftDuelPage'; 
 import './styles/index.css';
 
 function App() {
@@ -11,6 +12,7 @@ function App() {
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/StatleNBA" element={<StatleNBAPage />} />
+          <Route path="/DraftDuel" element={<DraftDuelPage />} /> 
         </Routes>
       </div>
     </Router>
