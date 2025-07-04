@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+// Updated import path to ensure case sensitivity
 import PlayerHeadshot from './playerheadshot';
 
 const AutocompleteInput = ({ onPlayerSelect, placeholder = "Enter NBA player name..." }) => {
