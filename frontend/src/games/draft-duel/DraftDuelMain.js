@@ -2,22 +2,53 @@ import React, { useState, useEffect, useCallback, useRef } from 'react';
 
 // Team colors mapping exactly as specified
 const TEAM_COLORS = {
-  "Duke": "#001A57", "Rutgers": "#CC0033", "Baylor": "#154734", "UCLA": "#2D68C4",
-  "Texas": "#BF5700", "Oklahoma": "#841617", "BYU": "#002255", "South Carolina": "#73000A",
-  "Washington State": "#990000", "Ratiopharm Ulm": "#FF6600", "Maryland": "#E03A3E",
-  "Arizona": "#003366", "Georgetown": "#041E42", "Qingdao Eagles": "#008080",
-  "Cedevita Olimpija": "#005691", "Florida": "#0021A5", "Saint-Quentin": "#000080",
-  "Illinois": "#13294B", "North Carolina": "#7BAFD4", "Georgia": "#BA0C0F",
-  "Colorado State": "#004B40", "Michigan State": "#18453B", "Real Madrid": "#00529F",
-  "Penn State": "#041E42", "Saint Joseph's": "#800000", "Le Mans Sarthe": "#2C3E50",
-  "Creighton": "#003366", "Auburn": "#0C2340", "Arkansas": "#9D2235",
-  "Tennessee": "#FF8200", "Marquette": "#002D62", "VCU": "#2C3E50",
-  "Liberty": "#800000", "Wisconsin": "#C5050C", "Northwestern": "#4E2A84",
-  "Brisbane Bullets": "#002D62", "Mega Basket": "#FF0000", "West Virginia": "#EAAA00",
-  "Nevada": "#003366", "Cholet Basket": "#CC0000", "Sydney Kings": "#522D80",
-  "Illawarra Hawks": "#CC0000", "Trento": "#2C3E50", "DEFAULT": "#34495E",
+  "Duke": "#001A57", // Dark Blue
+  "Rutgers": "#CC0033", // Scarlet
+  "Baylor": "#154734", // Dark Green
+  "UCLA": "#2D68C4", // Blue
+  "Texas": "#BF5700", // Burnt Orange
+  "Oklahoma": "#841617", // Crimson
+  "BYU": "#002255", // Navy Blue
+  "South Carolina": "#73000A", // Garnet
+  "Washington State": "#990000", // Crimson
+  "Ratiopharm Ulm": "#FF6600", // Orange
+  "Maryland": "#E03A3E", // Red
+  "Arizona": "#003366", // Navy Blue
+  "Georgetown": "#041E42", // Dark Blue
+  "Qingdao Eagles": "#008080", // Teal
+  "Cedevita Olimpija": "#005691", // Blue
+  "Florida": "#0021A5", // Blue
+  "Saint-Quentin": "#000080", // Navy
+  "Illinois": "#13294B", // Dark Blue
+  "North Carolina": "#7BAFD4", // Light Blue
+  "Georgia": "#BA0C0F", // Red
+  "Colorado State": "#004B40", // Dark Green
+  "Michigan State": "#18453B", // Dark Green
+  "Real Madrid": "#00529F", // Blue
+  "Penn State": "#041E42", // Navy Blue
+  "Saint Joseph's": "#800000", // Maroon
+  "Le Mans Sarthe": "#2C3E50", // Dark Grey
+  "Creighton": "#003366", // Blue
+  "Auburn": "#0C2340", // Navy Blue
+  "Arkansas": "#9D2235", // Cardinal
+  "Tennessee": "#FF8200", // Orange
+  "Marquette": "#002D62", // Blue
+  "VCU": "#2C3E50", // Dark Grey
+  "Liberty": "#800000", // Red
+  "Wisconsin": "#C5050C", // Red
+  "Northwestern": "#4E2A84", // Purple
+  "Brisbane Bullets": "#002D62", // Blue
+  "Mega Basket": "#FF0000", // Red
+  "West Virginia": "#EAAA00", // Gold
+  "Nevada": "#003366", // Blue
+  "Cholet Basket": "#CC0000", // Red
+  "Sydney Kings": "#522D80", // Purple
+  "Illawarra Hawks": "#CC0000", // Red
+  "Trento": "#2C3E50", // Dark Grey
+  "DEFAULT": "#34495E", // Dark Slate Gray
 };
 
+// Function to determine text color based on background luminance
 const getContrastTextColor = (hexcolor) => {
   if (!hexcolor || hexcolor === TEAM_COLORS.DEFAULT) return '#FFFFFF';
   const r = parseInt(hexcolor.substr(1, 2), 16);
@@ -46,32 +77,14 @@ const PlayerCard = ({ player, onClick, isSelected, isCorrect, showPick, disabled
   const cardBackgroundColor = TEAM_COLORS[player.preDraftTeam] || TEAM_COLORS.DEFAULT;
   const cardTextColor = getContrastTextColor(cardBackgroundColor);
 
-  let cardClasses = `relative flex flex-col items-center p-6 m-2 rounded-2xl shadow-xl transform transition-all duration-300 ease-out w-64 h-80 sm:w-72 sm:h-96 border-4`;
-  
-  if (isDarkMode) {
-    cardClasses += ` border-gray-700`;
-  } else {
-    cardClasses += ` border-gray-300`;
-  }
-
-  if (isSelected) {
-    cardClasses += ` border-blue-500 ring-4 ring-blue-300 animate-pop-on-select`;
-  } else if (isCorrect === true) {
-    cardClasses += ` border-green-600 ring-4 ring-green-400 animate-pop-in`;
-  } else if (isCorrect === false) {
-    cardClasses += ` border-red-600 ring-4 ring-red-400 animate-shake`;
-  } else if (!disabled) {
-    cardClasses += ` hover:scale-103 hover:shadow-2xl`;
-  }
-
-  if (disabled) {
-    cardClasses += ` opacity-70 cursor-not-allowed`;
-  } else {
-    cardClasses += ` cursor-pointer`;
-  }
+  let cardClasses = "player-card";
+  if (isSelected) cardClasses += " selected";
+  if (isCorrect === true) cardClasses += " correct";
+  if (isCorrect === false) cardClasses += " incorrect";
+  if (disabled) cardClasses += " disabled";
 
   return (
-    <div className="flex flex-col items-center w-full max-w-xs mx-auto">
+    <div className="player-card-wrapper">
       <button
         className={cardClasses}
         onClick={() => onClick(player.id)}
@@ -81,20 +94,20 @@ const PlayerCard = ({ player, onClick, isSelected, isCorrect, showPick, disabled
         <img
           src={player.imageUrl}
           alt={player.name}
-          className={`w-36 h-36 md:w-44 md:h-44 rounded-full object-cover mb-4 border-4 ${isDarkMode ? 'border-gray-800' : 'border-gray-100'} shadow-md transform transition-transform duration-300 hover:scale-105`}
+          className="player-image"
           onError={(e) => { 
             e.target.onerror = null; 
             e.target.src = `https://placehold.co/200x200/666666/FFFFFF?text=${player.name.split(' ').map(n => n[0]).join('')}`; 
           }}
         />
-        <h3 className="text-2xl md:text-3xl font-bold text-center mb-2 leading-tight">{player.name}</h3>
-        <p className="text-lg text-center font-medium">{player.preDraftTeam}</p>
+        <h3 className="player-name">{player.name}</h3>
+        <p className="player-team">{player.preDraftTeam}</p>
       </button>
 
       {showPick && (
-        <div className={`mt-4 bg-gradient-to-r ${isDarkMode ? 'from-gray-800 to-gray-900' : 'from-gray-100 to-gray-200'} ${isDarkMode ? 'text-white' : 'text-gray-900'} text-center px-6 py-3 rounded-xl shadow-lg text-base md:text-lg w-full transform transition-all duration-500 ease-out animate-fade-in-up`}>
-          <p className="font-bold text-yellow-300 text-xl md:text-2xl mb-1">Pick #{player.draftPick}</p>
-          <p className={`${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>{player.team}</p>
+        <div className="reveal-section">
+          <p className="pick-number">Pick #{player.draftPick}</p>
+          <p className="nba-team">{player.team}</p>
         </div>
       )}
     </div>
@@ -335,73 +348,48 @@ const DraftDuelMain = () => {
 
   return (
     <div 
-      className="min-h-screen flex flex-col items-center justify-center p-4 relative App"
+      className={`draft-duel-container ${isDarkMode ? 'dark-mode' : ''}`}
       style={{
         backgroundColor: isDarkMode ? '#1A202C' : '#F8F8F0',
-        fontFamily: "'Outfit', sans-serif",
         backgroundImage: `url("data:image/svg+xml;utf8,${encodedBasketballPattern}")`,
         backgroundRepeat: 'repeat',
         backgroundSize: '200px 200px',
       }}
     >
-      <style>
-        {`
+      <style jsx>{`
         @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&display=swap');
         @import url('https://fonts.googleapis.com/css2?family=VT323&display=swap');
-
-        body { font-family: 'Outfit', sans-serif; }
-        .animate-shake {
-          animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both;
-          transform: translate3d(0, 0, 0);
-          backface-visibility: hidden;
-          perspective: 1000px;
-        }
-        @keyframes shake {
-          10%, 90% { transform: translate3d(-1px, 0, 0); }
-          20%, 80% { transform: translate3d(2px, 0, 0); }
-          30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
-          40%, 60% { transform: translate3d(4px, 0, 0); }
-        }
-        .animate-pop-in {
-            animation: pop-in 0.3s ease-out forwards;
-        }
-        @keyframes pop-in {
-            0% { transform: scale(0.8); opacity: 0; }
-            70% { transform: scale(1.1); opacity: 1; }
-            100% { transform: scale(1); }
-        }
-        .animate-pop-on-select {
-            animation: pop-on-select 0.15s ease-out forwards;
-        }
-        @keyframes pop-on-select {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.03); }
-            100% { transform: scale(1.02); }
-        }
-        .animate-fade-in-up {
-            animation: fade-in-up 0.5s ease-out forwards;
-        }
-        @keyframes fade-in-up {
-            0% { opacity: 0; transform: translateY(20px); }
-            100% { opacity: 1; transform: translateY(0); }
-        }
-        .vs-text {
-          background: linear-gradient(to top, #FFD700 30%, #FF4500 100%);
-          -webkit-background-clip: text;
-          -webkit-text-fill-color: transparent;
-          background-clip: text;
-          color: transparent;
-          filter: drop-shadow(0 0 8px rgba(255, 165, 0, 0.8)) drop-shadow(0 0 15px rgba(255, 69, 0, 0.6));
-          animation: flicker 1.5s infinite alternate;
+        
+        .draft-duel-container {
+          min-height: 100vh;
+          padding: 2rem;
+          font-family: 'Outfit', sans-serif;
+          position: relative;
         }
 
-        @keyframes flicker {
-          0%, 100% { opacity: 1; transform: scale(1); }
-          25% { opacity: 0.9; transform: scale(1.02); }
-          50% { opacity: 1; transform: scale(1); }
-          75% { opacity: 0.95; transform: scale(1.01); }
+        /* Dark Mode Toggle */
+        .theme-toggle {
+          position: absolute;
+          top: 1rem;
+          right: 1rem;
+          background: rgba(255, 255, 255, 0.1);
+          border: none;
+          border-radius: 50%;
+          width: 3rem;
+          height: 3rem;
+          font-size: 1.5rem;
+          cursor: pointer;
+          backdrop-filter: blur(10px);
+          transition: all 0.3s ease;
+          z-index: 100;
         }
 
+        .theme-toggle:hover {
+          background: rgba(255, 255, 255, 0.2);
+          transform: scale(1.1);
+        }
+
+        /* Scoreboard */
         .scoreboard {
           background-color: #000;
           border: 5px solid #333;
@@ -417,6 +405,7 @@ const DraftDuelMain = () => {
           padding: 5px;
           min-height: 100px;
           height: auto;
+          margin: 0 auto 2rem;
         }
 
         .scoreboard-box {
@@ -429,7 +418,7 @@ const DraftDuelMain = () => {
           flex-direction: column;
           align-items: center;
           justify-content: space-between;
-          padding: 5px 5px;
+          padding: 5px;
           margin: 0 5px;
           position: relative;
           min-height: 60px;
@@ -440,7 +429,7 @@ const DraftDuelMain = () => {
           display: flex;
           flex-direction: column;
           justify-content: space-between;
-          padding: 5px 5px;
+          padding: 5px;
         }
 
         .scoreboard-box:not(.scoreboard-middle-box)::before {
@@ -513,33 +502,445 @@ const DraftDuelMain = () => {
           to { text-shadow: 0 0 25px rgba(255, 0, 0, 1.2); }
         }
 
-        .hover\\:scale-103:hover {
-          transform: scale(1.03);
+        /* Game Area */
+        .game-area {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 2rem;
+          max-width: 1200px;
+          margin: 0 auto;
+          position: relative;
         }
-        `}
-      </style>
 
-      {/* Dark/Light Mode Toggle Button */}
-      <button
+        /* Basketball Court Background */
+        .court-background {
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          z-index: -1;
+          opacity: 0.45;
+          transform: scale(0.38) translateY(35px);
+          pointer-events: none;
+        }
+
+        /* Player Comparison */
+        .players-comparison {
+          position: relative;
+          width: 100%;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          gap: 4rem;
+          flex-wrap: wrap;
+        }
+
+        .player-card-wrapper {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 1rem;
+        }
+
+        /* Player Cards */
+        .player-card {
+          position: relative;
+          width: 16rem;
+          height: 20rem;
+          border-radius: 1rem;
+          padding: 1.5rem;
+          cursor: pointer;
+          transition: all 0.3s ease;
+          box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+          border: 4px solid rgba(255, 255, 255, 0.2);
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: space-between;
+          background: none;
+          font-family: inherit;
+        }
+
+        .player-card:hover:not(.disabled) {
+          transform: translateY(-8px) scale(1.03);
+          box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+        }
+
+        .player-card.selected {
+          border-color: #3B82F6;
+          box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.3);
+          animation: pop-on-select 0.15s ease-out;
+        }
+
+        .player-card.correct {
+          border-color: #10B981;
+          box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.4);
+          animation: pop-in 0.3s ease-out;
+        }
+
+        .player-card.incorrect {
+          border-color: #EF4444;
+          box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.4);
+          animation: shake 0.5s ease-out;
+        }
+
+        .player-card.disabled {
+          opacity: 0.7;
+          cursor: not-allowed;
+        }
+
+        @keyframes pop-on-select {
+          0% { transform: scale(1); }
+          50% { transform: scale(1.03); }
+          100% { transform: scale(1.02); }
+        }
+
+        @keyframes pop-in {
+          0% { transform: scale(0.8); opacity: 0; }
+          70% { transform: scale(1.1); opacity: 1; }
+          100% { transform: scale(1); }
+        }
+
+        @keyframes shake {
+          10%, 90% { transform: translate3d(-1px, 0, 0); }
+          20%, 80% { transform: translate3d(2px, 0, 0); }
+          30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
+          40%, 60% { transform: translate3d(4px, 0, 0); }
+        }
+
+        /* Player Card Content */
+        .player-image {
+          width: 9rem;
+          height: 11rem;
+          border-radius: 50%;
+          object-fit: cover;
+          margin-bottom: 1rem;
+          border: 4px solid rgba(255, 255, 255, 0.2);
+          transition: transform 0.3s ease;
+        }
+
+        .player-card:hover .player-image {
+          transform: scale(1.05);
+        }
+
+        .player-name {
+          font-size: 1.5rem;
+          font-weight: 700;
+          text-align: center;
+          margin-bottom: 0.5rem;
+          text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .player-team {
+          font-size: 1.125rem;
+          text-align: center;
+          font-weight: 500;
+          margin: 0;
+          opacity: 0.9;
+        }
+
+        /* Reveal Section */
+        .reveal-section {
+          background: linear-gradient(135deg, rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.9));
+          color: #ffffff;
+          padding: 1rem 1.5rem;
+          border-radius: 0.75rem;
+          box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+          text-align: center;
+          animation: fade-in-up 0.5s ease-out;
+          min-width: 200px;
+        }
+
+        .pick-number {
+          font-size: 1.5rem;
+          font-weight: 700;
+          color: #FBBF24;
+          margin-bottom: 0.5rem;
+        }
+
+        .nba-team {
+          font-size: 1rem;
+          opacity: 0.9;
+          margin: 0;
+        }
+
+        @keyframes fade-in-up {
+          from {
+            opacity: 0;
+            transform: translateY(20px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+
+        /* VS Text */
+        .vs-text {
+          font-size: 6rem;
+          font-weight: 800;
+          background: linear-gradient(to top, #FFD700 30%, #FF4500 100%);
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          background-clip: text;
+          filter: drop-shadow(0 0 8px rgba(255, 165, 0, 0.8)) drop-shadow(0 0 15px rgba(255, 69, 0, 0.6));
+          animation: flicker 1.5s infinite alternate;
+          position: absolute;
+          z-index: 10;
+        }
+
+        @keyframes flicker {
+          0%, 100% { opacity: 1; transform: scale(1); }
+          25% { opacity: 0.9; transform: scale(1.02); }
+          50% { opacity: 1; transform: scale(1); }
+          75% { opacity: 0.95; transform: scale(1.01); }
+        }
+
+        /* Feedback Message */
+        .feedback-message {
+          font-size: 3rem;
+          font-weight: 700;
+          text-align: center;
+          padding: 1.5rem 2rem;
+          border-radius: 0.75rem;
+          box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+          animation: fade-in-up 0.5s ease-out;
+          margin-top: 2rem;
+        }
+
+        .feedback-message.correct {
+          background: #10B981;
+          color: white;
+        }
+
+        .feedback-message.incorrect {
+          background: #EF4444;
+          color: white;
+        }
+
+        .feedback-message.timeout {
+          background: #3B82F6;
+          color: white;
+        }
+
+        /* Action Buttons */
+        .action-buttons {
+          display: flex;
+          gap: 1rem;
+          justify-content: center;
+          flex-wrap: wrap;
+          margin-top: 2rem;
+        }
+
+        .action-button {
+          padding: 1rem 2rem;
+          border: none;
+          border-radius: 9999px;
+          font-size: 1rem;
+          font-weight: 600;
+          cursor: pointer;
+          transition: all 0.3s ease;
+          box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+          min-width: 140px;
+        }
+
+        .action-button:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+        }
+
+        .action-button:active {
+          transform: translateY(0);
+        }
+
+        .continue-button {
+          background: linear-gradient(135deg, #3B82F6 0%, #1D4ED8 100%);
+          color: white;
+        }
+
+        .play-again-button {
+          background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+          color: white;
+        }
+
+        .share-button {
+          background: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%);
+          color: white;
+        }
+
+        /* Share Modal */
+        .share-modal-overlay {
+          position: fixed;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          background: rgba(0, 0, 0, 0.75);
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          z-index: 1000;
+          padding: 1rem;
+          animation: fade-in-up 0.3s ease-out;
+        }
+
+        .share-modal {
+          background: ${isDarkMode ? '#2D3748' : '#FFFFFF'};
+          color: ${isDarkMode ? '#FFFFFF' : '#2D3748'};
+          padding: 2rem;
+          border-radius: 1.5rem;
+          box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+          max-width: 28rem;
+          width: 100%;
+          text-align: center;
+        }
+
+        .share-modal h2 {
+          font-size: 3rem;
+          font-weight: 800;
+          margin-bottom: 1rem;
+          color: ${isDarkMode ? '#FFFFFF' : '#2D3748'};
+        }
+
+        .share-modal p {
+          font-size: 1.125rem;
+          margin-bottom: 1rem;
+          color: ${isDarkMode ? '#A0AEC0' : '#4A5568'};
+        }
+
+        .share-textarea {
+          width: 100%;
+          padding: 1rem;
+          border: 2px solid ${isDarkMode ? '#4A5568' : '#E2E8F0'};
+          border-radius: 0.5rem;
+          font-family: 'Courier New', monospace;
+          font-size: 1rem;
+          resize: none;
+          height: 7rem;
+          margin-bottom: 1rem;
+          background: ${isDarkMode ? '#1A202C' : '#F7FAFC'};
+          color: ${isDarkMode ? '#FFFFFF' : '#2D3748'};
+        }
+
+        .share-textarea:focus {
+          outline: none;
+          border-color: #3B82F6;
+          box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+        }
+
+        .share-buttons {
+          display: flex;
+          gap: 1rem;
+          justify-content: center;
+        }
+
+        .copy-button {
+          background: linear-gradient(135deg, #3B82F6 0%, #1D4ED8 100%);
+          color: white;
+        }
+
+        .back-button {
+          background: ${isDarkMode ? '#4A5568' : '#E2E8F0'};
+          color: ${isDarkMode ? '#FFFFFF' : '#2D3748'};
+        }
+
+        .back-button:hover {
+          background: ${isDarkMode ? '#2D3748' : '#CBD5E0'};
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+          .draft-duel-container {
+            padding: 1rem;
+          }
+          
+          .scoreboard {
+            flex-direction: column;
+            gap: 1rem;
+            text-align: center;
+            padding: 1rem;
+          }
+          
+          .scoreboard-box, .scoreboard-middle-box {
+            min-width: auto;
+          }
+          
+          .players-comparison {
+            flex-direction: column;
+            gap: 1rem;
+          }
+          
+          .player-card {
+            width: 100%;
+            max-width: 280px;
+          }
+          
+          .vs-text {
+            position: static;
+            font-size: 4rem;
+            margin: 1rem 0;
+          }
+          
+          .action-buttons {
+            flex-direction: column;
+            align-items: center;
+          }
+          
+          .action-button {
+            width: 100%;
+            max-width: 200px;
+          }
+        }
+
+        @media (max-width: 480px) {
+          .player-card {
+            width: 100%;
+            height: 18rem;
+          }
+          
+          .scoreboard {
+            padding: 1rem;
+          }
+          
+          .scoreboard-value, .scoreboard-timer {
+            font-size: 2rem;
+          }
+          
+          .scoreboard-question-text {
+            font-size: 1rem;
+          }
+          
+          .vs-text {
+            font-size: 3rem;
+          }
+          
+          .feedback-message {
+            font-size: 2rem;
+          }
+        }
+      `}</style>
+
+      {/* Theme Toggle */}
+      <button 
+        className="theme-toggle"
         onClick={toggleDarkMode}
-        className={`absolute top-4 right-4 p-3 rounded-full shadow-lg transition-colors duration-300
-          ${isDarkMode ? 'bg-gray-700 text-yellow-300 hover:bg-gray-600' : 'bg-gray-200 text-gray-800 hover:bg-gray-300'}
-        `}
-        title={isDarkMode ? "Switch to Light Mode" : "Switch to Dark Mode"}
+        aria-label="Toggle theme"
       >
         {isDarkMode ? (
           <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-            <path strokeLinecap="round" strokeLinejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9 9 0 008.354-5.646z" />
+            <path strokeLinecap="round" strokeLinejoin="round" d="M12 3v1m0 16v1m9-9h1M4 12H3m15.354 5.354l-.707.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
           </svg>
         ) : (
           <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-            <path strokeLinecap="round" strokeLinejoin="round" d="M12 3v1m0 16v1m9-9h1M4 12H3m15.354 5.354l-.707.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+            <path strokeLinecap="round" strokeLinejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9 9 0 008.354-5.646z" />
           </svg>
         )}
       </button>
 
       {/* High School Basketball Scoreboard */}
-      <div className="scoreboard mb-6 mt-4">
+      <div className="scoreboard">
         <div className="scoreboard-box">
           <div className="scoreboard-label">Streak</div>
           <div className="scoreboard-value">{currentStreak}</div>
@@ -560,118 +961,89 @@ const DraftDuelMain = () => {
         </div>
       </div>
 
-      {/* The main game content (player cards and VS) */}
-      <div className="relative flex flex-col md:flex-row justify-center items-stretch gap-8 w-full max-w-5xl mt-6">
-        {/* Basketball court SVG as background for the VS section */}
-        <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-          <div className="w-full h-full max-w-5xl max-h-96 relative overflow-hidden">
-            <div
-              className="absolute inset-0"
-              dangerouslySetInnerHTML={{ __html: basketballCourtSVG }}
-              style={{ transform: 'scale(0.38) translateY(35px)', opacity: 0.45 }}
+      {/* Game Area */}
+      <div className="game-area">
+        {/* Basketball Court Background */}
+        <div className="court-background" dangerouslySetInnerHTML={{ __html: basketballCourtSVG }} />
+
+        {/* Player Comparison */}
+        <div className="players-comparison">
+          {player1 && (
+            <PlayerCard
+              player={player1}
+              onClick={handleGuess}
+              isSelected={selectedPlayerId === player1.id}
+              isCorrect={selectedPlayerId !== null ? (currentQuestion?.getCorrectPlayerId(player1, player2) === player1.id) : null}
+              showPick={selectedPlayerId !== null}
+              disabled={selectedPlayerId !== null || gameOver}
+              isDarkMode={isDarkMode}
             />
-          </div>
+          )}
+          
+          {/* VS Text */}
+          <div className="vs-text">VS</div>
+          
+          {player2 && (
+            <PlayerCard
+              player={player2}
+              onClick={handleGuess}
+              isSelected={selectedPlayerId === player2.id}
+              isCorrect={selectedPlayerId !== null ? (currentQuestion?.getCorrectPlayerId(player1, player2) === player2.id) : null}
+              showPick={selectedPlayerId !== null}
+              disabled={selectedPlayerId !== null || gameOver}
+              isDarkMode={isDarkMode}
+            />
+          )}
         </div>
 
-        {player1 && (
-          <PlayerCard
-            player={player1}
-            onClick={handleGuess}
-            isSelected={selectedPlayerId === player1.id}
-            isCorrect={selectedPlayerId !== null ? (currentQuestion.getCorrectPlayerId(player1, player2) === player1.id) : null}
-            showPick={selectedPlayerId !== null}
-            disabled={selectedPlayerId !== null || gameOver}
-            isDarkMode={isDarkMode}
-          />
+        {/* Feedback */}
+        {feedbackMessage && (
+          <div className={`feedback-message ${
+            isCorrectGuess === true ? 'correct' : 
+            isCorrectGuess === false ? 'incorrect' : 'timeout'
+          }`}>
+            {feedbackMessage}
+          </div>
         )}
-        
-        {/* VS text styling */}
-        <div className="relative z-10 flex items-center justify-center text-6xl font-extrabold md:px-4">
-          <span className="vs-text">VS</span>
-        </div>
-        
-        {player2 && (
-          <PlayerCard
-            player={player2}
-            onClick={handleGuess}
-            isSelected={selectedPlayerId === player2.id}
-            isCorrect={selectedPlayerId !== null ? (currentQuestion.getCorrectPlayerId(player1, player2) === player2.id) : null}
-            showPick={selectedPlayerId !== null}
-            disabled={selectedPlayerId !== null || gameOver}
-            isDarkMode={isDarkMode}
-          />
+
+        {/* Action Buttons */}
+        {selectedPlayerId !== null && (
+          <div className="action-buttons">
+            {!gameOver ? (
+              <button onClick={handleContinue} className="action-button continue-button">
+                Continue
+              </button>
+            ) : (
+              <>
+                <button onClick={handleContinue} className="action-button play-again-button">
+                  Play Again
+                </button>
+                <button onClick={shareStreak} className="action-button share-button">
+                  Share Streak
+                </button>
+              </>
+            )}
+          </div>
         )}
       </div>
 
-      {feedbackMessage && (
-        <p className={`mt-10 text-3xl font-bold text-center px-6 py-4 rounded-xl shadow-lg animate-fade-in-up
-          ${isCorrectGuess === true ? 'bg-green-700 text-white' : ''}
-          ${isCorrectGuess === false ? 'bg-red-700 text-white' : ''}
-          ${isCorrectGuess === null ? 'bg-blue-500 text-white' : ''}
-        `}>
-          {feedbackMessage}
-        </p>
-      )}
-
-      {selectedPlayerId !== null && (
-        <div className="mt-10 flex flex-col sm:flex-row gap-6">
-          {!gameOver ? (
-            <button
-              onClick={handleContinue}
-              className="bg-gradient-to-r from-blue-500 to-blue-700 hover:from-blue-600 hover:to-blue-800 text-white font-bold py-4 px-10 rounded-full shadow-lg transition-all duration-300 transform hover:scale-105 active:scale-95 focus:outline-none focus:ring-4 focus:ring-blue-400 focus:ring-opacity-75 text-xl"
-            >
-              Continue
-            </button>
-          ) : (
-            <>
-              <button
-                onClick={handleContinue}
-                className="bg-gradient-to-r from-green-500 to-green-700 hover:from-green-600 hover:to-green-800 text-white font-bold py-4 px-10 rounded-full shadow-lg transition-all duration-300 transform hover:scale-105 active:scale-95 focus:outline-none focus:ring-4 focus:ring-green-400 focus:ring-opacity-75 text-xl"
-              >
-                Play Again
-              </button>
-              <button
-                onClick={shareStreak}
-                className="bg-gradient-to-r from-purple-500 to-purple-700 hover:from-purple-600 hover:to-purple-800 text-white font-bold py-4 px-10 rounded-full shadow-lg transition-all duration-300 transform hover:scale-105 active:scale-95 focus:outline-none focus:ring-4 focus:ring-purple-400 focus:ring-opacity-75 text-xl"
-              >
-                Share Streak
-              </button>
-            </>
-          )}
-        </div>
-      )}
-
-      {/* Share Streak Modal */}
+      {/* Share Modal */}
       {showShareModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-4 animate-fade-in-up">
-          <div className={`p-8 rounded-2xl shadow-2xl max-w-md w-full text-center transform scale-105 transition-transform duration-300 ease-out
-            ${isDarkMode ? 'bg-gray-800 text-white' : 'bg-white text-gray-900'}
-          `}>
-            <h2 className="text-3xl font-extrabold mb-6">Share Your Streak!</h2>
-            <p className={`text-lg mb-4 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-              Copy the text below to share your amazing streak!
-            </p>
+        <div className="share-modal-overlay">
+          <div className="share-modal">
+            <h2>Share Your Streak!</h2>
+            <p>Copy the text below to share your amazing streak!</p>
             <textarea
               ref={shareTextRef}
+              className="share-textarea"
               readOnly
               value={`I just scored a streak of ${currentStreak} in the NBA Rookie Draft Pick game! Think you can beat it? #NBADraftGame`}
-              className={`w-full p-4 border-2 rounded-lg font-mono text-base resize-none mb-6 focus:outline-none focus:border-blue-500 h-28
-                ${isDarkMode ? 'bg-gray-700 border-gray-600 text-gray-200' : 'bg-gray-50 border-gray-300 text-gray-800'}
-              `}
             />
-            <div className="flex flex-col sm:flex-row justify-center gap-4">
-              <button
-                onClick={handleCopyShareText}
-                className="bg-gradient-to-r from-blue-500 to-blue-700 hover:from-blue-600 hover:to-blue-800 text-white font-bold py-3 px-8 rounded-full shadow-lg transition-all duration-300 transform hover:scale-105 active:scale-95 focus:outline-none focus:ring-4 focus:ring-blue-400 text-lg"
-              >
+            <div className="share-buttons">
+              <button onClick={handleCopyShareText} className="action-button copy-button">
                 Copy
               </button>
-              <button
-                onClick={handleCloseShareModal}
-                className={`font-bold py-3 px-8 rounded-full shadow-lg transition-all duration-300 transform hover:scale-105 active:scale-95 focus:outline-none focus:ring-4 text-lg
-                  ${isDarkMode ? 'bg-gray-600 hover:bg-gray-500 text-white focus:ring-gray-400' : 'bg-gray-300 hover:bg-gray-400 text-gray-800 focus:ring-gray-400'}
-                `}
-              >
+              <button onClick={handleCloseShareModal} className="action-button back-button">
                 Back
               </button>
             </div>
