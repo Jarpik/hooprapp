@@ -1,5 +1,5 @@
 import React from 'react';
-import './ProgressVisualization.css';
+import './progressvisualization.css';
 
 const ProgressVisualization = ({ 
   guessCount, 
