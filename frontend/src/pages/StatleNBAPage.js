@@ -9,365 +9,595 @@ import ProgressVisualization from '../games/statle-nba/progressvisualization';
 import ConfettiAnimation from '../games/statle-nba/confettianimation';
 import '../styles/app.css';
 
-const StatleNBAPage = () => {
+function StatleNBAPage() {
   const navigate = useNavigate();
-  const [gameState, setGameState] = useState('playing');
-  const [guessCount, setGuessCount] = useState(0);
-  const [hintsRevealed, setHintsRevealed] = useState(0);
-  const [targetPlayer, setTargetPlayer] = useState(null);
+  const [dailyPlayer, setDailyPlayer] = useState(null);
   const [guesses, setGuesses] = useState([]);
-  const [showAuthModal, setShowAuthModal] = useState(false);
-  const [user, setUser] = useState(null);
-  const [gameId, setGameId] = useState(null);
+  const [gameWon, setGameWon] = useState(false);
+  const [hintsRevealed, setHintsRevealed] = useState(1); // Start with 1 hint revealed
+  const [gameStats, setGameStats] = useState(null);
+  const [shareText, setShareText] = useState('');
+  const [copySuccess, setCopySuccess] = useState(false);
   const [showConfetti, setShowConfetti] = useState(false);
-  const [confettiIntensity, setConfettiIntensity] = useState(0.5);
-  const [allPlayers, setAllPlayers] = useState([]);
-  const [currentHints, setCurrentHints] = useState([]);
+  
+  // User authentication states
+  const [user, setUser] = useState(null);
+  const [userStats, setUserStats] = useState(null);
+  const [showAuthModal, setShowAuthModal] = useState(false);
 
-  // API base URL
-  const API_BASE_URL = process.env.REACT_APP_API_URL || 'https://hooprapp-api.onrender.com';
-
+  // Fetch daily player from backend
   useEffect(() => {
-    fetchTargetPlayer();
-    fetchAllPlayers();
-    
-    const storedUser = localStorage.getItem('user');
-    if (storedUser) {
-      setUser(JSON.parse(storedUser));
+    fetch('https://hooprapp.onrender.com/api/daily-player')
+      .then(response => response.json())
+      .then(data => {
+        console.log('Daily player data:', data.player); // Debug log
+        console.log('Daily player photo URL:', data.player.headshot_url); // Debug log
+        setDailyPlayer(data.player);
+      })
+      .catch(error => {
+        console.error('Error fetching player:', error);
+      });
+  }, []);
+
+  // Check for saved user in localStorage on app load
+  useEffect(() => {
+    const savedUser = localStorage.getItem('statlnba_user');
+    if (savedUser) {
+      const userData = JSON.parse(savedUser);
+      setUser(userData);
+      // Fetch fresh user stats
+      fetchUserStats(userData.email);
     }
   }, []);
 
-  const fetchTargetPlayer = async () => {
+  const fetchUserStats = async (email) => {
     try {
-      const response = await fetch(`${API_BASE_URL}/api/target-player`);
+      const response = await fetch(`https://hooprapp.onrender.com/api/user/${email}/stats`);
       const data = await response.json();
-      setTargetPlayer(data);
-      setGameId(data.gameId);
+      setUserStats(data.stats);
     } catch (error) {
-      console.error('Error fetching target player:', error);
+      console.error('Error fetching user stats:', error);
     }
   };
 
-  const fetchAllPlayers = async () => {
+  // Calculate score based on performance
+  const calculateScore = (guessCount, hintsUsed) => {
+    let score = 100;
+    
+    // Deduct points for each guess (first guess is free)
+    if (guessCount > 1) {
+      score -= (guessCount - 1) * 15;
+    }
+    
+    // Deduct points for each hint used (subtract 1 since first hint is free)
+    const paidHints = Math.max(hintsUsed - 1, 0);
+    score -= paidHints * 10;
+    
+    // Ensure score doesn't go below 10
+    score = Math.max(score, 10);
+    
+    return score;
+  };
+
+  // NEW: Calculate current score preview for progress visualization
+  const calculateCurrentScore = () => {
+    if (gameWon) {
+      return gameStats?.score || 0;
+    }
+    // Calculate preview score based on current state
+    const currentGuessCount = guesses.length > 0 ? guesses.length + 1 : 1; // +1 for the guess they're about to make
+    return calculateScore(currentGuessCount, hintsRevealed);
+  };
+
+  // NEW: Get maximum hints available for this player
+  const getMaxHints = () => {
+    if (!dailyPlayer) return 12;
+    
+    // Count all valid hints (same logic as getHints())
+    const allPossibleHints = [
+      hasValue(dailyPlayer.team) ? `Team: ${dailyPlayer.team}` : null,
+      hasValue(dailyPlayer.position) ? `Position: ${dailyPlayer.position}` : null,
+      hasValue(dailyPlayer.height) ? `Height: ${dailyPlayer.height}` : null,
+      hasValue(dailyPlayer.age) ? `Age: ${dailyPlayer.age}` : null,
+      hasValue(dailyPlayer.ppg) ? `Points Per Game: ${dailyPlayer.ppg}` : null,
+      hasValue(dailyPlayer.rpg) ? `Rebounds Per Game: ${dailyPlayer.rpg}` : null,
+      hasValue(dailyPlayer.apg) ? `Assists Per Game: ${dailyPlayer.apg}` : null,
+      formatDraftYear(dailyPlayer.draft_year),
+      hasValue(dailyPlayer.college) ? `College: ${dailyPlayer.college}` : null,
+      hasValue(dailyPlayer.country) ? `Country: ${dailyPlayer.country}` : null,
+      hasValue(dailyPlayer.weight) ? `Weight: ${dailyPlayer.weight} lbs` : null,
+      hasValue(dailyPlayer.draft_round) ? `Draft Round: ${dailyPlayer.draft_round}` : null
+    ];
+    
+    return allPossibleHints.filter(hint => hint !== null).length;
+  };
+
+  // Get performance rating
+  const getPerformanceRating = (score, guessCount) => {
+    if (guessCount === 1 && score >= 100) return { text: "🎯 PERFECT!", color: "#10b981" };
+    if (score >= 80) return { text: "🔥 AMAZING!", color: "#3b82f6" };
+    if (score >= 60) return { text: "⭐ GREAT!", color: "#8b5cf6" };
+    if (score >= 40) return { text: "👏 GOOD!", color: "#f59e0b" };
+    return { text: "💪 NICE TRY!", color: "#ef4444" };
+  };
+
+  // Generate shareable result text
+  const generateShareText = (guessCount, hintsUsed, score, playerName) => {
+    // Calculate challenge number (days since epoch)
+    const today = new Date();
+    const startDate = new Date('2025-01-01'); // StatleNBA launch date
+    const daysSinceStart = Math.floor((today - startDate) / (1000 * 60 * 60 * 24)) + 1;
+    
+    // Create visual representation
+    let visual = '';
+    
+    // Add incorrect guesses (red squares)
+    for (let i = 0; i < guessCount - 1; i++) {
+      visual += '🟥';
+    }
+    
+    // Add correct guess (green square)
+    visual += '🟩';
+    
+    // Add hint indicators (yellow squares for hints used, subtract 1 for free first hint)
+    const paidHints = Math.max(hintsUsed - 1, 0);
+    if (paidHints > 0) {
+      visual += ' ';
+      for (let i = 0; i < paidHints; i++) {
+        visual += '🟨';
+      }
+    }
+    
+    const shareText = `🏀 StatleNBA #${daysSinceStart}
+
+${visual}
+
+Score: ${score}/100
+Guesses: ${guessCount}
+Hints: ${hintsUsed}
+
+Can you guess today's NBA player?
+Play at: hooprapp.com`;
+
+    return shareText;
+  };
+
+  // Copy to clipboard function
+  const copyToClipboard = async () => {
     try {
-      const response = await fetch(`${API_BASE_URL}/api/players`);
-      const data = await response.json();
-      setAllPlayers(data);
-    } catch (error) {
-      console.error('Error fetching players:', error);
+      await navigator.clipboard.writeText(shareText);
+      setCopySuccess(true);
+      setTimeout(() => setCopySuccess(false), 2000);
+    } catch (err) {
+      console.error('Failed to copy text: ', err);
+      // Fallback for older browsers
+      const textArea = document.createElement('textarea');
+      textArea.value = shareText;
+      document.body.appendChild(textArea);
+      textArea.select();
+      document.execCommand('copy');
+      document.body.removeChild(textArea);
+      setCopySuccess(true);
+      setTimeout(() => setCopySuccess(false), 2000);
     }
   };
 
-  const handleGuess = async (playerName) => {
-    if (gameState !== 'playing') return;
+  // Submit game result to backend (if user is logged in)
+  const submitGameResult = async (finalScore, finalGuessCount, finalHintsUsed, won) => {
+    if (!user) return;
 
-    const newGuessCount = guessCount + 1;
-    setGuessCount(newGuessCount);
+    try {
+      const response = await fetch('https://hooprapp.onrender.com/api/submit-game', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: user.email,
+          score: finalScore,
+          guesses: finalGuessCount,
+          hintsUsed: finalHintsUsed,
+          won: won,
+          date: new Date().toISOString().split('T')[0]
+        }),
+      });
 
-    const guessedPlayer = allPlayers.find(p => p.name === playerName);
-    if (guessedPlayer) {
-      setGuesses(prev => [...prev, guessedPlayer]);
+      if (response.ok) {
+        const data = await response.json();
+        setUserStats(data.stats);
+        // Show streak badge if earned
+        if (data.streakBadge) {
+          console.log('Streak badge earned:', data.streakBadge);
+        }
+      }
+    } catch (error) {
+      console.error('Error submitting game result:', error);
     }
+  };
 
-    if (playerName === targetPlayer?.name) {
-      setGameState('won');
-      const score = Math.max(0, 100 - (newGuessCount - 1) * 20);
+  // Updated to handle autocomplete selections with score tracking
+  const handlePlayerSelect = (playerName) => {
+    if (!playerName.trim()) return;
+    
+    const newGuesses = [...guesses, playerName];
+    setGuesses(newGuesses);
+    
+    if (playerName.toLowerCase() === dailyPlayer.name.toLowerCase()) {
+      // Calculate final stats
+      const finalGuessCount = newGuesses.length;
+      const finalHintsUsed = hintsRevealed;
+      const finalScore = calculateScore(finalGuessCount, finalHintsUsed);
+      const rating = getPerformanceRating(finalScore, finalGuessCount);
       
-      // Set confetti intensity based on score
-      if (score >= 80) setConfettiIntensity(1.0);
-      else if (score >= 60) setConfettiIntensity(0.8);
-      else if (score >= 40) setConfettiIntensity(0.6);
-      else setConfettiIntensity(0.4);
+      // Generate share text
+      const share = generateShareText(finalGuessCount, finalHintsUsed, finalScore, dailyPlayer.name);
+      setShareText(share);
       
+      setGameStats({
+        guessCount: finalGuessCount,
+        hintsUsed: finalHintsUsed,
+        score: finalScore,
+        rating: rating,
+        playerName: dailyPlayer.name,
+        playerPhotoUrl: dailyPlayer.headshot_url
+      });
+      
+      setGameWon(true);
       setShowConfetti(true);
       
-      // Submit game result if user is logged in
-      if (user && gameId) {
-        try {
-          await fetch(`${API_BASE_URL}/api/game-result`, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-              userId: user.id,
-              gameId: gameId,
-              won: true,
-              guessCount: newGuessCount,
-              hintsUsed: hintsRevealed,
-              score: score,
-              targetPlayerId: targetPlayer.id
-            }),
-          });
-        } catch (error) {
-          console.error('Error submitting game result:', error);
-        }
-      }
-    } else if (newGuessCount >= 5) {
-      setGameState('lost');
-      
-      // Submit game result if user is logged in
-      if (user && gameId) {
-        try {
-          await fetch(`${API_BASE_URL}/api/game-result`, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-              userId: user.id,
-              gameId: gameId,
-              won: false,
-              guessCount: newGuessCount,
-              hintsUsed: hintsRevealed,
-              score: 0,
-              targetPlayerId: targetPlayer.id
-            }),
-          });
-        } catch (error) {
-          console.error('Error submitting game result:', error);
-        }
+      // Submit to backend if user is logged in
+      submitGameResult(finalScore, finalGuessCount, finalHintsUsed, true);
+    } else {
+      // Check if maximum guesses reached
+      if (newGuesses.length >= 5) {
+        // Game over - player failed
+        setGameStats({
+          guessCount: newGuesses.length,
+          hintsUsed: hintsRevealed,
+          score: 0,
+          rating: { text: "💔 GAME OVER!", color: "#ef4444" },
+          playerName: dailyPlayer.name,
+          playerPhotoUrl: dailyPlayer.headshot_url
+        });
+        setGameWon(true); // Use same win state to show results
+        
+        // No confetti for game over (only for wins)
+        
+        // Submit failed game to backend if user is logged in
+        submitGameResult(0, newGuesses.length, hintsRevealed, false);
+      } else {
+        setHintsRevealed(hintsRevealed + 1);
       }
     }
   };
 
-  const handleHintRequest = () => {
-    if (hintsRevealed < 5 && gameState === 'playing') {
-      setHintsRevealed(prev => prev + 1);
+  // Handle user login
+  const handleLogin = (userData, stats) => {
+    setUser(userData);
+    if (stats) {
+      setUserStats(stats);
     }
+    // Save to localStorage
+    localStorage.setItem('statlnba_user', JSON.stringify(userData));
+    setShowAuthModal(false);
   };
 
-  const handleNewGame = () => {
-    setGameState('playing');
-    setGuessCount(0);
-    setHintsRevealed(0);
-    setGuesses([]);
-    setShowConfetti(false);
-    setCurrentHints([]);
-    fetchTargetPlayer();
+  // Handle user logout
+  const handleLogout = () => {
+    setUser(null);
+    setUserStats(null);
+    localStorage.removeItem('statlnba_user');
   };
 
+  // Handle title click to navigate home
   const handleTitleClick = () => {
     navigate('/');
   };
 
-  const handleLogin = async (username, password) => {
-    try {
-      const response = await fetch(`${API_BASE_URL}/api/login`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ username, password }),
+  // Reset game function
+  const resetGame = () => {
+    setGuesses([]);
+    setGameWon(false);
+    setHintsRevealed(1); // Reset to 1 to show first hint
+    setGameStats(null);
+    setShareText('');
+    setCopySuccess(false);
+    setShowConfetti(false);
+    
+    // Fetch a new daily player
+    fetch('https://hooprapp.onrender.com/api/daily-player')
+      .then(response => response.json())
+      .then(data => {
+        console.log('New daily player data:', data.player); // Debug log
+        setDailyPlayer(data.player);
       });
-
-      if (response.ok) {
-        const userData = await response.json();
-        setUser(userData);
-        localStorage.setItem('user', JSON.stringify(userData));
-        setShowAuthModal(false);
-        return { success: true };
-      } else {
-        const error = await response.json();
-        return { success: false, error: error.message };
-      }
-    } catch (error) {
-      return { success: false, error: 'Connection error' };
-    }
   };
 
-  const handleRegister = async (username, password) => {
-    try {
-      const response = await fetch(`${API_BASE_URL}/api/register`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ username, password }),
-      });
-
-      if (response.ok) {
-        const userData = await response.json();
-        setUser(userData);
-        localStorage.setItem('user', JSON.stringify(userData));
-        setShowAuthModal(false);
-        return { success: true };
-      } else {
-        const error = await response.json();
-        return { success: false, error: error.message };
-      }
-    } catch (error) {
-      return { success: false, error: 'Connection error' };
-    }
+  // Helper function to check if a value exists and is not null/undefined/empty
+  const hasValue = (value) => {
+    return value !== null && value !== undefined && value !== '' && value !== 'null';
   };
 
-  const handleLogout = () => {
-    setUser(null);
-    localStorage.removeItem('user');
+  // Helper function to format draft year display
+  const formatDraftYear = (draftYear) => {
+    if (!hasValue(draftYear)) return null;
+    return `Draft Year: ${draftYear}`;
   };
 
-  // Generate hints based on target player and current hint count
-  useEffect(() => {
-    if (targetPlayer && hintsRevealed > 0) {
-      const hints = [];
-      
-      if (hintsRevealed >= 1) {
-        hints.push(`Position: ${targetPlayer.position}`);
-      }
-      if (hintsRevealed >= 2) {
-        hints.push(`Team: ${targetPlayer.team}`);
-      }
-      if (hintsRevealed >= 3) {
-        hints.push(`Points Per Game: ${targetPlayer.ppg}`);
-      }
-      if (hintsRevealed >= 4) {
-        hints.push(`Rebounds Per Game: ${targetPlayer.rpg}`);
-      }
-      if (hintsRevealed >= 5) {
-        hints.push(`Assists Per Game: ${targetPlayer.apg}`);
-      }
-      
-      setCurrentHints(hints);
-    } else {
-      setCurrentHints([]);
-    }
-  }, [targetPlayer, hintsRevealed]);
+  const getHints = () => {
+    if (!dailyPlayer) return [];
+    
+    // Define all possible hints with null checking
+    const allPossibleHints = [
+      hasValue(dailyPlayer.team) ? `Team: ${dailyPlayer.team}` : null,
+      hasValue(dailyPlayer.position) ? `Position: ${dailyPlayer.position}` : null,
+      hasValue(dailyPlayer.height) ? `Height: ${dailyPlayer.height}` : null,
+      hasValue(dailyPlayer.age) ? `Age: ${dailyPlayer.age}` : null,
+      hasValue(dailyPlayer.ppg) ? `Points Per Game: ${dailyPlayer.ppg}` : null,
+      hasValue(dailyPlayer.rpg) ? `Rebounds Per Game: ${dailyPlayer.rpg}` : null,
+      hasValue(dailyPlayer.apg) ? `Assists Per Game: ${dailyPlayer.apg}` : null,
+      formatDraftYear(dailyPlayer.draft_year),
+      hasValue(dailyPlayer.college) ? `College: ${dailyPlayer.college}` : null,
+      hasValue(dailyPlayer.country) ? `Country: ${dailyPlayer.country}` : null,
+      hasValue(dailyPlayer.weight) ? `Weight: ${dailyPlayer.weight} lbs` : null,
+      hasValue(dailyPlayer.draft_round) ? `Draft Round: ${dailyPlayer.draft_round}` : null
+    ];
+    
+    // Filter out null values to get only valid hints
+    const validHints = allPossibleHints.filter(hint => hint !== null);
+    
+    // Return the number of hints that should be revealed
+    return validHints.slice(0, hintsRevealed);
+  };
 
-  if (!targetPlayer) {
+  if (!dailyPlayer) {
     return (
-      <div className="game-page">
-        <div className="loading">Loading...</div>
+      <div className="App">
+        <div className="App-header">
+          <div className="loading">
+            🏀 Loading today's player...
+          </div>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="game-page">
-      {showConfetti && (
-        <ConfettiAnimation 
-          intensity={confettiIntensity}
-          onComplete={() => setShowConfetti(false)}
-        />
-      )}
-      
-      <div className="game-container">
-        <div className="game-header">
-          <BasketballLogo />
-          <h1 className="game-title" onClick={handleTitleClick} style={{ cursor: 'pointer' }}>
-            StatleNBA
-          </h1>
+    <div className="App">
+      <div className="App-header">
+        <div className="header-top">
+          <div className="title-section">
+            <h1>
+              <BasketballLogo 
+                size="large" 
+                className={`title-logo ${gameWon && gameStats?.score > 0 ? 'celebration' : ''}`}
+              />
+              <span onClick={handleTitleClick} style={{ cursor: 'pointer' }}>
+                StatleNBA
+              </span>
+            </h1>
+            <p className="subtitle">Guess today's NBA player from the 2024-2025 season!</p>
+          </div>
           <div className="auth-section">
             {user ? (
-              <div className="user-info">
-                <UserStats user={user} />
-                <button onClick={handleLogout} className="logout-button">
-                  Logout
-                </button>
-              </div>
+              <button onClick={handleLogout} className="logout-button">
+                Logout
+              </button>
             ) : (
-              <button 
-                onClick={() => setShowAuthModal(true)}
-                className="login-button"
-              >
-                Login / Register
+              <button onClick={() => setShowAuthModal(true)} className="login-button">
+                Login / Sign Up
               </button>
             )}
           </div>
         </div>
 
-        <div className="game-content">
-          <ProgressVisualization 
-            guessCount={guessCount}
-            hintsRevealed={hintsRevealed}
+        {/* User Stats Display */}
+        {user && userStats && (
+          <UserStats 
+            user={user} 
+            stats={userStats} 
+            onLogout={handleLogout}
           />
-
-          <div className="game-area">
-            {gameState === 'playing' && (
-              <div className="playing-state">
-                <div className="hints-section">
-                  <div className="hints-header">
-                    <h3>Hints</h3>
-                    {hintsRevealed < 5 && (
-                      <button 
-                        onClick={handleHintRequest}
-                        className="hint-button"
-                        disabled={gameState !== 'playing'}
-                      >
-                        Get Hint ({hintsRevealed + 1}/5)
-                      </button>
-                    )}
+        )}
+        
+        {!gameWon ? (
+          <div className="game-container">
+            {/* Progress Visualization Component */}
+            <ProgressVisualization 
+              guessCount={guesses.length}
+              maxGuesses={5}
+              hintsRevealed={hintsRevealed}
+              maxHints={5}
+              currentScore={calculateCurrentScore()}
+              gameWon={gameWon}
+              gameFailed={guesses.length >= 5 && !gameWon}
+            />
+            
+            <div className="hints-section">
+              <h3 className="hints-title">
+                🔍 Hints
+              </h3>
+              <div className="hints-grid">
+                {getHints().map((hint, index) => (
+                  <div key={index} className="hint-item">
+                    {hint}
                   </div>
-                  
-                  <div className="hints-list">
-                    {currentHints.map((hint, index) => (
-                      <div key={index} className="hint-item">
-                        {hint}
-                      </div>
-                    ))}
-                  </div>
-
-                  <div className="input-section">
-                    <AutocompleteInput
-                      players={allPlayers}
-                      onGuess={handleGuess}
-                      disabled={gameState !== 'playing'}
-                      placeholder="Enter player name..."
-                    />
-                  </div>
-                </div>
-
-                <div className="guesses-section">
-                  <h3>Your Guesses ({guessCount}/5)</h3>
-                  <div className="guesses-list">
-                    {guesses.map((guess, index) => (
-                      <div key={index} className="guess-item">
-                        <PlayerHeadshot player={guess} />
-                        <span className="guess-name">{guess.name}</span>
-                      </div>
-                    ))}
-                  </div>
+                ))}
+              </div>
+              
+              {/* Input section moved into hints box */}
+              <div className="input-section-embedded">
+                <div className="input-wrapper">
+                  <AutocompleteInput 
+                    onPlayerSelect={handlePlayerSelect}
+                    placeholder="Enter NBA player name..."
+                  />
                 </div>
               </div>
-            )}
-
-            {gameState === 'won' && (
-              <div className="game-result won">
-                <h2>🎉 Congratulations! 🎉</h2>
-                <PlayerHeadshot player={targetPlayer} />
-                <p>You guessed <strong>{targetPlayer.name}</strong> correctly!</p>
-                <p>Score: {Math.max(0, 100 - (guessCount - 1) * 20)} points</p>
-                <p>Guesses used: {guessCount}/5</p>
-                <p>Hints used: {hintsRevealed}/5</p>
-                <button onClick={handleNewGame} className="new-game-button">
-                  Play Again
-                </button>
-              </div>
-            )}
-
-            {gameState === 'lost' && (
-              <div className="game-result lost">
-                <h2>😞 Game Over</h2>
-                <PlayerHeadshot player={targetPlayer} />
-                <p>The correct answer was <strong>{targetPlayer.name}</strong></p>
-                <p>Better luck next time!</p>
-                <button onClick={handleNewGame} className="new-game-button">
-                  Try Again
-                </button>
+            </div>
+            
+            {guesses.length > 0 && (
+              <div className="guesses-section">
+                <h3 className="guesses-title">
+                  ❌ Incorrect Guesses
+                  <span className="guess-counter">{guesses.length}/5</span>
+                </h3>
+                {guesses.map((g, index) => (
+                  <div key={index} className="guess-item">
+                    {g}
+                  </div>
+                ))}
               </div>
             )}
           </div>
-        </div>
-      </div>
+        ) : (
+          <div className="win-container">
+            {/* Player Headshot */}
+            <div className="player-headshot-container" style={{ textAlign: 'center', marginBottom: '24px' }}>
+              <PlayerHeadshot 
+                playerName={gameStats.playerName}
+                photoUrl={gameStats.playerPhotoUrl}
+                size="xlarge"
+                className="player-headshot-win"
+              />
+              {/* DEBUG: Show if player has photo URL (only in development) */}
+              {process.env.NODE_ENV === 'development' && (
+                <div style={{ fontSize: '12px', color: '#888', marginTop: '8px' }}>
+                  Photo URL: {gameStats.playerPhotoUrl ? '✅ Available' : '❌ Missing'}
+                </div>
+              )}
+            </div>
 
-      {showAuthModal && (
-        <AuthModal
+            {/* Score Summary Section */}
+            <div className="score-summary">
+              <h2 className="win-title" style={{ color: gameStats.rating.color }}>
+                {gameStats.rating.text}
+              </h2>
+              <p className="win-subtitle">
+                {gameStats.score > 0 ? (
+                  <>You guessed <strong>{gameStats.playerName}</strong>!</>
+                ) : (
+                  <>The answer was <strong>{gameStats.playerName}</strong>!</>
+                )}
+              </p>
+              
+              <div className="score-stats">
+                <div className="score-item">
+                  <div className="score-number">{gameStats.score}</div>
+                  <div className="score-label">Score</div>
+                </div>
+                <div className="score-item">
+                  <div className="score-number">{gameStats.guessCount}</div>
+                  <div className="score-label">Guess{gameStats.guessCount !== 1 ? 'es' : ''}</div>
+                </div>
+              </div>
+            </div>
+
+            {/* Share Results Section */}
+            <div className="share-section">
+              <h3 className="share-title">📱 Share Your Result</h3>
+              <div className="share-preview">
+                <pre className="share-text">{shareText}</pre>
+              </div>
+              <button 
+                onClick={copyToClipboard} 
+                className={`copy-button ${copySuccess ? 'copied' : ''}`}
+              >
+                {copySuccess ? '✅ Copied!' : '📋 Copy Result'}
+              </button>
+            </div>
+
+            {/* Player Stats Section */}
+            <div className="win-stats">
+              <h3 className="stats-title">📊 Player Stats</h3>
+              <div className="stats-grid">
+                {hasValue(dailyPlayer.team) && (
+                  <div className="stat-item">
+                    <div className="stat-label">Team</div>
+                    <div className="stat-value">{dailyPlayer.team}</div>
+                  </div>
+                )}
+                {hasValue(dailyPlayer.position) && (
+                  <div className="stat-item">
+                    <div className="stat-label">Position</div>
+                    <div className="stat-value">{dailyPlayer.position}</div>
+                  </div>
+                )}
+                {hasValue(dailyPlayer.height) && (
+                  <div className="stat-item">
+                    <div className="stat-label">Height</div>
+                    <div className="stat-value">{dailyPlayer.height}</div>
+                  </div>
+                )}
+                {hasValue(dailyPlayer.age) && (
+                  <div className="stat-item">
+                    <div className="stat-label">Age</div>
+                    <div className="stat-value">{dailyPlayer.age}</div>
+                  </div>
+                )}
+                {hasValue(dailyPlayer.ppg) && (
+                  <div className="stat-item">
+                    <div className="stat-label">Points Per Game</div>
+                    <div className="stat-value">{dailyPlayer.ppg}</div>
+                  </div>
+                )}
+                {hasValue(dailyPlayer.rpg) && (
+                  <div className="stat-item">
+                    <div className="stat-label">Rebounds Per Game</div>
+                    <div className="stat-value">{dailyPlayer.rpg}</div>
+                  </div>
+                )}
+                {hasValue(dailyPlayer.apg) && (
+                  <div className="stat-item">
+                    <div className="stat-label">Assists Per Game</div>
+                    <div className="stat-value">{dailyPlayer.apg}</div>
+                  </div>
+                )}
+                {hasValue(dailyPlayer.draft_year) && (
+                  <div className="stat-item">
+                    <div className="stat-label">Draft Year</div>
+                    <div className="stat-value">{dailyPlayer.draft_year}</div>
+                  </div>
+                )}
+                {hasValue(dailyPlayer.college) && (
+                  <div className="stat-item">
+                    <div className="stat-label">College</div>
+                    <div className="stat-value">{dailyPlayer.college}</div>
+                  </div>
+                )}
+                {hasValue(dailyPlayer.country) && (
+                  <div className="stat-item">
+                    <div className="stat-label">Country</div>
+                    <div className="stat-value">{dailyPlayer.country}</div>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Play Again Button */}
+            <button onClick={resetGame} className="play-again-button">
+              🎯 Play Again
+            </button>
+          </div>
+        )}
+
+        {/* Confetti Animation Component */}
+        <ConfettiAnimation 
+          isActive={showConfetti}
+          intensity={gameStats?.score >= 100 ? 'intense' : gameStats?.score >= 80 ? 'normal' : 'light'}
+          duration={4000}
+          colors={['#f97316', '#ea580c', '#dc2626', '#3b82f6', '#10b981', '#8b5cf6', '#f59e0b']}
+        />
+
+        {/* Auth Modal */}
+        <AuthModal 
+          isOpen={showAuthModal}
           onClose={() => setShowAuthModal(false)}
           onLogin={handleLogin}
-          onRegister={handleRegister}
         />
-      )}
+      </div>
     </div>
   );
-};
+}
 
 export default StatleNBAPage;
