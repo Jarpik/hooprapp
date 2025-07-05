@@ -670,11 +670,12 @@ const DraftDuelMain = () => {
 
         .player-name {
           font-family: 'DM Sans', sans-serif;
-          font-size: 1.6rem;
-          font-weight: 700;
+          font-size: 1.8rem;
+          font-weight: 800;
           text-align: center;
           margin-bottom: 0.5rem;
           text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.4);
+          letter-spacing: 0.5px;
         }
 
         .player-team {
@@ -945,7 +946,7 @@ const DraftDuelMain = () => {
           }
           
           .player-name {
-            font-size: 1.3rem;
+            font-size: 1.5rem;
           }
           
           .player-team {
@@ -972,6 +973,7 @@ const DraftDuelMain = () => {
             width: 200px;
             min-width: 200px;
             max-width: 200px;
+            height: 50px;
           }
         }
 
