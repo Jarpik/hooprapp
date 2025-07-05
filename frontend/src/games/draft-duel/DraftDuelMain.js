@@ -2,53 +2,22 @@ import React, { useState, useEffect, useCallback, useRef } from 'react';
 
 // Team colors mapping exactly as specified
 const TEAM_COLORS = {
-  "Duke": "#001A57", // Dark Blue
-  "Rutgers": "#CC0033", // Scarlet
-  "Baylor": "#154734", // Dark Green
-  "UCLA": "#2D68C4", // Blue
-  "Texas": "#BF5700", // Burnt Orange
-  "Oklahoma": "#841617", // Crimson
-  "BYU": "#002255", // Navy Blue
-  "South Carolina": "#73000A", // Garnet
-  "Washington State": "#990000", // Crimson
-  "Ratiopharm Ulm": "#FF6600", // Orange
-  "Maryland": "#E03A3E", // Red
-  "Arizona": "#003366", // Navy Blue
-  "Georgetown": "#041E42", // Dark Blue
-  "Qingdao Eagles": "#008080", // Teal
-  "Cedevita Olimpija": "#005691", // Blue
-  "Florida": "#0021A5", // Blue
-  "Saint-Quentin": "#000080", // Navy
-  "Illinois": "#13294B", // Dark Blue
-  "North Carolina": "#7BAFD4", // Light Blue
-  "Georgia": "#BA0C0F", // Red
-  "Colorado State": "#004B40", // Dark Green
-  "Michigan State": "#18453B", // Dark Green
-  "Real Madrid": "#00529F", // Blue
-  "Penn State": "#041E42", // Navy Blue
-  "Saint Joseph's": "#800000", // Maroon
-  "Le Mans Sarthe": "#2C3E50", // Dark Grey
-  "Creighton": "#003366", // Blue
-  "Auburn": "#0C2340", // Navy Blue
-  "Arkansas": "#9D2235", // Cardinal
-  "Tennessee": "#FF8200", // Orange
-  "Marquette": "#002D62", // Blue
-  "VCU": "#2C3E50", // Dark Grey
-  "Liberty": "#800000", // Red
-  "Wisconsin": "#C5050C", // Red
-  "Northwestern": "#4E2A84", // Purple
-  "Brisbane Bullets": "#002D62", // Blue
-  "Mega Basket": "#FF0000", // Red
-  "West Virginia": "#EAAA00", // Gold
-  "Nevada": "#003366", // Blue
-  "Cholet Basket": "#CC0000", // Red
-  "Sydney Kings": "#522D80", // Purple
-  "Illawarra Hawks": "#CC0000", // Red
-  "Trento": "#2C3E50", // Dark Grey
-  "DEFAULT": "#34495E", // Dark Slate Gray
+  "Duke": "#001A57", "Rutgers": "#CC0033", "Baylor": "#154734", "UCLA": "#2D68C4",
+  "Texas": "#BF5700", "Oklahoma": "#841617", "BYU": "#002255", "South Carolina": "#73000A",
+  "Washington State": "#990000", "Ratiopharm Ulm": "#FF6600", "Maryland": "#E03A3E",
+  "Arizona": "#003366", "Georgetown": "#041E42", "Qingdao Eagles": "#008080",
+  "Cedevita Olimpija": "#005691", "Florida": "#0021A5", "Saint-Quentin": "#000080",
+  "Illinois": "#13294B", "North Carolina": "#7BAFD4", "Georgia": "#BA0C0F",
+  "Colorado State": "#004B40", "Michigan State": "#18453B", "Real Madrid": "#00529F",
+  "Penn State": "#041E42", "Saint Joseph's": "#800000", "Le Mans Sarthe": "#2C3E50",
+  "Creighton": "#003366", "Auburn": "#0C2340", "Arkansas": "#9D2235",
+  "Tennessee": "#FF8200", "Marquette": "#002D62", "VCU": "#2C3E50",
+  "Liberty": "#800000", "Wisconsin": "#C5050C", "Northwestern": "#4E2A84",
+  "Brisbane Bullets": "#002D62", "Mega Basket": "#FF0000", "West Virginia": "#EAAA00",
+  "Nevada": "#003366", "Cholet Basket": "#CC0000", "Sydney Kings": "#522D80",
+  "Illawarra Hawks": "#CC0000", "Trento": "#2C3E50", "DEFAULT": "#34495E",
 };
 
-// Function to determine text color based on background luminance
 const getContrastTextColor = (hexcolor) => {
   if (!hexcolor || hexcolor === TEAM_COLORS.DEFAULT) return '#FFFFFF';
   const r = parseInt(hexcolor.substr(1, 2), 16);
@@ -72,7 +41,7 @@ const ROOKIES_2025_NBA = [
   { id: 10, name: "Khaman Maluach", draftPick: 10, team: "Phoenix Suns", preDraftTeam: "Duke", imageUrl: "https://a.espncdn.com/combiner/i?img=/i/headshots/nba/players/full/5203685.png&w=350&h=254", height: 85, age: 18, position: "Center", conference: "ACC" },
 ];
 
-// PlayerCard component matching the original specification
+// PlayerCard component
 const PlayerCard = ({ player, onClick, isSelected, isCorrect, showPick, disabled, isDarkMode }) => {
   const cardBackgroundColor = TEAM_COLORS[player.preDraftTeam] || TEAM_COLORS.DEFAULT;
   const cardTextColor = getContrastTextColor(cardBackgroundColor);
@@ -228,7 +197,7 @@ const DraftDuelMain = () => {
   // Game logic functions
   const handleTimeOut = useCallback(() => {
     setIsCorrectGuess(false);
-    setFeedbackMessage('Time ran out! You need to make a pick within 10 seconds.');
+    setFeedbackMessage('Time ran out!');
     setGameOver(true);
     if (currentStreak > highScore) {
       setHighScore(currentStreak);
@@ -301,10 +270,10 @@ const DraftDuelMain = () => {
     if (isGuessCorrect) {
       setIsCorrectGuess(true);
       setCurrentStreak(prev => prev + 1);
-      setFeedbackMessage('Correct! Click "Continue" to play the next round.');
+      setFeedbackMessage('Correct!');
     } else {
       setIsCorrectGuess(false);
-      setFeedbackMessage('Incorrect! Click "Play Again" to try again.');
+      setFeedbackMessage('Incorrect!');
       setGameOver(true);
       if (currentStreak > highScore) {
         setHighScore(currentStreak);
@@ -348,7 +317,7 @@ const DraftDuelMain = () => {
 
   return (
     <div 
-      className={`draft-duel-container ${isDarkMode ? 'dark-mode' : ''}`}
+      className="draft-duel-fullscreen"
       style={{
         backgroundColor: isDarkMode ? '#1A202C' : '#F8F8F0',
         backgroundImage: `url("data:image/svg+xml;utf8,${encodedBasketballPattern}")`,
@@ -360,11 +329,19 @@ const DraftDuelMain = () => {
         @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&display=swap');
         @import url('https://fonts.googleapis.com/css2?family=VT323&display=swap');
         
-        .draft-duel-container {
-          min-height: 100vh;
-          padding: 2rem;
+        /* Full screen takeover */
+        .draft-duel-fullscreen {
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100vw;
+          height: 100vh;
           font-family: 'Outfit', sans-serif;
-          position: relative;
+          z-index: 9999;
+          display: flex;
+          flex-direction: column;
+          overflow-x: hidden;
+          overflow-y: auto;
         }
 
         /* Dark Mode Toggle */
@@ -396,7 +373,7 @@ const DraftDuelMain = () => {
           border-radius: 15px;
           display: flex;
           width: 95%;
-          max-width: 800px;
+          max-width: 900px;
           box-shadow: inset 0 0 20px rgba(0,0,0,0.7), 0 8px 20px rgba(0,0,0,0.5);
           font-family: 'VT323', monospace;
           color: #FF8C00;
@@ -405,7 +382,7 @@ const DraftDuelMain = () => {
           padding: 5px;
           min-height: 100px;
           height: auto;
-          margin: 0 auto 2rem;
+          margin: 2rem auto 1rem;
         }
 
         .scoreboard-box {
@@ -502,39 +479,44 @@ const DraftDuelMain = () => {
           to { text-shadow: 0 0 25px rgba(255, 0, 0, 1.2); }
         }
 
-        /* Game Area */
+        /* Main Game Area - Horizontal Focus */
         .game-area {
+          flex: 1;
           display: flex;
           flex-direction: column;
           align-items: center;
-          gap: 2rem;
-          max-width: 1200px;
-          margin: 0 auto;
+          justify-content: center;
           position: relative;
+          padding: 1rem;
+          max-width: 1400px;
+          margin: 0 auto;
+          width: 100%;
         }
 
-        /* Basketball Court Background */
+        /* Basketball Court Background - Behind cards only */
         .court-background {
           position: absolute;
-          top: 0;
-          left: 0;
-          width: 100%;
-          height: 100%;
-          z-index: -1;
-          opacity: 0.45;
-          transform: scale(0.38) translateY(35px);
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, -50%) scale(0.6);
+          z-index: 0;
+          opacity: 0.15;
           pointer-events: none;
+          width: 1000px;
+          height: 500px;
         }
 
-        /* Player Comparison */
+        /* Player Comparison - Always Horizontal */
         .players-comparison {
           position: relative;
-          width: 100%;
           display: flex;
           justify-content: center;
           align-items: center;
-          gap: 4rem;
-          flex-wrap: wrap;
+          gap: 3rem;
+          z-index: 10;
+          width: 100%;
+          max-width: 1200px;
+          margin: 2rem 0;
         }
 
         .player-card-wrapper {
@@ -542,18 +524,19 @@ const DraftDuelMain = () => {
           flex-direction: column;
           align-items: center;
           gap: 1rem;
+          z-index: 20;
         }
 
-        /* Player Cards */
+        /* Player Cards - Clear Focus */
         .player-card {
           position: relative;
-          width: 16rem;
-          height: 20rem;
+          width: 18rem;
+          height: 22rem;
           border-radius: 1rem;
           padding: 1.5rem;
           cursor: pointer;
           transition: all 0.3s ease;
-          box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+          box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
           border: 4px solid rgba(255, 255, 255, 0.2);
           display: flex;
           flex-direction: column;
@@ -561,33 +544,35 @@ const DraftDuelMain = () => {
           justify-content: space-between;
           background: none;
           font-family: inherit;
+          z-index: 20;
         }
 
         .player-card:hover:not(.disabled) {
-          transform: translateY(-8px) scale(1.03);
-          box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+          transform: translateY(-8px) scale(1.05);
+          box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
+          z-index: 30;
         }
 
         .player-card.selected {
           border-color: #3B82F6;
-          box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.3);
+          box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.4), 0 15px 35px rgba(0, 0, 0, 0.4);
           animation: pop-on-select 0.15s ease-out;
         }
 
         .player-card.correct {
           border-color: #10B981;
-          box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.4);
+          box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.5), 0 15px 35px rgba(0, 0, 0, 0.4);
           animation: pop-in 0.3s ease-out;
         }
 
         .player-card.incorrect {
           border-color: #EF4444;
-          box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.4);
+          box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.5), 0 15px 35px rgba(0, 0, 0, 0.4);
           animation: shake 0.5s ease-out;
         }
 
         .player-card.disabled {
-          opacity: 0.7;
+          opacity: 0.8;
           cursor: not-allowed;
         }
 
@@ -612,12 +597,12 @@ const DraftDuelMain = () => {
 
         /* Player Card Content */
         .player-image {
-          width: 9rem;
-          height: 11rem;
+          width: 10rem;
+          height: 12rem;
           border-radius: 50%;
           object-fit: cover;
           margin-bottom: 1rem;
-          border: 4px solid rgba(255, 255, 255, 0.2);
+          border: 4px solid rgba(255, 255, 255, 0.3);
           transition: transform 0.3s ease;
         }
 
@@ -626,15 +611,15 @@ const DraftDuelMain = () => {
         }
 
         .player-name {
-          font-size: 1.5rem;
+          font-size: 1.6rem;
           font-weight: 700;
           text-align: center;
           margin-bottom: 0.5rem;
-          text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+          text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.4);
         }
 
         .player-team {
-          font-size: 1.125rem;
+          font-size: 1.2rem;
           text-align: center;
           font-weight: 500;
           margin: 0;
@@ -643,25 +628,26 @@ const DraftDuelMain = () => {
 
         /* Reveal Section */
         .reveal-section {
-          background: linear-gradient(135deg, rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.9));
+          background: linear-gradient(135deg, rgba(0, 0, 0, 0.9), rgba(0, 0, 0, 0.8));
           color: #ffffff;
           padding: 1rem 1.5rem;
           border-radius: 0.75rem;
-          box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+          box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4);
           text-align: center;
           animation: fade-in-up 0.5s ease-out;
-          min-width: 200px;
+          min-width: 220px;
+          z-index: 25;
         }
 
         .pick-number {
-          font-size: 1.5rem;
+          font-size: 1.6rem;
           font-weight: 700;
           color: #FBBF24;
           margin-bottom: 0.5rem;
         }
 
         .nba-team {
-          font-size: 1rem;
+          font-size: 1.1rem;
           opacity: 0.9;
           margin: 0;
         }
@@ -677,9 +663,9 @@ const DraftDuelMain = () => {
           }
         }
 
-        /* VS Text */
+        /* VS Text - No Overlap */
         .vs-text {
-          font-size: 6rem;
+          font-size: 5rem;
           font-weight: 800;
           background: linear-gradient(to top, #FFD700 30%, #FF4500 100%);
           -webkit-background-clip: text;
@@ -687,8 +673,8 @@ const DraftDuelMain = () => {
           background-clip: text;
           filter: drop-shadow(0 0 8px rgba(255, 165, 0, 0.8)) drop-shadow(0 0 15px rgba(255, 69, 0, 0.6));
           animation: flicker 1.5s infinite alternate;
-          position: absolute;
-          z-index: 10;
+          z-index: 15;
+          margin: 0 2rem;
         }
 
         @keyframes flicker {
@@ -698,16 +684,18 @@ const DraftDuelMain = () => {
           75% { opacity: 0.95; transform: scale(1.01); }
         }
 
-        /* Feedback Message */
+        /* Feedback Message - Smaller & Aesthetic */
         .feedback-message {
-          font-size: 3rem;
-          font-weight: 700;
+          font-size: 1.5rem;
+          font-weight: 600;
           text-align: center;
-          padding: 1.5rem 2rem;
-          border-radius: 0.75rem;
-          box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+          padding: 0.75rem 1.5rem;
+          border-radius: 0.5rem;
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
           animation: fade-in-up 0.5s ease-out;
-          margin-top: 2rem;
+          margin-top: 1.5rem;
+          max-width: 300px;
+          z-index: 10;
         }
 
         .feedback-message.correct {
@@ -725,13 +713,14 @@ const DraftDuelMain = () => {
           color: white;
         }
 
-        /* Action Buttons */
+        /* Action Buttons - Equal Size */
         .action-buttons {
           display: flex;
           gap: 1rem;
           justify-content: center;
           flex-wrap: wrap;
           margin-top: 2rem;
+          z-index: 10;
         }
 
         .action-button {
@@ -743,7 +732,8 @@ const DraftDuelMain = () => {
           cursor: pointer;
           transition: all 0.3s ease;
           box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-          min-width: 140px;
+          min-width: 160px;
+          width: 160px;
         }
 
         .action-button:hover {
@@ -798,7 +788,7 @@ const DraftDuelMain = () => {
         }
 
         .share-modal h2 {
-          font-size: 3rem;
+          font-size: 2rem;
           font-weight: 800;
           margin-bottom: 1rem;
           color: ${isDarkMode ? '#FFFFFF' : '#2D3748'};
@@ -850,58 +840,17 @@ const DraftDuelMain = () => {
           background: ${isDarkMode ? '#2D3748' : '#CBD5E0'};
         }
 
-        /* Mobile Responsive */
+        /* Mobile Responsive - STILL HORIZONTAL */
         @media (max-width: 768px) {
-          .draft-duel-container {
-            padding: 1rem;
-          }
-          
           .scoreboard {
-            flex-direction: column;
-            gap: 1rem;
-            text-align: center;
-            padding: 1rem;
+            width: 98%;
+            margin: 1rem auto 1rem;
+            padding: 3px;
           }
           
           .scoreboard-box, .scoreboard-middle-box {
-            min-width: auto;
-          }
-          
-          .players-comparison {
-            flex-direction: column;
-            gap: 1rem;
-          }
-          
-          .player-card {
-            width: 100%;
-            max-width: 280px;
-          }
-          
-          .vs-text {
-            position: static;
-            font-size: 4rem;
-            margin: 1rem 0;
-          }
-          
-          .action-buttons {
-            flex-direction: column;
-            align-items: center;
-          }
-          
-          .action-button {
-            width: 100%;
-            max-width: 200px;
-          }
-        }
-
-        @media (max-width: 480px) {
-          .player-card {
-            width: 100%;
-            height: 18rem;
-          }
-          
-          .scoreboard {
-            padding: 1rem;
+            padding: 3px;
+            margin: 0 3px;
           }
           
           .scoreboard-value, .scoreboard-timer {
@@ -912,12 +861,73 @@ const DraftDuelMain = () => {
             font-size: 1rem;
           }
           
+          .players-comparison {
+            gap: 1.5rem;
+            margin: 1rem 0;
+          }
+          
+          .player-card {
+            width: 14rem;
+            height: 18rem;
+          }
+          
+          .player-image {
+            width: 8rem;
+            height: 10rem;
+          }
+          
+          .player-name {
+            font-size: 1.3rem;
+          }
+          
+          .player-team {
+            font-size: 1rem;
+          }
+          
           .vs-text {
             font-size: 3rem;
+            margin: 0 1rem;
           }
           
           .feedback-message {
-            font-size: 2rem;
+            font-size: 1.2rem;
+            margin-top: 1rem;
+          }
+          
+          .action-buttons {
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+          }
+          
+          .action-button {
+            width: 200px;
+            min-width: 200px;
+          }
+        }
+
+        @media (max-width: 480px) {
+          .players-comparison {
+            gap: 1rem;
+          }
+          
+          .player-card {
+            width: 12rem;
+            height: 16rem;
+          }
+          
+          .player-image {
+            width: 7rem;
+            height: 8.5rem;
+          }
+          
+          .vs-text {
+            font-size: 2.5rem;
+            margin: 0 0.5rem;
+          }
+          
+          .scoreboard-value, .scoreboard-timer {
+            font-size: 1.5rem;
           }
         }
       `}</style>
@@ -963,10 +973,10 @@ const DraftDuelMain = () => {
 
       {/* Game Area */}
       <div className="game-area">
-        {/* Basketball Court Background */}
+        {/* Basketball Court Background - Behind cards only */}
         <div className="court-background" dangerouslySetInnerHTML={{ __html: basketballCourtSVG }} />
 
-        {/* Player Comparison */}
+        {/* Player Comparison - Always Horizontal */}
         <div className="players-comparison">
           {player1 && (
             <PlayerCard
@@ -980,7 +990,7 @@ const DraftDuelMain = () => {
             />
           )}
           
-          {/* VS Text */}
+          {/* VS Text - No Overlap */}
           <div className="vs-text">VS</div>
           
           {player2 && (
@@ -996,7 +1006,7 @@ const DraftDuelMain = () => {
           )}
         </div>
 
-        {/* Feedback */}
+        {/* Feedback - Smaller & Aesthetic */}
         {feedbackMessage && (
           <div className={`feedback-message ${
             isCorrectGuess === true ? 'correct' : 
@@ -1006,7 +1016,7 @@ const DraftDuelMain = () => {
           </div>
         )}
 
-        {/* Action Buttons */}
+        {/* Action Buttons - Equal Size */}
         {selectedPlayerId !== null && (
           <div className="action-buttons">
             {!gameOver ? (
