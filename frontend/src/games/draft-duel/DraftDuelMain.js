@@ -333,32 +333,32 @@ const DraftDuelMain = () => {
         
         /* Full screen takeover */
         .draft-duel-fullscreen {
-          position: fixed;
-          top: 0;
-          left: 0;
-          width: 100vw;
-          height: 100vh;
-          font-family: 'Outfit', sans-serif;
-          z-index: 9999;
-          display: flex;
-          flex-direction: column;
-          overflow-x: hidden;
-          overflow-y: auto;
+          position: fixed !important;
+          top: 0 !important;
+          left: 0 !important;
+          width: 100vw !important;
+          height: 100vh !important;
+          font-family: 'Outfit', sans-serif !important;
+          z-index: 9999 !important;
+          display: flex !important;
+          flex-direction: column !important;
+          overflow-x: hidden !important;
+          overflow-y: auto !important;
         }
 
-        /* Game Title - Same style as VS text */
+        /* Game Title */
         .game-title {
-          text-align: center;
-          margin: 1.5rem 0 1rem 0;
-          font-size: 4rem;
-          font-weight: 800;
-          background: linear-gradient(to top, #FFD700 30%, #FF4500 100%);
-          -webkit-background-clip: text;
-          -webkit-text-fill-color: transparent;
-          background-clip: text;
-          filter: drop-shadow(0 0 8px rgba(255, 165, 0, 0.8)) drop-shadow(0 0 15px rgba(255, 69, 0, 0.6));
-          animation: flicker 1.5s infinite alternate;
-          z-index: 20;
+          text-align: center !important;
+          margin: 1.5rem 0 1rem 0 !important;
+          font-size: 4rem !important;
+          font-weight: 800 !important;
+          background: linear-gradient(to top, #FFD700 30%, #FF4500 100%) !important;
+          -webkit-background-clip: text !important;
+          -webkit-text-fill-color: transparent !important;
+          background-clip: text !important;
+          filter: drop-shadow(0 0 8px rgba(255, 165, 0, 0.8)) drop-shadow(0 0 15px rgba(255, 69, 0, 0.6)) !important;
+          animation: flicker 1.5s infinite alternate !important;
+          z-index: 20 !important;
         }
 
         @keyframes flicker {
@@ -370,65 +370,63 @@ const DraftDuelMain = () => {
 
         /* Dark Mode Toggle */
         .theme-toggle {
-          position: absolute;
-          top: 1rem;
-          right: 1rem;
-          background: rgba(255, 255, 255, 0.1);
-          border: none;
-          border-radius: 50%;
-          width: 3rem;
-          height: 3rem;
-          font-size: 1.5rem;
-          cursor: pointer;
-          backdrop-filter: blur(10px);
-          transition: all 0.3s ease;
-          z-index: 100;
+          position: absolute !important;
+          top: 1rem !important;
+          right: 1rem !important;
+          background: rgba(255, 255, 255, 0.1) !important;
+          border: none !important;
+          border-radius: 50% !important;
+          width: 3rem !important;
+          height: 3rem !important;
+          font-size: 1.5rem !important;
+          cursor: pointer !important;
+          backdrop-filter: blur(10px) !important;
+          transition: all 0.3s ease !important;
+          z-index: 100 !important;
         }
 
         .theme-toggle:hover {
-          background: rgba(255, 255, 255, 0.2);
-          transform: scale(1.1);
+          background: rgba(255, 255, 255, 0.2) !important;
+          transform: scale(1.1) !important;
         }
 
-        /* FIXED SCOREBOARD - Stable positioning and sizing */
+        /* FIXED SCOREBOARD - Absolutely stable */
         .scoreboard {
-          background: linear-gradient(145deg, #000000, #1a1a1a);
-          border: 6px solid #333;
-          border-radius: 20px;
-          display: flex;
-          width: 95%;
-          max-width: 900px;
-          /* CRITICAL FIXES: Fixed dimensions prevent movement */
-          height: 120px;
-          min-height: 120px;
-          max-height: 120px;
+          background: linear-gradient(145deg, #000000, #1a1a1a) !important;
+          border: 6px solid #333 !important;
+          border-radius: 20px !important;
+          display: flex !important;
+          position: relative !important;
+          width: 95% !important;
+          max-width: 900px !important;
+          height: 120px !important;
+          min-height: 120px !important;
+          max-height: 120px !important;
           box-shadow: 
             inset 0 0 30px rgba(0,0,0,0.8), 
             0 10px 30px rgba(0,0,0,0.6),
-            0 0 20px rgba(255, 140, 0, 0.3);
-          font-family: 'Share Tech Mono', monospace;
-          color: #FF8C00;
-          text-shadow: 0 0 15px rgba(255, 140, 0, 0.9);
-          position: relative;
-          padding: 8px;
-          margin: 0 auto 1rem;
-          /* CRITICAL FIXES: Prevent any flexbox changes */
-          flex-shrink: 0;
-          overflow: hidden;
+            0 0 20px rgba(255, 140, 0, 0.3) !important;
+          font-family: 'Share Tech Mono', monospace !important;
+          color: #FF8C00 !important;
+          text-shadow: 0 0 15px rgba(255, 140, 0, 0.9) !important;
+          padding: 8px !important;
+          margin: 0 auto 1rem !important;
+          flex-shrink: 0 !important;
+          overflow: hidden !important;
         }
 
         .scoreboard::before {
-          content: '';
-          position: absolute;
-          top: -3px;
-          left: -3px;
-          right: -3px;
-          bottom: -3px;
-          background: linear-gradient(45deg, #FF8C00, #FFD700, #FF4500, #FF8C00);
-          border-radius: 23px;
-          z-index: -1;
-          opacity: 0.3;
-          animation: borderGlow 3s ease-in-out infinite;
+          content: '' !important;
+          position: absolute !important;
+          top: -3px !important;
+          left: -3px !important;
+          right: -3px !important;
+          bottom: -3px !important;
+          background: linear-gradient(45deg, #FF8C00, #FFD700, #FF4500, #FF8C00) !important;
+          border-radius: 23px !important;
+          z-index: -1 !important;
+          opacity: 0.3 !important;
+          animation: borderGlow 3s ease-in-out infinite !important;
         }
 
         @keyframes borderGlow {
@@ -437,93 +435,87 @@ const DraftDuelMain = () => {
         }
 
         .scoreboard-box {
-          background: linear-gradient(145deg, #0a0a0a, #000000);
-          border: 3px solid #444;
-          border-radius: 12px;
+          background: linear-gradient(145deg, #0a0a0a, #000000) !important;
+          border: 3px solid #444 !important;
+          border-radius: 12px !important;
           box-shadow: 
             inset 0 0 15px rgba(0,0,0,0.8), 
-            0 4px 8px rgba(0,0,0,0.4);
-          flex: 1;
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          justify-content: space-between;
-          padding: 8px;
-          margin: 0 6px;
-          position: relative;
-          /* CRITICAL FIXES: Fixed dimensions prevent movement */
-          height: calc(100% - 16px);
-          min-height: 96px;
-          max-height: 96px;
-          flex-shrink: 0;
-          overflow: hidden;
+            0 4px 8px rgba(0,0,0,0.4) !important;
+          flex: 1 !important;
+          display: flex !important;
+          flex-direction: column !important;
+          align-items: center !important;
+          justify-content: space-between !important;
+          padding: 8px !important;
+          margin: 0 6px !important;
+          position: relative !important;
+          height: 100% !important;
+          min-height: 90px !important;
+          max-height: 90px !important;
+          flex-shrink: 0 !important;
+          overflow: hidden !important;
         }
 
         .scoreboard-label {
-          font-family: 'Outfit', sans-serif;
-          font-size: 1rem;
-          font-weight: 700;
-          color: #FFD700;
-          margin-bottom: 8px;
-          text-transform: uppercase;
-          letter-spacing: 1px;
-          text-shadow: 0 0 10px rgba(255, 215, 0, 0.8);
-          /* CRITICAL FIXES: Fixed positioning */
-          height: 20px;
-          line-height: 20px;
-          flex-shrink: 0;
+          font-family: 'Outfit', sans-serif !important;
+          font-size: 1rem !important;
+          font-weight: 700 !important;
+          color: #FFD700 !important;
+          margin-bottom: 8px !important;
+          text-transform: uppercase !important;
+          letter-spacing: 1px !important;
+          text-shadow: 0 0 10px rgba(255, 215, 0, 0.8) !important;
+          height: 20px !important;
+          line-height: 20px !important;
+          flex-shrink: 0 !important;
         }
 
-        /* FIXED: 7-Segment Display Font for Numbers - Contained */
         .scoreboard-value {
-          font-family: 'Orbitron', monospace;
-          font-size: 3.5rem;
-          font-weight: 900;
-          line-height: 1;
-          color: #FF8C00;
+          font-family: 'Orbitron', monospace !important;
+          font-size: 3.5rem !important;
+          font-weight: 900 !important;
+          line-height: 1 !important;
+          color: #FF8C00 !important;
           text-shadow: 
             0 0 20px rgba(255, 140, 0, 1),
             0 0 40px rgba(255, 140, 0, 0.6),
-            0 0 60px rgba(255, 140, 0, 0.3);
-          /* CRITICAL FIXES: Fixed height prevents number overflow */
-          height: 50px;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          padding-bottom: 8px;
-          filter: brightness(1.2);
-          flex-shrink: 0;
+            0 0 60px rgba(255, 140, 0, 0.3) !important;
+          height: 50px !important;
+          display: flex !important;
+          align-items: center !important;
+          justify-content: center !important;
+          padding-bottom: 8px !important;
+          filter: brightness(1.2) !important;
+          flex-shrink: 0 !important;
         }
 
-        /* FIXED: 7-Segment Display Font for Timer - Contained */
         .scoreboard-timer {
-          font-family: 'Orbitron', monospace;
-          font-size: 3.5rem;
-          font-weight: 900;
-          line-height: 1;
-          color: #FF0000;
+          font-family: 'Orbitron', monospace !important;
+          font-size: 3.5rem !important;
+          font-weight: 900 !important;
+          line-height: 1 !important;
+          color: #FF0000 !important;
           text-shadow: 
             0 0 20px rgba(255, 0, 0, 1),
             0 0 40px rgba(255, 0, 0, 0.6),
-            0 0 60px rgba(255, 0, 0, 0.3);
-          /* CRITICAL FIXES: Fixed height prevents number overflow */
-          height: 50px;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          width: 100%;
-          padding-bottom: 8px;
-          filter: brightness(1.2);
-          flex-shrink: 0;
+            0 0 60px rgba(255, 0, 0, 0.3) !important;
+          height: 50px !important;
+          display: flex !important;
+          align-items: center !important;
+          justify-content: center !important;
+          width: 100% !important;
+          padding-bottom: 8px !important;
+          filter: brightness(1.2) !important;
+          flex-shrink: 0 !important;
         }
 
         .scoreboard-timer.warning {
-          color: #FF3333;
+          color: #FF3333 !important;
           text-shadow: 
             0 0 25px rgba(255, 50, 50, 1),
             0 0 50px rgba(255, 50, 50, 0.8),
-            0 0 75px rgba(255, 50, 50, 0.5);
-          animation: pulse-red 1s infinite alternate;
+            0 0 75px rgba(255, 50, 50, 0.5) !important;
+          animation: pulse-red 1s infinite alternate !important;
         }
 
         @keyframes pulse-red {
@@ -537,126 +529,123 @@ const DraftDuelMain = () => {
           }
         }
 
-        /* Question Section - Moved Below Scoreboard */
+        /* Question Section */
         .question-section {
-          width: 95%;
-          max-width: 900px;
-          margin: 0 auto 2rem;
-          text-align: center;
-          background: linear-gradient(135deg, rgba(59, 130, 246, 0.15), rgba(147, 51, 234, 0.15));
-          border-radius: 20px;
-          padding: 1.5rem 2rem;
-          border: 1px solid rgba(255, 255, 255, 0.1);
-          backdrop-filter: blur(10px);
-          box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+          width: 95% !important;
+          max-width: 900px !important;
+          margin: 0 auto 2rem !important;
+          text-align: center !important;
+          background: linear-gradient(135deg, rgba(59, 130, 246, 0.15), rgba(147, 51, 234, 0.15)) !important;
+          border-radius: 20px !important;
+          padding: 1.5rem 2rem !important;
+          border: 1px solid rgba(255, 255, 255, 0.1) !important;
+          backdrop-filter: blur(10px) !important;
+          box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2) !important;
         }
 
         .question-text {
-          font-family: 'Outfit', sans-serif;
-          font-size: 1.8rem;
-          font-weight: 700;
-          color: ${isDarkMode ? '#FFF' : '#333'};
-          text-shadow: 0 0 10px rgba(${isDarkMode ? '255,255,255' : '0,0,0'},0.7);
-          text-transform: uppercase;
-          letter-spacing: 1px;
-          margin: 0;
+          font-family: 'Outfit', sans-serif !important;
+          font-size: 1.8rem !important;
+          font-weight: 700 !important;
+          color: ${isDarkMode ? '#FFF' : '#333'} !important;
+          text-shadow: 0 0 10px rgba(${isDarkMode ? '255,255,255' : '0,0,0'},0.7) !important;
+          text-transform: uppercase !important;
+          letter-spacing: 1px !important;
+          margin: 0 !important;
         }
 
-        /* Main Game Area - Horizontal Focus */
+        /* Game Area */
         .game-area {
-          flex: 1;
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          justify-content: center;
-          position: relative;
-          padding: 1rem;
-          max-width: 1400px;
-          margin: 0 auto;
-          width: 100%;
+          flex: 1 !important;
+          display: flex !important;
+          flex-direction: column !important;
+          align-items: center !important;
+          justify-content: center !important;
+          position: relative !important;
+          padding: 1rem !important;
+          max-width: 1400px !important;
+          margin: 0 auto !important;
+          width: 100% !important;
         }
 
-        /* Basketball Court Background - Behind cards only */
         .court-background {
-          position: absolute;
-          top: 50%;
-          left: 50%;
-          transform: translate(-50%, -50%) scale(0.6);
-          z-index: 0;
-          opacity: 0.15;
-          pointer-events: none;
-          width: 1000px;
-          height: 500px;
+          position: absolute !important;
+          top: 50% !important;
+          left: 50% !important;
+          transform: translate(-50%, -50%) scale(0.6) !important;
+          z-index: 0 !important;
+          opacity: 0.15 !important;
+          pointer-events: none !important;
+          width: 1000px !important;
+          height: 500px !important;
         }
 
-        /* Player Comparison - Always Horizontal */
         .players-comparison {
-          position: relative;
-          display: flex;
-          justify-content: center;
-          align-items: center;
-          gap: 3rem;
-          z-index: 10;
-          width: 100%;
-          max-width: 1200px;
-          margin: 2rem 0;
+          position: relative !important;
+          display: flex !important;
+          justify-content: center !important;
+          align-items: center !important;
+          gap: 3rem !important;
+          z-index: 10 !important;
+          width: 100% !important;
+          max-width: 1200px !important;
+          margin: 2rem 0 !important;
         }
 
         .player-card-wrapper {
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          gap: 1rem;
-          z-index: 20;
+          display: flex !important;
+          flex-direction: column !important;
+          align-items: center !important;
+          gap: 1rem !important;
+          z-index: 20 !important;
         }
 
-        /* Player Cards - Clear Focus */
         .player-card {
-          position: relative;
-          width: 18rem;
-          height: 22rem;
-          border-radius: 1rem;
-          padding: 1.5rem;
-          cursor: pointer;
-          transition: all 0.3s ease;
-          box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
-          border: 4px solid rgba(255, 255, 255, 0.2);
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          justify-content: space-between;
-          background: none;
-          font-family: inherit;
-          z-index: 20;
+          position: relative !important;
+          width: 18rem !important;
+          height: 22rem !important;
+          border-radius: 1rem !important;
+          padding: 1.5rem !important;
+          cursor: pointer !important;
+          transition: all 0.3s ease !important;
+          box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4) !important;
+          border: 4px solid rgba(255, 255, 255, 0.2) !important;
+          display: flex !important;
+          flex-direction: column !important;
+          align-items: center !important;
+          justify-content: space-between !important;
+          background: none !important;
+          font-family: inherit !important;
+          z-index: 20 !important;
         }
 
         .player-card:hover:not(.disabled) {
-          transform: translateY(-8px) scale(1.05);
-          box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
-          z-index: 30;
+          transform: translateY(-8px) scale(1.05) !important;
+          box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5) !important;
+          z-index: 30 !important;
         }
 
         .player-card.selected {
-          border-color: #3B82F6;
-          box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.4), 0 15px 35px rgba(0, 0, 0, 0.4);
-          animation: pop-on-select 0.15s ease-out;
+          border-color: #3B82F6 !important;
+          box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.4), 0 15px 35px rgba(0, 0, 0, 0.4) !important;
+          animation: pop-on-select 0.15s ease-out !important;
         }
 
         .player-card.correct {
-          border-color: #10B981;
-          box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.5), 0 15px 35px rgba(0, 0, 0, 0.4);
-          animation: pop-in 0.3s ease-out;
+          border-color: #10B981 !important;
+          box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.5), 0 15px 35px rgba(0, 0, 0, 0.4) !important;
+          animation: pop-in 0.3s ease-out !important;
         }
 
         .player-card.incorrect {
-          border-color: #EF4444;
-          box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.5), 0 15px 35px rgba(0, 0, 0, 0.4);
-          animation: shake 0.5s ease-out;
+          border-color: #EF4444 !important;
+          box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.5), 0 15px 35px rgba(0, 0, 0, 0.4) !important;
+          animation: shake 0.5s ease-out !important;
         }
 
         .player-card.disabled {
-          opacity: 0.8;
-          cursor: not-allowed;
+          opacity: 0.8 !important;
+          cursor: not-allowed !important;
         }
 
         @keyframes pop-on-select {
@@ -678,64 +667,62 @@ const DraftDuelMain = () => {
           40%, 60% { transform: translate3d(4px, 0, 0); }
         }
 
-        /* Player Card Content */
         .player-image {
-          width: 10rem;
-          height: 12rem;
-          border-radius: 50%;
-          object-fit: cover;
-          margin-bottom: 1rem;
-          border: 4px solid rgba(255, 255, 255, 0.3);
-          transition: transform 0.3s ease;
+          width: 10rem !important;
+          height: 12rem !important;
+          border-radius: 50% !important;
+          object-fit: cover !important;
+          margin-bottom: 1rem !important;
+          border: 4px solid rgba(255, 255, 255, 0.3) !important;
+          transition: transform 0.3s ease !important;
         }
 
         .player-card:hover .player-image {
-          transform: scale(1.05);
+          transform: scale(1.05) !important;
         }
 
         .player-name {
-          font-family: 'DM Sans', sans-serif;
-          font-size: 1.8rem;
-          font-weight: 800;
-          text-align: center;
-          margin-bottom: 0.5rem;
-          text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.4);
-          letter-spacing: 0.5px;
+          font-family: 'DM Sans', sans-serif !important;
+          font-size: 1.8rem !important;
+          font-weight: 800 !important;
+          text-align: center !important;
+          margin-bottom: 0.5rem !important;
+          text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.4) !important;
+          letter-spacing: 0.5px !important;
         }
 
         .player-team {
-          font-family: 'DM Sans', sans-serif;
-          font-size: 1.2rem;
-          text-align: center;
-          font-weight: 500;
-          margin: 0;
-          opacity: 0.9;
+          font-family: 'DM Sans', sans-serif !important;
+          font-size: 1.2rem !important;
+          text-align: center !important;
+          font-weight: 500 !important;
+          margin: 0 !important;
+          opacity: 0.9 !important;
         }
 
-        /* Reveal Section */
         .reveal-section {
-          background: linear-gradient(135deg, rgba(0, 0, 0, 0.9), rgba(0, 0, 0, 0.8));
-          color: #ffffff;
-          padding: 1rem 1.5rem;
-          border-radius: 0.75rem;
-          box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4);
-          text-align: center;
-          animation: fade-in-up 0.5s ease-out;
-          min-width: 220px;
-          z-index: 25;
+          background: linear-gradient(135deg, rgba(0, 0, 0, 0.9), rgba(0, 0, 0, 0.8)) !important;
+          color: #ffffff !important;
+          padding: 1rem 1.5rem !important;
+          border-radius: 0.75rem !important;
+          box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4) !important;
+          text-align: center !important;
+          animation: fade-in-up 0.5s ease-out !important;
+          min-width: 220px !important;
+          z-index: 25 !important;
         }
 
         .pick-number {
-          font-size: 1.6rem;
-          font-weight: 700;
-          color: #FBBF24;
-          margin-bottom: 0.5rem;
+          font-size: 1.6rem !important;
+          font-weight: 700 !important;
+          color: #FBBF24 !important;
+          margin-bottom: 0.5rem !important;
         }
 
         .nba-team {
-          font-size: 1.1rem;
-          opacity: 0.9;
-          margin: 0;
+          font-size: 1.1rem !important;
+          opacity: 0.9 !important;
+          margin: 0 !important;
         }
 
         @keyframes fade-in-up {
@@ -749,71 +736,68 @@ const DraftDuelMain = () => {
           }
         }
 
-        /* VS Text - No Overlap */
         .vs-text {
-          font-size: 5rem;
-          font-weight: 800;
-          background: linear-gradient(to top, #FFD700 30%, #FF4500 100%);
-          -webkit-background-clip: text;
-          -webkit-text-fill-color: transparent;
-          background-clip: text;
-          filter: drop-shadow(0 0 8px rgba(255, 165, 0, 0.8)) drop-shadow(0 0 15px rgba(255, 69, 0, 0.6));
-          animation: flicker 1.5s infinite alternate;
-          z-index: 15;
-          margin: 0 2rem;
+          font-size: 5rem !important;
+          font-weight: 800 !important;
+          background: linear-gradient(to top, #FFD700 30%, #FF4500 100%) !important;
+          -webkit-background-clip: text !important;
+          -webkit-text-fill-color: transparent !important;
+          background-clip: text !important;
+          filter: drop-shadow(0 0 8px rgba(255, 165, 0, 0.8)) drop-shadow(0 0 15px rgba(255, 69, 0, 0.6)) !important;
+          animation: flicker 1.5s infinite alternate !important;
+          z-index: 15 !important;
+          margin: 0 2rem !important;
         }
 
-        /* FIXED: Feedback Area - Prevents Layout Shifts */
+        /* FIXED: Feedback Area */
         .feedback-area {
-          height: 80px;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          margin-top: 1rem;
-          flex-shrink: 0;
+          height: 80px !important;
+          display: flex !important;
+          align-items: center !important;
+          justify-content: center !important;
+          margin-top: 1rem !important;
+          flex-shrink: 0 !important;
         }
 
-        /* FIXED: Feedback Message - Contained in Fixed Area */
         .feedback-message {
-          font-size: 1.5rem;
-          font-weight: 600;
-          text-align: center;
-          padding: 0.75rem 1.5rem;
-          border-radius: 0.5rem;
-          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-          animation: fade-in-up 0.5s ease-out;
-          max-width: 300px;
-          z-index: 10;
-          margin: 0;
+          font-size: 1.5rem !important;
+          font-weight: 600 !important;
+          text-align: center !important;
+          padding: 0.75rem 1.5rem !important;
+          border-radius: 0.5rem !important;
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2) !important;
+          animation: fade-in-up 0.5s ease-out !important;
+          max-width: 300px !important;
+          z-index: 10 !important;
+          margin: 0 !important;
         }
 
         .feedback-message.correct {
-          background: #10B981;
-          color: white;
+          background: #10B981 !important;
+          color: white !important;
         }
 
         .feedback-message.incorrect {
-          background: #EF4444;
-          color: white;
+          background: #EF4444 !important;
+          color: white !important;
         }
 
         .feedback-message.timeout {
-          background: #3B82F6;
-          color: white;
+          background: #3B82F6 !important;
+          color: white !important;
         }
 
-        /* FIXED: Action Buttons - IDENTICAL SIZE */
+        /* FIXED: Action Buttons - Absolutely identical */
         .action-buttons {
-          display: flex;
-          gap: 1rem;
-          justify-content: center;
-          flex-wrap: wrap;
-          margin-top: 2rem;
-          z-index: 10;
+          display: flex !important;
+          gap: 1rem !important;
+          justify-content: center !important;
+          flex-wrap: wrap !important;
+          margin-top: 2rem !important;
+          z-index: 10 !important;
         }
 
         .action-button {
-          /* CRITICAL FIXES: Absolutely fixed dimensions */
           width: 180px !important;
           height: 50px !important;
           min-width: 180px !important;
@@ -821,205 +805,203 @@ const DraftDuelMain = () => {
           min-height: 50px !important;
           max-height: 50px !important;
           padding: 0 !important;
-          margin: 0;
-          border: none;
-          border-radius: 25px;
-          font-size: 1rem;
-          font-weight: 600;
-          cursor: pointer;
-          transition: all 0.3s ease;
-          box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-          /* CRITICAL FIXES: Flex centering for text */
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          text-align: center;
-          /* CRITICAL FIXES: Prevent text wrapping */
-          white-space: nowrap;
-          overflow: hidden;
-          text-overflow: ellipsis;
-          box-sizing: border-box;
+          margin: 0 !important;
+          border: none !important;
+          border-radius: 25px !important;
+          font-size: 1rem !important;
+          font-weight: 600 !important;
+          cursor: pointer !important;
+          transition: all 0.3s ease !important;
+          box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1) !important;
+          display: flex !important;
+          align-items: center !important;
+          justify-content: center !important;
+          text-align: center !important;
+          white-space: nowrap !important;
+          overflow: hidden !important;
+          text-overflow: ellipsis !important;
+          box-sizing: border-box !important;
         }
 
         .action-button:hover {
-          transform: translateY(-2px);
-          box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+          transform: translateY(-2px) !important;
+          box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15) !important;
         }
 
         .action-button:active {
-          transform: translateY(0);
+          transform: translateY(0) !important;
         }
 
         .continue-button {
-          background: linear-gradient(135deg, #3B82F6 0%, #1D4ED8 100%);
-          color: white;
+          background: linear-gradient(135deg, #3B82F6 0%, #1D4ED8 100%) !important;
+          color: white !important;
         }
 
         .play-again-button {
-          background: linear-gradient(135deg, #10B981 0%, #059669 100%);
-          color: white;
+          background: linear-gradient(135deg, #10B981 0%, #059669 100%) !important;
+          color: white !important;
         }
 
         .share-button {
-          background: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%);
-          color: white;
+          background: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%) !important;
+          color: white !important;
         }
 
         /* Share Modal */
         .share-modal-overlay {
-          position: fixed;
-          top: 0;
-          left: 0;
-          right: 0;
-          bottom: 0;
-          background: rgba(0, 0, 0, 0.75);
-          display: flex;
-          justify-content: center;
-          align-items: center;
-          z-index: 1000;
-          padding: 1rem;
-          animation: fade-in-up 0.3s ease-out;
+          position: fixed !important;
+          top: 0 !important;
+          left: 0 !important;
+          right: 0 !important;
+          bottom: 0 !important;
+          background: rgba(0, 0, 0, 0.75) !important;
+          display: flex !important;
+          justify-content: center !important;
+          align-items: center !important;
+          z-index: 1000 !important;
+          padding: 1rem !important;
+          animation: fade-in-up 0.3s ease-out !important;
         }
 
         .share-modal {
-          background: ${isDarkMode ? '#2D3748' : '#FFFFFF'};
-          color: ${isDarkMode ? '#FFFFFF' : '#2D3748'};
-          padding: 2rem;
-          border-radius: 1.5rem;
-          box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
-          max-width: 28rem;
-          width: 100%;
-          text-align: center;
+          background: ${isDarkMode ? '#2D3748' : '#FFFFFF'} !important;
+          color: ${isDarkMode ? '#FFFFFF' : '#2D3748'} !important;
+          padding: 2rem !important;
+          border-radius: 1.5rem !important;
+          box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3) !important;
+          max-width: 28rem !important;
+          width: 100% !important;
+          text-align: center !important;
         }
 
         .share-modal h2 {
-          font-size: 2rem;
-          font-weight: 800;
-          margin-bottom: 1rem;
-          color: ${isDarkMode ? '#FFFFFF' : '#2D3748'};
+          font-size: 2rem !important;
+          font-weight: 800 !important;
+          margin-bottom: 1rem !important;
+          color: ${isDarkMode ? '#FFFFFF' : '#2D3748'} !important;
         }
 
         .share-modal p {
-          font-size: 1.125rem;
-          margin-bottom: 1rem;
-          color: ${isDarkMode ? '#A0AEC0' : '#4A5568'};
+          font-size: 1.125rem !important;
+          margin-bottom: 1rem !important;
+          color: ${isDarkMode ? '#A0AEC0' : '#4A5568'} !important;
         }
 
         .share-textarea {
-          width: 100%;
-          padding: 1rem;
-          border: 2px solid ${isDarkMode ? '#4A5568' : '#E2E8F0'};
-          border-radius: 0.5rem;
-          font-family: 'Courier New', monospace;
-          font-size: 1rem;
-          resize: none;
-          height: 7rem;
-          margin-bottom: 1rem;
-          background: ${isDarkMode ? '#1A202C' : '#F7FAFC'};
-          color: ${isDarkMode ? '#FFFFFF' : '#2D3748'};
+          width: 100% !important;
+          padding: 1rem !important;
+          border: 2px solid ${isDarkMode ? '#4A5568' : '#E2E8F0'} !important;
+          border-radius: 0.5rem !important;
+          font-family: 'Courier New', monospace !important;
+          font-size: 1rem !important;
+          resize: none !important;
+          height: 7rem !important;
+          margin-bottom: 1rem !important;
+          background: ${isDarkMode ? '#1A202C' : '#F7FAFC'} !important;
+          color: ${isDarkMode ? '#FFFFFF' : '#2D3748'} !important;
         }
 
         .share-textarea:focus {
-          outline: none;
-          border-color: #3B82F6;
-          box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+          outline: none !important;
+          border-color: #3B82F6 !important;
+          box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1) !important;
         }
 
         .share-buttons {
-          display: flex;
-          gap: 1rem;
-          justify-content: center;
+          display: flex !important;
+          gap: 1rem !important;
+          justify-content: center !important;
         }
 
         .copy-button {
-          background: linear-gradient(135deg, #3B82F6 0%, #1D4ED8 100%);
-          color: white;
+          background: linear-gradient(135deg, #3B82F6 0%, #1D4ED8 100%) !important;
+          color: white !important;
         }
 
         .back-button {
-          background: ${isDarkMode ? '#4A5568' : '#E2E8F0'};
-          color: ${isDarkMode ? '#FFFFFF' : '#2D3748'};
+          background: ${isDarkMode ? '#4A5568' : '#E2E8F0'} !important;
+          color: ${isDarkMode ? '#FFFFFF' : '#2D3748'} !important;
         }
 
         .back-button:hover {
-          background: ${isDarkMode ? '#2D3748' : '#CBD5E0'};
+          background: ${isDarkMode ? '#2D3748' : '#CBD5E0'} !important;
         }
 
-        /* Mobile Responsive - STILL HORIZONTAL */
+        /* Mobile Responsive */
         @media (max-width: 768px) {
           .game-title {
-            font-size: 3rem;
-            margin: 1rem 0 0.5rem 0;
+            font-size: 3rem !important;
+            margin: 1rem 0 0.5rem 0 !important;
           }
           
           .scoreboard {
-            width: 98%;
-            margin: 0 auto 0.5rem;
-            padding: 6px;
-            height: 100px;
-            min-height: 100px;
-            max-height: 100px;
+            width: 98% !important;
+            margin: 0 auto 0.5rem !important;
+            padding: 6px !important;
+            height: 100px !important;
+            min-height: 100px !important;
+            max-height: 100px !important;
           }
           
           .scoreboard-box {
-            padding: 6px;
-            margin: 0 4px;
-            height: calc(100% - 12px);
-            min-height: 76px;
-            max-height: 76px;
+            padding: 6px !important;
+            margin: 0 4px !important;
+            height: calc(100% - 12px) !important;
+            min-height: 76px !important;
+            max-height: 76px !important;
           }
           
           .scoreboard-value, .scoreboard-timer {
-            font-size: 2.5rem;
-            height: 40px;
+            font-size: 2.5rem !important;
+            height: 40px !important;
           }
           
           .question-section {
-            width: 98%;
-            margin: 0 auto 1.5rem;
-            padding: 1rem;
+            width: 98% !important;
+            margin: 0 auto 1.5rem !important;
+            padding: 1rem !important;
           }
           
           .question-text {
-            font-size: 1.4rem;
+            font-size: 1.4rem !important;
           }
           
           .players-comparison {
-            gap: 1.5rem;
-            margin: 1rem 0;
+            gap: 1.5rem !important;
+            margin: 1rem 0 !important;
           }
           
           .player-card {
-            width: 14rem;
-            height: 18rem;
+            width: 14rem !important;
+            height: 18rem !important;
           }
           
           .player-image {
-            width: 8rem;
-            height: 10rem;
+            width: 8rem !important;
+            height: 10rem !important;
           }
           
           .player-name {
-            font-size: 1.5rem;
+            font-size: 1.5rem !important;
           }
           
           .player-team {
-            font-size: 1rem;
+            font-size: 1rem !important;
           }
           
           .vs-text {
-            font-size: 3rem;
-            margin: 0 1rem;
+            font-size: 3rem !important;
+            margin: 0 1rem !important;
           }
           
           .feedback-message {
-            font-size: 1.2rem;
+            font-size: 1.2rem !important;
           }
           
           .action-buttons {
-            flex-direction: column;
-            align-items: center;
-            gap: 0.5rem;
+            flex-direction: column !important;
+            align-items: center !important;
+            gap: 0.5rem !important;
           }
           
           .action-button {
@@ -1034,35 +1016,35 @@ const DraftDuelMain = () => {
 
         @media (max-width: 480px) {
           .game-title {
-            font-size: 2.5rem;
+            font-size: 2.5rem !important;
           }
           
           .question-text {
-            font-size: 1.2rem;
+            font-size: 1.2rem !important;
           }
           
           .players-comparison {
-            gap: 1rem;
+            gap: 1rem !important;
           }
           
           .player-card {
-            width: 12rem;
-            height: 16rem;
+            width: 12rem !important;
+            height: 16rem !important;
           }
           
           .player-image {
-            width: 7rem;
-            height: 8.5rem;
+            width: 7rem !important;
+            height: 8.5rem !important;
           }
           
           .vs-text {
-            font-size: 2.5rem;
-            margin: 0 0.5rem;
+            font-size: 2.5rem !important;
+            margin: 0 0.5rem !important;
           }
           
           .scoreboard-value, .scoreboard-timer {
-            font-size: 2rem;
-            height: 35px;
+            font-size: 2rem !important;
+            height: 35px !important;
           }
         }
       `}</style>
@@ -1084,10 +1066,10 @@ const DraftDuelMain = () => {
         )}
       </button>
 
-      {/* Game Title - Same style as VS text */}
+      {/* Game Title */}
       <div className="game-title">DRAFT DUEL</div>
 
-      {/* FIXED Scoreboard - 3 Sections */}
+      {/* FIXED Scoreboard */}
       <div className="scoreboard">
         <div className="scoreboard-box">
           <div className="scoreboard-label">Streak</div>
@@ -1107,7 +1089,7 @@ const DraftDuelMain = () => {
         </div>
       </div>
 
-      {/* Question Section - Better Focus */}
+      {/* Question Section */}
       <div className="question-section">
         <div className="question-text">
           {currentQuestion ? currentQuestion.text : "Loading question..."}
@@ -1116,10 +1098,8 @@ const DraftDuelMain = () => {
 
       {/* Game Area */}
       <div className="game-area">
-        {/* Basketball Court Background - Behind cards only */}
         <div className="court-background" dangerouslySetInnerHTML={{ __html: basketballCourtSVG }} />
 
-        {/* Player Comparison - Always Horizontal */}
         <div className="players-comparison">
           {player1 && (
             <PlayerCard
@@ -1133,7 +1113,6 @@ const DraftDuelMain = () => {
             />
           )}
           
-          {/* VS Text - No Overlap */}
           <div className="vs-text">VS</div>
           
           {player2 && (
@@ -1149,7 +1128,7 @@ const DraftDuelMain = () => {
           )}
         </div>
 
-        {/* FIXED: Feedback Area - Prevents Layout Shifts */}
+        {/* FIXED: Feedback Area */}
         <div className="feedback-area">
           {feedbackMessage && (
             <div className={`feedback-message ${
@@ -1161,7 +1140,7 @@ const DraftDuelMain = () => {
           )}
         </div>
 
-        {/* FIXED: Action Buttons - EXACTLY EQUAL SIZE */}
+        {/* FIXED: Action Buttons */}
         {selectedPlayerId !== null && (
           <div className="action-buttons">
             {!gameOver ? (
