@@ -329,6 +329,7 @@ const DraftDuelMain = () => {
         @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&display=swap');
         @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap');
         @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono:wght@400&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap');
         
         /* Full screen takeover */
         .draft-duel-fullscreen {
@@ -445,18 +446,6 @@ const DraftDuelMain = () => {
           margin: 0 6px;
           position: relative;
           min-height: 80px;
-        }
-
-        .scoreboard-box::before {
-          content: '';
-          position: absolute;
-          left: 8%;
-          right: 8%;
-          top: 50%;
-          transform: translateY(-50%);
-          height: 2px;
-          background: linear-gradient(90deg, transparent, #FF8C00, transparent);
-          box-shadow: 0 0 8px rgba(255, 140, 0, 0.6);
         }
 
         .scoreboard-label {
@@ -680,6 +669,7 @@ const DraftDuelMain = () => {
         }
 
         .player-name {
+          font-family: 'DM Sans', sans-serif;
           font-size: 1.6rem;
           font-weight: 700;
           text-align: center;
@@ -688,6 +678,7 @@ const DraftDuelMain = () => {
         }
 
         .player-team {
+          font-family: 'DM Sans', sans-serif;
           font-size: 1.2rem;
           text-align: center;
           font-weight: 500;
