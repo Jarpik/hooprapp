@@ -1,4 +1,758 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+.scoreboard-value {
+          font-family: 'Orbitron', monospace !important;
+          font-size: 2rem !important;
+          font-weight: 900 !important;
+          line-height: 1 !important;
+          color: #FF8C00 !important;
+          text-shadow: 
+            0 0 10px rgba(255, 140, 0, 0.8),
+            0 0 20px rgba(255, 140, 0, 0.4) !important;
+          height: 36px !important;
+          display: flex !important;
+          align-items: center !important;
+          justify-content: center !important;
+          flex-shrink: 0 !important;
+        }
+
+        .scoreboard-timer {
+          font-family: 'Orbitron', monospace !important;
+          font-size: 2rem !important;
+          font-weight: 900 !important;
+          line-height: 1 !important;
+          color: #FF0000 !important;
+          text-shadow: 
+            0 0 10px rgba(255, 0, 0, 0.8),
+            0 0 20px rgba(255, 0, 0, 0.4) !important;
+          height: 36px !important;
+          display: flex !important;
+          align-items: center !important;
+          justify-content: center !important;
+          width: 100% !important;
+          flex-shrink: 0 !important;
+        }
+
+        .scoreboard-timer.warning {
+          color: #FF3333 !important;
+          text-shadow: 
+            0 0 15px rgba(255, 50, 50, 1),
+            0 0 30px rgba(255, 50, 50, 0.6) !important;
+          animation: pulse-red 1s infinite alternate !important;
+        }
+
+        @keyframes pulse-red {
+          from { 
+            filter: brightness(1.2);
+            transform: scale(1);
+          }
+          to { 
+            filter: brightness(1.5);
+            transform: scale(1.02);
+          }
+        }
+
+        /* MOBILE-OPTIMIZED QUESTION SECTION */
+        .question-section {
+          width: 98% !important;
+          max-width: 380px !important;
+          margin: 0 auto 1rem !important;
+          text-align: center !important;
+          background: linear-gradient(135deg, rgba(59, 130, 246, 0.15), rgba(147, 51, 234, 0.15)) !important;
+          border-radius: 15px !important;
+          padding: 1rem !important;
+          border: 1px solid rgba(255, 255, 255, 0.1) !important;
+          backdrop-filter: blur(10px) !important;
+          box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2) !important;
+        }
+
+        .question-text {
+          font-family: 'Outfit', sans-serif !important;
+          font-size: 1.1rem !important;
+          font-weight: 700 !important;
+          color: ${isDarkMode ? '#FFF' : '#333'} !important;
+          text-shadow: 0 0 8px rgba(${isDarkMode ? '255,255,255' : '0,0,0'},0.5) !important;
+          text-transform: uppercase !important;
+          letter-spacing: 0.5px !important;
+          margin: 0 !important;
+          line-height: 1.3 !important;
+        }
+
+        /* MOBILE-OPTIMIZED GAME AREA */
+        .game-area {
+          flex: 1 !important;
+          display: flex !important;
+          flex-direction: column !important;
+          align-items: center !important;
+          justify-content: flex-start !important;
+          position: relative !important;
+          padding: 0.5rem !important;
+          max-width: 100% !important;
+          margin: 0 auto !important;
+          width: 100% !important;
+          overflow: hidden !important;
+        }
+
+        .court-background {
+          position: absolute !important;
+          top: 50% !important;
+          left: 50% !important;
+          transform: translate(-50%, -50%) scale(0.3) !important;
+          z-index: 0 !important;
+          opacity: 0.1 !important;
+          pointer-events: none !important;
+          width: 1000px !important;
+          height: 500px !important;
+        }
+
+        /* MOBILE-OPTIMIZED PLAYER COMPARISON */
+        .players-comparison {
+          position: relative !important;
+          display: flex !important;
+          justify-content: center !important;
+          align-items: center !important;
+          gap: 0.5rem !important;
+          z-index: 10 !important;
+          width: 100% !important;
+          max-width: 380px !important;
+          margin: 0.5rem 0 !important;
+        }
+
+        .player-card-wrapper {
+          display: flex !important;
+          flex-direction: column !important;
+          align-items: center !important;
+          gap: 0.5rem !important;
+          z-index: 20 !important;
+          flex: 1 !important;
+        }
+
+        /* MOBILE-OPTIMIZED PLAYER CARDS */
+        .player-card {
+          position: relative !important;
+          width: 100% !important;
+          max-width: 140px !important;
+          height: 180px !important;
+          border-radius: 12px !important;
+          padding: 0.75rem !important;
+          cursor: pointer !important;
+          transition: all 0.3s ease !important;
+          box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3) !important;
+          border: 3px solid rgba(255, 255, 255, 0.2) !important;
+          display: flex !important;
+          flex-direction: column !important;
+          align-items: center !important;
+          justify-content: space-between !important;
+          background: none !important;
+          font-family: inherit !important;
+          z-index: 20 !important;
+          overflow: hidden !important;
+        }
+
+        .player-card:hover:not(.disabled) {
+          transform: translateY(-4px) scale(1.02) !important;
+          box-shadow: 0 12px 25px rgba(0, 0, 0, 0.4) !important;
+          z-index: 30 !important;
+        }
+
+        .player-card.selected {
+          border-color: #3B82F6 !important;
+          box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.4), 0 8px 20px rgba(0, 0, 0, 0.3) !important;
+          animation: pop-on-select 0.15s ease-out !important;
+        }
+
+        .player-card.correct {
+          border-color: #10B981 !important;
+          box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.5), 0 8px 20px rgba(0, 0, 0, 0.3) !important;
+          animation: pop-in 0.3s ease-out !important;
+        }
+
+        .player-card.incorrect {
+          border-color: #EF4444 !important;
+          box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.5), 0 8px 20px rgba(0, 0, 0, 0.3) !important;
+          animation: shake 0.5s ease-out !important;
+        }
+
+        .player-card.disabled {
+          opacity: 0.8 !important;
+          cursor: not-allowed !important;
+        }
+
+        @keyframes pop-on-select {
+          0% { transform: scale(1); }
+          50% { transform: scale(1.05); }
+          100% { transform: scale(1.02); }
+        }
+
+        @keyframes pop-in {
+          0% { transform: scale(0.8); opacity: 0; }
+          70% { transform: scale(1.1); opacity: 1; }
+          100% { transform: scale(1); }
+        }
+
+        @keyframes shake {
+          10%, 90% { transform: translate3d(-1px, 0, 0); }
+          20%, 80% { transform: translate3d(2px, 0, 0); }
+          30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
+          40%, 60% { transform: translate3d(4px, 0, 0); }
+        }
+
+        /* MOBILE-OPTIMIZED PLAYER CARD CONTENT */
+        .player-image {
+          width: 5rem !important;
+          height: 6rem !important;
+          border-radius: 50% !important;
+          object-fit: cover !important;
+          margin-bottom: 0.5rem !important;
+          border: 2px solid rgba(255, 255, 255, 0.3) !important;
+          transition: transform 0.3s ease !important;
+          flex-shrink: 0 !important;
+        }
+
+        .player-card:hover .player-image {
+          transform: scale(1.05) !important;
+        }
+
+        .player-name {
+          font-family: 'DM Sans', sans-serif !important;
+          font-size: 0.9rem !important;
+          font-weight: 800 !important;
+          text-align: center !important;
+          margin-bottom: 0.25rem !important;
+          text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.4) !important;
+          letter-spacing: 0.3px !important;
+          line-height: 1.2 !important;
+          overflow: hidden !important;
+          text-overflow: ellipsis !important;
+          white-space: nowrap !important;
+          width: 100% !important;
+        }
+
+        .player-team {
+          font-family: 'DM Sans', sans-serif !important;
+          font-size: 0.7rem !important;
+          text-align: center !important;
+          font-weight: 500 !important;
+          margin: 0 !important;
+          opacity: 0.9 !important;
+          line-height: 1.1 !important;
+          overflow: hidden !important;
+          text-overflow: ellipsis !important;
+          white-space: nowrap !important;
+          width: 100% !important;
+        }
+
+        /* MOBILE-OPTIMIZED REVEAL SECTION */
+        .reveal-section {
+          background: linear-gradient(135deg, rgba(0, 0, 0, 0.9), rgba(0, 0, 0, 0.8)) !important;
+          color: #ffffff !important;
+          padding: 0.5rem 0.75rem !important;
+          border-radius: 8px !important;
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4) !important;
+          text-align: center !important;
+          animation: fade-in-up 0.5s ease-out !important;
+          min-width: 120px !important;
+          z-index: 25 !important;
+          width: 100% !important;
+        }
+
+        .pick-number {
+          font-size: 1rem !important;
+          font-weight: 700 !important;
+          color: #FBBF24 !important;
+          margin-bottom: 0.25rem !important;
+          line-height: 1.2 !important;
+        }
+
+        .nba-team {
+          font-size: 0.75rem !important;
+          opacity: 0.9 !important;
+          margin: 0 !important;
+          line-height: 1.1 !important;
+          overflow: hidden !important;
+          text-overflow: ellipsis !important;
+          white-space: nowrap !important;
+        }
+
+        @keyframes fade-in-up {
+          from {
+            opacity: 0;
+            transform: translateY(10px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+
+        /* MOBILE-OPTIMIZED VS TEXT */
+        .vs-text {
+          font-size: 2rem !important;
+          font-weight: 800 !important;
+          background: linear-gradient(to top, #FFD700 30%, #FF4500 100%) !important;
+          -webkit-background-clip: text !important;
+          -webkit-text-fill-color: transparent !important;
+          background-clip: text !important;
+          filter: drop-shadow(0 0 6px rgba(255, 165, 0, 0.8)) drop-shadow(0 0 12px rgba(255, 69, 0, 0.6)) !important;
+          animation: flicker 1.5s infinite alternate !important;
+          z-index: 15 !important;
+          margin: 0 0.5rem !important;
+          flex-shrink: 0 !important;
+        }
+
+        /* MOBILE-OPTIMIZED FEEDBACK AREA */
+        .feedback-area {
+          height: 60px !important;
+          display: flex !important;
+          align-items: center !important;
+          justify-content: center !important;
+          margin-top: 0.5rem !important;
+          flex-shrink: 0 !important;
+          width: 100% !important;
+          max-width: 380px !important;
+        }
+
+        .feedback-message {
+          font-size: 1.1rem !important;
+          font-weight: 600 !important;
+          text-align: center !important;
+          padding: 0.5rem 1rem !important;
+          border-radius: 8px !important;
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2) !important;
+          animation: fade-in-up 0.5s ease-out !important;
+          max-width: 280px !important;
+          z-index: 10 !important;
+          margin: 0 !important;
+          line-height: 1.3 !important;
+        }
+
+        .feedback-message.correct {
+          background: #10B981 !important;
+          color: white !important;
+        }
+
+        .feedback-message.incorrect {
+          background: #EF4444 !important;
+          color: white !important;
+        }
+
+        .feedback-message.timeout {
+          background: #3B82F6 !important;
+          color: white !important;
+        }
+
+        /* MOBILE-OPTIMIZED ACTION BUTTONS */
+        .action-buttons {
+          display: flex !important;
+          gap: 0.75rem !important;
+          justify-content: center !important;
+          flex-wrap: wrap !important;
+          margin-top: 1rem !important;
+          z-index: 10 !important;
+          width: 100% !important;
+          max-width: 380px !important;
+          padding: 0 1rem !important;
+        }
+
+        .action-button {
+          width: 140px !important;
+          height: 45px !important;
+          min-width: 140px !important;
+          max-width: 140px !important;
+          min-height: 45px !important;
+          max-height: 45px !important;
+          padding: 0 !important;
+          margin: 0 !important;
+          border: none !important;
+          border-radius: 20px !important;
+          font-size: 0.9rem !important;
+          font-weight: 600 !important;
+          cursor: pointer !important;
+          transition: all 0.3s ease !important;
+          box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1) !important;
+          display: flex !important;
+          align-items: center !important;
+          justify-content: center !important;
+          text-align: center !important;
+          white-space: nowrap !important;
+          overflow: hidden !important;
+          text-overflow: ellipsis !important;
+          box-sizing: border-box !important;
+        }
+
+        .action-button:hover {
+          transform: translateY(-2px) !important;
+          box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15) !important;
+        }
+
+        .action-button:active {
+          transform: translateY(0) !important;
+        }
+
+        .continue-button {
+          background: linear-gradient(135deg, #3B82F6 0%, #1D4ED8 100%) !important;
+          color: white !important;
+        }
+
+        .play-again-button {
+          background: linear-gradient(135deg, #10B981 0%, #059669 100%) !important;
+          color: white !important;
+        }
+
+        .share-button {
+          background: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%) !important;
+          color: white !important;
+        }
+
+        /* MOBILE-OPTIMIZED SHARE MODAL */
+        .share-modal-overlay {
+          position: fixed !important;
+          top: 0 !important;
+          left: 0 !important;
+          right: 0 !important;
+          bottom: 0 !important;
+          background: rgba(0, 0, 0, 0.75) !important;
+          display: flex !important;
+          justify-content: center !important;
+          align-items: center !important;
+          z-index: 1000 !important;
+          padding: 1rem !important;
+          animation: fade-in-up 0.3s ease-out !important;
+        }
+
+        .share-modal {
+          background: ${isDarkMode ? '#2D3748' : '#FFFFFF'} !important;
+          color: ${isDarkMode ? '#FFFFFF' : '#2D3748'} !important;
+          padding: 1.5rem !important;
+          border-radius: 1rem !important;
+          box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3) !important;
+          max-width: 320px !important;
+          width: 100% !important;
+          text-align: center !important;
+        }
+
+        .share-modal h2 {
+          font-size: 1.5rem !important;
+          font-weight: 800 !important;
+          margin-bottom: 0.75rem !important;
+          color: ${isDarkMode ? '#FFFFFF' : '#2D3748'} !important;
+        }
+
+        .share-modal p {
+          font-size: 1rem !important;
+          margin-bottom: 0.75rem !important;
+          color: ${isDarkMode ? '#A0AEC0' : '#4A5568'} !important;
+        }
+
+        .share-textarea {
+          width: 100% !important;
+          padding: 0.75rem !important;
+          border: 2px solid ${isDarkMode ? '#4A5568' : '#E2E8F0'} !important;
+          border-radius: 0.5rem !important;
+          font-family: 'Courier New', monospace !important;
+          font-size: 0.85rem !important;
+          resize: none !important;
+          height: 5rem !important;
+          margin-bottom: 0.75rem !important;
+          background: ${isDarkMode ? '#1A202C' : '#F7FAFC'} !important;
+          color: ${isDarkMode ? '#FFFFFF' : '#2D3748'} !important;
+        }
+
+        .share-textarea:focus {
+          outline: none !important;
+          border-color: #3B82F6 !important;
+          box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1) !important;
+        }
+
+        .share-buttons {
+          display: flex !important;
+          gap: 0.5rem !important;
+          justify-content: center !important;
+        }
+
+        .copy-button {
+          background: linear-gradient(135deg, #3B82F6 0%, #1D4ED8 100%) !important;
+          color: white !important;
+          width: 100px !important;
+          height: 40px !important;
+          font-size: 0.85rem !important;
+        }
+
+        .back-button {
+          background: ${isDarkMode ? '#4A5568' : '#E2E8F0'} !important;
+          color: ${isDarkMode ? '#FFFFFF' : '#2D3748'} !important;
+          width: 100px !important;
+          height: 40px !important;
+          font-size: 0.85rem !important;
+        }
+
+        .back-button:hover {
+          background: ${isDarkMode ? '#2D3748' : '#CBD5E0'} !important;
+        }
+
+        /* DESKTOP STYLES (768px and above) */
+        @media (min-width: 768px) {
+          .game-title {
+            font-size: 4rem !important;
+            margin: 1.5rem 0 1rem 0 !important;
+          }
+
+          .theme-toggle {
+            top: 1rem !important;
+            right: 1rem !important;
+            width: 3rem !important;
+            height: 3rem !important;
+            font-size: 1.5rem !important;
+          }
+          
+          .scoreboard {
+            width: 95% !important;
+            max-width: 900px !important;
+            height: 120px !important;
+            min-height: 120px !important;
+            max-height: 120px !important;
+            border: 6px solid #333 !important;
+            border-radius: 20px !important;
+            padding: 8px !important;
+          }
+          
+          .scoreboard-box {
+            padding: 8px !important;
+            margin: 0 6px !important;
+            height: calc(100% - 16px) !important;
+            min-height: 88px !important;
+            max-height: 88px !important;
+            border: 3px solid #444 !important;
+            border-radius: 12px !important;
+          }
+
+          .scoreboard-label {
+            font-size: 1rem !important;
+            height: 20px !important;
+            line-height: 20px !important;
+            margin-bottom: 8px !important;
+            letter-spacing: 1px !important;
+          }
+          
+          .scoreboard-value, .scoreboard-timer {
+            font-size: 3.5rem !important;
+            height: 50px !important;
+            text-shadow: 
+              0 0 20px rgba(255, 140, 0, 1),
+              0 0 40px rgba(255, 140, 0, 0.6),
+              0 0 60px rgba(255, 140, 0, 0.3) !important;
+          }
+
+          .scoreboard-timer {
+            text-shadow: 
+              0 0 20px rgba(255, 0, 0, 1),
+              0 0 40px rgba(255, 0, 0, 0.6),
+              0 0 60px rgba(255, 0, 0, 0.3) !important;
+          }
+
+          .scoreboard-timer.warning {
+            text-shadow: 
+              0 0 25px rgba(255, 50, 50, 1),
+              0 0 50px rgba(255, 50, 50, 0.8),
+              0 0 75px rgba(255, 50, 50, 0.5) !important;
+          }
+          
+          .question-section {
+            width: 95% !important;
+            max-width: 900px !important;
+            margin: 0 auto 2rem !important;
+            padding: 1.5rem 2rem !important;
+            border-radius: 20px !important;
+          }
+          
+          .question-text {
+            font-size: 1.8rem !important;
+            letter-spacing: 1px !important;
+          }
+
+          .game-area {
+            padding: 1rem !important;
+            max-width: 1400px !important;
+            justify-content: center !important;
+          }
+
+          .court-background {
+            transform: translate(-50%, -50%) scale(0.6) !important;
+            opacity: 0.15 !important;
+          }
+          
+          .players-comparison {
+            gap: 3rem !important;
+            margin: 2rem 0 !important;
+            max-width: 1200px !important;
+          }
+          
+          .player-card {
+            width: 18rem !important;
+            max-width: none !important;
+            height: 22rem !important;
+            border-radius: 1rem !important;
+            padding: 1.5rem !important;
+            border: 4px solid rgba(255, 255, 255, 0.2) !important;
+          }
+
+          .player-card:hover:not(.disabled) {
+            transform: translateY(-8px) scale(1.05) !important;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5) !important;
+          }
+
+          .player-card.selected {
+            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.4), 0 15px 35px rgba(0, 0, 0, 0.4) !important;
+          }
+
+          .player-card.correct {
+            box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.5), 0 15px 35px rgba(0, 0, 0, 0.4) !important;
+          }
+
+          .player-card.incorrect {
+            box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.5), 0 15px 35px rgba(0, 0, 0, 0.4) !important;
+          }
+          
+          .player-image {
+            width: 10rem !important;
+            height: 12rem !important;
+            margin-bottom: 1rem !important;
+            border: 4px solid rgba(255, 255, 255, 0.3) !important;
+          }
+          
+          .player-name {
+            font-size: 1.8rem !important;
+            margin-bottom: 0.5rem !important;
+            letter-spacing: 0.5px !important;
+            white-space: normal !important;
+          }
+          
+          .player-team {
+            font-size: 1.2rem !important;
+            white-space: normal !important;
+          }
+
+          .reveal-section {
+            padding: 1rem 1.5rem !important;
+            border-radius: 0.75rem !important;
+            min-width: 220px !important;
+          }
+
+          .pick-number {
+            font-size: 1.6rem !important;
+            margin-bottom: 0.5rem !important;
+          }
+
+          .nba-team {
+            font-size: 1.1rem !important;
+            white-space: normal !important;
+          }
+          
+          .vs-text {
+            font-size: 5rem !important;
+            margin: 0 2rem !important;
+          }
+
+          .feedback-area {
+            height: 80px !important;
+            margin-top: 1rem !important;
+            max-width: none !important;
+          }
+          
+          .feedback-message {
+            font-size: 1.5rem !important;
+            padding: 0.75rem 1.5rem !important;
+            border-radius: 0.5rem !important;
+            max-width: 300px !important;
+          }
+          
+          .action-buttons {
+            margin-top: 2rem !important;
+            max-width: none !important;
+            padding: 0 !important;
+          }
+          
+          .action-button {
+            width: 180px !important;
+            height: 50px !important;
+            min-width: 180px !important;
+            max-width: 180px !important;
+            min-height: 50px !important;
+            max-height: 50px !important;
+            font-size: 1rem !important;
+            border-radius: 25px !important;
+          }
+
+          .share-modal {
+            max-width: 28rem !important;
+            padding: 2rem !important;
+            border-radius: 1.5rem !important;
+          }
+
+          .share-modal h2 {
+            font-size: 2rem !important;
+            margin-bottom: 1rem !important;
+          }
+
+          .share-modal p {
+            font-size: 1.125rem !important;
+            margin-bottom: 1rem !important;
+          }
+
+          .share-textarea {
+            height: 7rem !important;
+            padding: 1rem !important;
+            font-size: 1rem !important;
+            margin-bottom: 1rem !important;
+          }
+
+          .copy-button, .back-button {
+            width: 120px !important;
+            height: 45px !important;
+            font-size: 1rem !important;
+          }
+
+          .share-buttons {
+            gap: 1rem !important;
+          }
+        }
+      `}</style>
+
+      {/* Theme Toggle */}
+      <button 
+        className="theme-toggle"
+        onClick={toggleDarkMode}
+        aria-label="Toggle theme"
+      >
+        {isDarkMode ? (
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M12 3v1m0 16v1m9-9h1M4 12H3m15.354 5.354l-.707.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+          </svg>
+        ) : (
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9 9 0 008.354-5.646z" />
+          </svg>
+        )}
+      </button>
+
+      {/* Game Title */}
+      <div className="game-title">DRAFT DUEL</div>
+
+      {/* MOBILE-OPTIMIZED Scoreboard */}
+      <div className="scoreboard">
+        <div className="scoreboard-box">
+          <div className="scoreboard-label">STREAK</div>
+          <div className="scoreboard-value">{currentStreak}</div>
+        </div>
+
+        <div className="scoreboard-box">
+          <div className="scoreboard-label">SHOT CLOCK</div>
+          <div className={`scoreboard-timer ${shotClockTime <= 3 ? 'warning' : ''}`}>
+            {shotClockTime}
+          </div>
+        </div>
+
+        <div className="scoreboard-box">
+          <div className="scoreboard-label">HIGH SCORE</div>
+          <div className="scoreboard-value">{highScore}</div>import React, { useState, useEffect, useCallback, useRef } from 'react';
 
 // Team colors mapping exactly as specified
 const TEAM_COLORS = {
@@ -349,8 +1103,8 @@ const DraftDuelMain = () => {
         /* Game Title */
         .game-title {
           text-align: center !important;
-          margin: 1.5rem 0 1rem 0 !important;
-          font-size: 4rem !important;
+          margin: 1rem 0 0.5rem 0 !important;
+          font-size: 3rem !important;
           font-weight: 800 !important;
           background: linear-gradient(to top, #FFD700 30%, #FF4500 100%) !important;
           -webkit-background-clip: text !important;
@@ -371,14 +1125,14 @@ const DraftDuelMain = () => {
         /* Dark Mode Toggle */
         .theme-toggle {
           position: absolute !important;
-          top: 1rem !important;
-          right: 1rem !important;
+          top: 0.5rem !important;
+          right: 0.5rem !important;
           background: rgba(255, 255, 255, 0.1) !important;
           border: none !important;
           border-radius: 50% !important;
-          width: 3rem !important;
-          height: 3rem !important;
-          font-size: 1.5rem !important;
+          width: 2.5rem !important;
+          height: 2.5rem !important;
+          font-size: 1.2rem !important;
           cursor: pointer !important;
           backdrop-filter: blur(10px) !important;
           transition: all 0.3s ease !important;
@@ -390,802 +1144,72 @@ const DraftDuelMain = () => {
           transform: scale(1.1) !important;
         }
 
-        /* FIXED SCOREBOARD - Absolutely stable */
+        /* MOBILE-OPTIMIZED SCOREBOARD */
         .scoreboard {
           background: linear-gradient(145deg, #000000, #1a1a1a) !important;
-          border: 6px solid #333 !important;
-          border-radius: 20px !important;
+          border: 3px solid #333 !important;
+          border-radius: 12px !important;
           display: flex !important;
           position: relative !important;
-          width: 95% !important;
-          max-width: 900px !important;
-          height: 120px !important;
-          min-height: 120px !important;
-          max-height: 120px !important;
+          width: 98% !important;
+          max-width: 380px !important;
+          height: 80px !important;
+          min-height: 80px !important;
+          max-height: 80px !important;
           box-shadow: 
-            inset 0 0 30px rgba(0,0,0,0.8), 
-            0 10px 30px rgba(0,0,0,0.6),
-            0 0 20px rgba(255, 140, 0, 0.3) !important;
+            inset 0 0 15px rgba(0,0,0,0.8), 
+            0 8px 20px rgba(0,0,0,0.4),
+            0 0 15px rgba(255, 140, 0, 0.2) !important;
           font-family: 'Share Tech Mono', monospace !important;
           color: #FF8C00 !important;
-          text-shadow: 0 0 15px rgba(255, 140, 0, 0.9) !important;
-          padding: 8px !important;
+          text-shadow: 0 0 10px rgba(255, 140, 0, 0.8) !important;
+          padding: 4px !important;
           margin: 0 auto 1rem !important;
           flex-shrink: 0 !important;
           overflow: hidden !important;
         }
 
-        .scoreboard::before {
-          content: '' !important;
-          position: absolute !important;
-          top: -3px !important;
-          left: -3px !important;
-          right: -3px !important;
-          bottom: -3px !important;
-          background: linear-gradient(45deg, #FF8C00, #FFD700, #FF4500, #FF8C00) !important;
-          border-radius: 23px !important;
-          z-index: -1 !important;
-          opacity: 0.3 !important;
-          animation: borderGlow 3s ease-in-out infinite !important;
-        }
-
-        @keyframes borderGlow {
-          0%, 100% { opacity: 0.3; }
-          50% { opacity: 0.6; }
-        }
-
         .scoreboard-box {
           background: linear-gradient(145deg, #0a0a0a, #000000) !important;
-          border: 3px solid #444 !important;
-          border-radius: 12px !important;
+          border: 2px solid #444 !important;
+          border-radius: 8px !important;
           box-shadow: 
-            inset 0 0 15px rgba(0,0,0,0.8), 
-            0 4px 8px rgba(0,0,0,0.4) !important;
+            inset 0 0 10px rgba(0,0,0,0.8), 
+            0 2px 4px rgba(0,0,0,0.4) !important;
           flex: 1 !important;
           display: flex !important;
           flex-direction: column !important;
           align-items: center !important;
-          justify-content: space-between !important;
-          padding: 8px !important;
-          margin: 0 6px !important;
+          justify-content: center !important;
+          padding: 2px !important;
+          margin: 0 2px !important;
           position: relative !important;
-          height: 100% !important;
-          min-height: 90px !important;
-          max-height: 90px !important;
+          height: calc(100% - 8px) !important;
+          min-height: 64px !important;
+          max-height: 64px !important;
           flex-shrink: 0 !important;
           overflow: hidden !important;
         }
 
         .scoreboard-label {
           font-family: 'Outfit', sans-serif !important;
-          font-size: 1rem !important;
+          font-size: 0.6rem !important;
           font-weight: 700 !important;
           color: #FFD700 !important;
-          margin-bottom: 8px !important;
+          margin-bottom: 2px !important;
           text-transform: uppercase !important;
-          letter-spacing: 1px !important;
-          text-shadow: 0 0 10px rgba(255, 215, 0, 0.8) !important;
-          height: 20px !important;
-          line-height: 20px !important;
+          letter-spacing: 0.5px !important;
+          text-shadow: 0 0 5px rgba(255, 215, 0, 0.6) !important;
+          height: 12px !important;
+          line-height: 12px !important;
           flex-shrink: 0 !important;
         }
 
         .scoreboard-value {
           font-family: 'Orbitron', monospace !important;
-          font-size: 3.5rem !important;
+          font-size: 2rem !important;
           font-weight: 900 !important;
           line-height: 1 !important;
           color: #FF8C00 !important;
           text-shadow: 
-            0 0 20px rgba(255, 140, 0, 1),
-            0 0 40px rgba(255, 140, 0, 0.6),
-            0 0 60px rgba(255, 140, 0, 0.3) !important;
-          height: 50px !important;
-          display: flex !important;
-          align-items: center !important;
-          justify-content: center !important;
-          padding-bottom: 8px !important;
-          filter: brightness(1.2) !important;
-          flex-shrink: 0 !important;
-        }
-
-        .scoreboard-timer {
-          font-family: 'Orbitron', monospace !important;
-          font-size: 3.5rem !important;
-          font-weight: 900 !important;
-          line-height: 1 !important;
-          color: #FF0000 !important;
-          text-shadow: 
-            0 0 20px rgba(255, 0, 0, 1),
-            0 0 40px rgba(255, 0, 0, 0.6),
-            0 0 60px rgba(255, 0, 0, 0.3) !important;
-          height: 50px !important;
-          display: flex !important;
-          align-items: center !important;
-          justify-content: center !important;
-          width: 100% !important;
-          padding-bottom: 8px !important;
-          filter: brightness(1.2) !important;
-          flex-shrink: 0 !important;
-        }
-
-        .scoreboard-timer.warning {
-          color: #FF3333 !important;
-          text-shadow: 
-            0 0 25px rgba(255, 50, 50, 1),
-            0 0 50px rgba(255, 50, 50, 0.8),
-            0 0 75px rgba(255, 50, 50, 0.5) !important;
-          animation: pulse-red 1s infinite alternate !important;
-        }
-
-        @keyframes pulse-red {
-          from { 
-            filter: brightness(1.2);
-            transform: scale(1);
-          }
-          to { 
-            filter: brightness(1.5);
-            transform: scale(1.05);
-          }
-        }
-
-        /* Question Section */
-        .question-section {
-          width: 95% !important;
-          max-width: 900px !important;
-          margin: 0 auto 2rem !important;
-          text-align: center !important;
-          background: linear-gradient(135deg, rgba(59, 130, 246, 0.15), rgba(147, 51, 234, 0.15)) !important;
-          border-radius: 20px !important;
-          padding: 1.5rem 2rem !important;
-          border: 1px solid rgba(255, 255, 255, 0.1) !important;
-          backdrop-filter: blur(10px) !important;
-          box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2) !important;
-        }
-
-        .question-text {
-          font-family: 'Outfit', sans-serif !important;
-          font-size: 1.8rem !important;
-          font-weight: 700 !important;
-          color: ${isDarkMode ? '#FFF' : '#333'} !important;
-          text-shadow: 0 0 10px rgba(${isDarkMode ? '255,255,255' : '0,0,0'},0.7) !important;
-          text-transform: uppercase !important;
-          letter-spacing: 1px !important;
-          margin: 0 !important;
-        }
-
-        /* Game Area */
-        .game-area {
-          flex: 1 !important;
-          display: flex !important;
-          flex-direction: column !important;
-          align-items: center !important;
-          justify-content: center !important;
-          position: relative !important;
-          padding: 1rem !important;
-          max-width: 1400px !important;
-          margin: 0 auto !important;
-          width: 100% !important;
-        }
-
-        .court-background {
-          position: absolute !important;
-          top: 50% !important;
-          left: 50% !important;
-          transform: translate(-50%, -50%) scale(0.6) !important;
-          z-index: 0 !important;
-          opacity: 0.15 !important;
-          pointer-events: none !important;
-          width: 1000px !important;
-          height: 500px !important;
-        }
-
-        .players-comparison {
-          position: relative !important;
-          display: flex !important;
-          justify-content: center !important;
-          align-items: center !important;
-          gap: 3rem !important;
-          z-index: 10 !important;
-          width: 100% !important;
-          max-width: 1200px !important;
-          margin: 2rem 0 !important;
-        }
-
-        .player-card-wrapper {
-          display: flex !important;
-          flex-direction: column !important;
-          align-items: center !important;
-          gap: 1rem !important;
-          z-index: 20 !important;
-        }
-
-        .player-card {
-          position: relative !important;
-          width: 18rem !important;
-          height: 22rem !important;
-          border-radius: 1rem !important;
-          padding: 1.5rem !important;
-          cursor: pointer !important;
-          transition: all 0.3s ease !important;
-          box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4) !important;
-          border: 4px solid rgba(255, 255, 255, 0.2) !important;
-          display: flex !important;
-          flex-direction: column !important;
-          align-items: center !important;
-          justify-content: space-between !important;
-          background: none !important;
-          font-family: inherit !important;
-          z-index: 20 !important;
-        }
-
-        .player-card:hover:not(.disabled) {
-          transform: translateY(-8px) scale(1.05) !important;
-          box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5) !important;
-          z-index: 30 !important;
-        }
-
-        .player-card.selected {
-          border-color: #3B82F6 !important;
-          box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.4), 0 15px 35px rgba(0, 0, 0, 0.4) !important;
-          animation: pop-on-select 0.15s ease-out !important;
-        }
-
-        .player-card.correct {
-          border-color: #10B981 !important;
-          box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.5), 0 15px 35px rgba(0, 0, 0, 0.4) !important;
-          animation: pop-in 0.3s ease-out !important;
-        }
-
-        .player-card.incorrect {
-          border-color: #EF4444 !important;
-          box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.5), 0 15px 35px rgba(0, 0, 0, 0.4) !important;
-          animation: shake 0.5s ease-out !important;
-        }
-
-        .player-card.disabled {
-          opacity: 0.8 !important;
-          cursor: not-allowed !important;
-        }
-
-        @keyframes pop-on-select {
-          0% { transform: scale(1); }
-          50% { transform: scale(1.03); }
-          100% { transform: scale(1.02); }
-        }
-
-        @keyframes pop-in {
-          0% { transform: scale(0.8); opacity: 0; }
-          70% { transform: scale(1.1); opacity: 1; }
-          100% { transform: scale(1); }
-        }
-
-        @keyframes shake {
-          10%, 90% { transform: translate3d(-1px, 0, 0); }
-          20%, 80% { transform: translate3d(2px, 0, 0); }
-          30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
-          40%, 60% { transform: translate3d(4px, 0, 0); }
-        }
-
-        .player-image {
-          width: 10rem !important;
-          height: 12rem !important;
-          border-radius: 50% !important;
-          object-fit: cover !important;
-          margin-bottom: 1rem !important;
-          border: 4px solid rgba(255, 255, 255, 0.3) !important;
-          transition: transform 0.3s ease !important;
-        }
-
-        .player-card:hover .player-image {
-          transform: scale(1.05) !important;
-        }
-
-        .player-name {
-          font-family: 'DM Sans', sans-serif !important;
-          font-size: 1.8rem !important;
-          font-weight: 800 !important;
-          text-align: center !important;
-          margin-bottom: 0.5rem !important;
-          text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.4) !important;
-          letter-spacing: 0.5px !important;
-        }
-
-        .player-team {
-          font-family: 'DM Sans', sans-serif !important;
-          font-size: 1.2rem !important;
-          text-align: center !important;
-          font-weight: 500 !important;
-          margin: 0 !important;
-          opacity: 0.9 !important;
-        }
-
-        .reveal-section {
-          background: linear-gradient(135deg, rgba(0, 0, 0, 0.9), rgba(0, 0, 0, 0.8)) !important;
-          color: #ffffff !important;
-          padding: 1rem 1.5rem !important;
-          border-radius: 0.75rem !important;
-          box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4) !important;
-          text-align: center !important;
-          animation: fade-in-up 0.5s ease-out !important;
-          min-width: 220px !important;
-          z-index: 25 !important;
-        }
-
-        .pick-number {
-          font-size: 1.6rem !important;
-          font-weight: 700 !important;
-          color: #FBBF24 !important;
-          margin-bottom: 0.5rem !important;
-        }
-
-        .nba-team {
-          font-size: 1.1rem !important;
-          opacity: 0.9 !important;
-          margin: 0 !important;
-        }
-
-        @keyframes fade-in-up {
-          from {
-            opacity: 0;
-            transform: translateY(20px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-
-        .vs-text {
-          font-size: 5rem !important;
-          font-weight: 800 !important;
-          background: linear-gradient(to top, #FFD700 30%, #FF4500 100%) !important;
-          -webkit-background-clip: text !important;
-          -webkit-text-fill-color: transparent !important;
-          background-clip: text !important;
-          filter: drop-shadow(0 0 8px rgba(255, 165, 0, 0.8)) drop-shadow(0 0 15px rgba(255, 69, 0, 0.6)) !important;
-          animation: flicker 1.5s infinite alternate !important;
-          z-index: 15 !important;
-          margin: 0 2rem !important;
-        }
-
-        /* FIXED: Feedback Area */
-        .feedback-area {
-          height: 80px !important;
-          display: flex !important;
-          align-items: center !important;
-          justify-content: center !important;
-          margin-top: 1rem !important;
-          flex-shrink: 0 !important;
-        }
-
-        .feedback-message {
-          font-size: 1.5rem !important;
-          font-weight: 600 !important;
-          text-align: center !important;
-          padding: 0.75rem 1.5rem !important;
-          border-radius: 0.5rem !important;
-          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2) !important;
-          animation: fade-in-up 0.5s ease-out !important;
-          max-width: 300px !important;
-          z-index: 10 !important;
-          margin: 0 !important;
-        }
-
-        .feedback-message.correct {
-          background: #10B981 !important;
-          color: white !important;
-        }
-
-        .feedback-message.incorrect {
-          background: #EF4444 !important;
-          color: white !important;
-        }
-
-        .feedback-message.timeout {
-          background: #3B82F6 !important;
-          color: white !important;
-        }
-
-        /* FIXED: Action Buttons - Absolutely identical */
-        .action-buttons {
-          display: flex !important;
-          gap: 1rem !important;
-          justify-content: center !important;
-          flex-wrap: wrap !important;
-          margin-top: 2rem !important;
-          z-index: 10 !important;
-        }
-
-        .action-button {
-          width: 180px !important;
-          height: 50px !important;
-          min-width: 180px !important;
-          max-width: 180px !important;
-          min-height: 50px !important;
-          max-height: 50px !important;
-          padding: 0 !important;
-          margin: 0 !important;
-          border: none !important;
-          border-radius: 25px !important;
-          font-size: 1rem !important;
-          font-weight: 600 !important;
-          cursor: pointer !important;
-          transition: all 0.3s ease !important;
-          box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1) !important;
-          display: flex !important;
-          align-items: center !important;
-          justify-content: center !important;
-          text-align: center !important;
-          white-space: nowrap !important;
-          overflow: hidden !important;
-          text-overflow: ellipsis !important;
-          box-sizing: border-box !important;
-        }
-
-        .action-button:hover {
-          transform: translateY(-2px) !important;
-          box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15) !important;
-        }
-
-        .action-button:active {
-          transform: translateY(0) !important;
-        }
-
-        .continue-button {
-          background: linear-gradient(135deg, #3B82F6 0%, #1D4ED8 100%) !important;
-          color: white !important;
-        }
-
-        .play-again-button {
-          background: linear-gradient(135deg, #10B981 0%, #059669 100%) !important;
-          color: white !important;
-        }
-
-        .share-button {
-          background: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%) !important;
-          color: white !important;
-        }
-
-        /* Share Modal */
-        .share-modal-overlay {
-          position: fixed !important;
-          top: 0 !important;
-          left: 0 !important;
-          right: 0 !important;
-          bottom: 0 !important;
-          background: rgba(0, 0, 0, 0.75) !important;
-          display: flex !important;
-          justify-content: center !important;
-          align-items: center !important;
-          z-index: 1000 !important;
-          padding: 1rem !important;
-          animation: fade-in-up 0.3s ease-out !important;
-        }
-
-        .share-modal {
-          background: ${isDarkMode ? '#2D3748' : '#FFFFFF'} !important;
-          color: ${isDarkMode ? '#FFFFFF' : '#2D3748'} !important;
-          padding: 2rem !important;
-          border-radius: 1.5rem !important;
-          box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3) !important;
-          max-width: 28rem !important;
-          width: 100% !important;
-          text-align: center !important;
-        }
-
-        .share-modal h2 {
-          font-size: 2rem !important;
-          font-weight: 800 !important;
-          margin-bottom: 1rem !important;
-          color: ${isDarkMode ? '#FFFFFF' : '#2D3748'} !important;
-        }
-
-        .share-modal p {
-          font-size: 1.125rem !important;
-          margin-bottom: 1rem !important;
-          color: ${isDarkMode ? '#A0AEC0' : '#4A5568'} !important;
-        }
-
-        .share-textarea {
-          width: 100% !important;
-          padding: 1rem !important;
-          border: 2px solid ${isDarkMode ? '#4A5568' : '#E2E8F0'} !important;
-          border-radius: 0.5rem !important;
-          font-family: 'Courier New', monospace !important;
-          font-size: 1rem !important;
-          resize: none !important;
-          height: 7rem !important;
-          margin-bottom: 1rem !important;
-          background: ${isDarkMode ? '#1A202C' : '#F7FAFC'} !important;
-          color: ${isDarkMode ? '#FFFFFF' : '#2D3748'} !important;
-        }
-
-        .share-textarea:focus {
-          outline: none !important;
-          border-color: #3B82F6 !important;
-          box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1) !important;
-        }
-
-        .share-buttons {
-          display: flex !important;
-          gap: 1rem !important;
-          justify-content: center !important;
-        }
-
-        .copy-button {
-          background: linear-gradient(135deg, #3B82F6 0%, #1D4ED8 100%) !important;
-          color: white !important;
-        }
-
-        .back-button {
-          background: ${isDarkMode ? '#4A5568' : '#E2E8F0'} !important;
-          color: ${isDarkMode ? '#FFFFFF' : '#2D3748'} !important;
-        }
-
-        .back-button:hover {
-          background: ${isDarkMode ? '#2D3748' : '#CBD5E0'} !important;
-        }
-
-        /* Mobile Responsive */
-        @media (max-width: 768px) {
-          .game-title {
-            font-size: 3rem !important;
-            margin: 1rem 0 0.5rem 0 !important;
-          }
-          
-          .scoreboard {
-            width: 98% !important;
-            margin: 0 auto 0.5rem !important;
-            padding: 6px !important;
-            height: 100px !important;
-            min-height: 100px !important;
-            max-height: 100px !important;
-          }
-          
-          .scoreboard-box {
-            padding: 6px !important;
-            margin: 0 4px !important;
-            height: calc(100% - 12px) !important;
-            min-height: 76px !important;
-            max-height: 76px !important;
-          }
-          
-          .scoreboard-value, .scoreboard-timer {
-            font-size: 2.5rem !important;
-            height: 40px !important;
-          }
-          
-          .question-section {
-            width: 98% !important;
-            margin: 0 auto 1.5rem !important;
-            padding: 1rem !important;
-          }
-          
-          .question-text {
-            font-size: 1.4rem !important;
-          }
-          
-          .players-comparison {
-            gap: 1.5rem !important;
-            margin: 1rem 0 !important;
-          }
-          
-          .player-card {
-            width: 14rem !important;
-            height: 18rem !important;
-          }
-          
-          .player-image {
-            width: 8rem !important;
-            height: 10rem !important;
-          }
-          
-          .player-name {
-            font-size: 1.5rem !important;
-          }
-          
-          .player-team {
-            font-size: 1rem !important;
-          }
-          
-          .vs-text {
-            font-size: 3rem !important;
-            margin: 0 1rem !important;
-          }
-          
-          .feedback-message {
-            font-size: 1.2rem !important;
-          }
-          
-          .action-buttons {
-            flex-direction: column !important;
-            align-items: center !important;
-            gap: 0.5rem !important;
-          }
-          
-          .action-button {
-            width: 200px !important;
-            min-width: 200px !important;
-            max-width: 200px !important;
-            height: 50px !important;
-            min-height: 50px !important;
-            max-height: 50px !important;
-          }
-        }
-
-        @media (max-width: 480px) {
-          .game-title {
-            font-size: 2.5rem !important;
-          }
-          
-          .question-text {
-            font-size: 1.2rem !important;
-          }
-          
-          .players-comparison {
-            gap: 1rem !important;
-          }
-          
-          .player-card {
-            width: 12rem !important;
-            height: 16rem !important;
-          }
-          
-          .player-image {
-            width: 7rem !important;
-            height: 8.5rem !important;
-          }
-          
-          .vs-text {
-            font-size: 2.5rem !important;
-            margin: 0 0.5rem !important;
-          }
-          
-          .scoreboard-value, .scoreboard-timer {
-            font-size: 2rem !important;
-            height: 35px !important;
-          }
-        }
-      `}</style>
-
-      {/* Theme Toggle */}
-      <button 
-        className="theme-toggle"
-        onClick={toggleDarkMode}
-        aria-label="Toggle theme"
-      >
-        {isDarkMode ? (
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-            <path strokeLinecap="round" strokeLinejoin="round" d="M12 3v1m0 16v1m9-9h1M4 12H3m15.354 5.354l-.707.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
-          </svg>
-        ) : (
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-            <path strokeLinecap="round" strokeLinejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9 9 0 008.354-5.646z" />
-          </svg>
-        )}
-      </button>
-
-      {/* Game Title */}
-      <div className="game-title">DRAFT DUEL</div>
-
-      {/* FIXED Scoreboard */}
-      <div className="scoreboard">
-        <div className="scoreboard-box">
-          <div className="scoreboard-label">Streak</div>
-          <div className="scoreboard-value">{currentStreak}</div>
-        </div>
-
-        <div className="scoreboard-box">
-          <div className="scoreboard-label">Shot Clock</div>
-          <div className={`scoreboard-timer ${shotClockTime <= 3 ? 'warning' : ''}`}>
-            {shotClockTime}
-          </div>
-        </div>
-
-        <div className="scoreboard-box">
-          <div className="scoreboard-label">High Score</div>
-          <div className="scoreboard-value">{highScore}</div>
-        </div>
-      </div>
-
-      {/* Question Section */}
-      <div className="question-section">
-        <div className="question-text">
-          {currentQuestion ? currentQuestion.text : "Loading question..."}
-        </div>
-      </div>
-
-      {/* Game Area */}
-      <div className="game-area">
-        <div className="court-background" dangerouslySetInnerHTML={{ __html: basketballCourtSVG }} />
-
-        <div className="players-comparison">
-          {player1 && (
-            <PlayerCard
-              player={player1}
-              onClick={handleGuess}
-              isSelected={selectedPlayerId === player1.id}
-              isCorrect={selectedPlayerId !== null ? (currentQuestion?.getCorrectPlayerId(player1, player2) === player1.id) : null}
-              showPick={selectedPlayerId !== null}
-              disabled={selectedPlayerId !== null || gameOver}
-              isDarkMode={isDarkMode}
-            />
-          )}
-          
-          <div className="vs-text">VS</div>
-          
-          {player2 && (
-            <PlayerCard
-              player={player2}
-              onClick={handleGuess}
-              isSelected={selectedPlayerId === player2.id}
-              isCorrect={selectedPlayerId !== null ? (currentQuestion?.getCorrectPlayerId(player1, player2) === player2.id) : null}
-              showPick={selectedPlayerId !== null}
-              disabled={selectedPlayerId !== null || gameOver}
-              isDarkMode={isDarkMode}
-            />
-          )}
-        </div>
-
-        {/* FIXED: Feedback Area */}
-        <div className="feedback-area">
-          {feedbackMessage && (
-            <div className={`feedback-message ${
-              isCorrectGuess === true ? 'correct' : 
-              isCorrectGuess === false ? 'incorrect' : 'timeout'
-            }`}>
-              {feedbackMessage}
-            </div>
-          )}
-        </div>
-
-        {/* FIXED: Action Buttons */}
-        {selectedPlayerId !== null && (
-          <div className="action-buttons">
-            {!gameOver ? (
-              <button onClick={handleContinue} className="action-button continue-button">
-                Continue
-              </button>
-            ) : (
-              <>
-                <button onClick={handleContinue} className="action-button play-again-button">
-                  Play Again
-                </button>
-                <button onClick={shareStreak} className="action-button share-button">
-                  Share Streak
-                </button>
-              </>
-            )}
-          </div>
-        )}
-      </div>
-
-      {/* Share Modal */}
-      {showShareModal && (
-        <div className="share-modal-overlay">
-          <div className="share-modal">
-            <h2>Share Your Streak!</h2>
-            <p>Copy the text below to share your amazing streak!</p>
-            <textarea
-              ref={shareTextRef}
-              className="share-textarea"
-              readOnly
-              value={`I just scored a streak of ${currentStreak} in the NBA Rookie Draft Pick game! Think you can beat it? #NBADraftGame`}
-            />
-            <div className="share-buttons">
-              <button onClick={handleCopyShareText} className="action-button copy-button">
-                Copy
-              </button>
-              <button onClick={handleCloseShareModal} className="action-button back-button">
-                Back
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-    </div>
-  );
-};
-
-export default DraftDuelMain;
+            0 0
