@@ -390,14 +390,17 @@ const DraftDuelMain = () => {
           transform: scale(1.1);
         }
 
-        /* Scoreboard - Simplified 3-Section Layout */
+        /* FIXED SCOREBOARD - Stable positioning and sizing */
         .scoreboard {
           background: linear-gradient(145deg, #000000, #1a1a1a);
           border: 6px solid #333;
           border-radius: 20px;
           display: flex;
+          /* CRITICAL: Fixed dimensions prevent movement */
           width: 95%;
           max-width: 900px;
+          height: 120px;
+          min-height: 120px;
           box-shadow: 
             inset 0 0 30px rgba(0,0,0,0.8), 
             0 10px 30px rgba(0,0,0,0.6),
@@ -407,8 +410,9 @@ const DraftDuelMain = () => {
           text-shadow: 0 0 15px rgba(255, 140, 0, 0.9);
           position: relative;
           padding: 8px;
-          min-height: 120px;
           margin: 0 auto 1rem;
+          /* CRITICAL: Prevent any flexbox changes */
+          flex-shrink: 0;
         }
 
         .scoreboard::before {
@@ -445,7 +449,11 @@ const DraftDuelMain = () => {
           padding: 8px;
           margin: 0 6px;
           position: relative;
+          /* CRITICAL: Fixed dimensions prevent movement */
+          width: calc(33.333% - 12px);
+          height: 100%;
           min-height: 80px;
+          max-height: 80px;
         }
 
         .scoreboard-label {
@@ -457,9 +465,13 @@ const DraftDuelMain = () => {
           text-transform: uppercase;
           letter-spacing: 1px;
           text-shadow: 0 0 10px rgba(255, 215, 0, 0.8);
+          /* CRITICAL: Fixed positioning */
+          height: 20px;
+          line-height: 20px;
+          flex-shrink: 0;
         }
 
-        /* 7-Segment Display Font for Numbers */
+        /* FIXED: 7-Segment Display Font for Numbers - Contained */
         .scoreboard-value {
           font-family: 'Orbitron', monospace;
           font-size: 3.5rem;
@@ -470,12 +482,17 @@ const DraftDuelMain = () => {
             0 0 20px rgba(255, 140, 0, 1),
             0 0 40px rgba(255, 140, 0, 0.6),
             0 0 60px rgba(255, 140, 0, 0.3);
-          align-self: center;
+          /* CRITICAL: Fixed height prevents number overflow */
+          height: 50px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
           padding-bottom: 8px;
           filter: brightness(1.2);
+          flex-shrink: 0;
         }
 
-        /* 7-Segment Display Font for Timer */
+        /* FIXED: 7-Segment Display Font for Timer - Contained */
         .scoreboard-timer {
           font-family: 'Orbitron', monospace;
           font-size: 3.5rem;
@@ -486,10 +503,15 @@ const DraftDuelMain = () => {
             0 0 20px rgba(255, 0, 0, 1),
             0 0 40px rgba(255, 0, 0, 0.6),
             0 0 60px rgba(255, 0, 0, 0.3);
-          text-align: center;
+          /* CRITICAL: Fixed height prevents number overflow */
+          height: 50px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
           width: 100%;
           padding-bottom: 8px;
           filter: brightness(1.2);
+          flex-shrink: 0;
         }
 
         .scoreboard-timer.warning {
@@ -767,7 +789,7 @@ const DraftDuelMain = () => {
           color: white;
         }
 
-        /* Action Buttons - EQUAL SIZE FIXED */
+        /* FIXED: Action Buttons - IDENTICAL SIZE */
         .action-buttons {
           display: flex;
           gap: 1rem;
@@ -778,18 +800,29 @@ const DraftDuelMain = () => {
         }
 
         .action-button {
-          padding: 1rem 2rem;
+          /* CRITICAL: Fixed dimensions for ALL buttons */
+          width: 180px;
+          height: 50px;
+          min-width: 180px;
+          max-width: 180px;
+          min-height: 50px;
+          max-height: 50px;
+          padding: 0;
           border: none;
-          border-radius: 9999px;
+          border-radius: 25px;
           font-size: 1rem;
           font-weight: 600;
           cursor: pointer;
           transition: all 0.3s ease;
           box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-          /* FIXED: Both buttons same exact size */
-          width: 180px;
-          min-width: 180px;
-          max-width: 180px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          text-align: center;
+          /* CRITICAL: Prevent text wrapping */
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
         }
 
         .action-button:hover {
@@ -907,6 +940,7 @@ const DraftDuelMain = () => {
             width: 98%;
             margin: 0 auto 0.5rem;
             padding: 6px;
+            height: 100px;
             min-height: 100px;
           }
           
@@ -914,10 +948,12 @@ const DraftDuelMain = () => {
             padding: 6px;
             margin: 0 4px;
             min-height: 60px;
+            max-height: 60px;
           }
           
           .scoreboard-value, .scoreboard-timer {
             font-size: 2.5rem;
+            height: 40px;
           }
           
           .question-section {
@@ -974,6 +1010,8 @@ const DraftDuelMain = () => {
             min-width: 200px;
             max-width: 200px;
             height: 50px;
+            min-height: 50px;
+            max-height: 50px;
           }
         }
 
@@ -1007,148 +1045,7 @@ const DraftDuelMain = () => {
           
           .scoreboard-value, .scoreboard-timer {
             font-size: 2rem;
+            height: 35px;
           }
         }
-      `}</style>
-
-      {/* Theme Toggle */}
-      <button 
-        className="theme-toggle"
-        onClick={toggleDarkMode}
-        aria-label="Toggle theme"
-      >
-        {isDarkMode ? (
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-            <path strokeLinecap="round" strokeLinejoin="round" d="M12 3v1m0 16v1m9-9h1M4 12H3m15.354 5.354l-.707.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
-          </svg>
-        ) : (
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-            <path strokeLinecap="round" strokeLinejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9 9 0 008.354-5.646z" />
-          </svg>
-        )}
-      </button>
-
-      {/* Game Title - Same style as VS text */}
-      <div className="game-title">DRAFT DUEL</div>
-
-      {/* Simplified Scoreboard - 3 Sections */}
-      <div className="scoreboard">
-        <div className="scoreboard-box">
-          <div className="scoreboard-label">Streak</div>
-          <div className="scoreboard-value">{currentStreak}</div>
-        </div>
-
-        <div className="scoreboard-box">
-          <div className="scoreboard-label">Shot Clock</div>
-          <div className={`scoreboard-timer ${shotClockTime <= 3 ? 'warning' : ''}`}>
-            {shotClockTime}
-          </div>
-        </div>
-
-        <div className="scoreboard-box">
-          <div className="scoreboard-label">High Score</div>
-          <div className="scoreboard-value">{highScore}</div>
-        </div>
-      </div>
-
-      {/* Question Section - Better Focus */}
-      <div className="question-section">
-        <div className="question-text">
-          {currentQuestion ? currentQuestion.text : "Loading question..."}
-        </div>
-      </div>
-
-      {/* Game Area */}
-      <div className="game-area">
-        {/* Basketball Court Background - Behind cards only */}
-        <div className="court-background" dangerouslySetInnerHTML={{ __html: basketballCourtSVG }} />
-
-        {/* Player Comparison - Always Horizontal */}
-        <div className="players-comparison">
-          {player1 && (
-            <PlayerCard
-              player={player1}
-              onClick={handleGuess}
-              isSelected={selectedPlayerId === player1.id}
-              isCorrect={selectedPlayerId !== null ? (currentQuestion?.getCorrectPlayerId(player1, player2) === player1.id) : null}
-              showPick={selectedPlayerId !== null}
-              disabled={selectedPlayerId !== null || gameOver}
-              isDarkMode={isDarkMode}
-            />
-          )}
-          
-          {/* VS Text - No Overlap */}
-          <div className="vs-text">VS</div>
-          
-          {player2 && (
-            <PlayerCard
-              player={player2}
-              onClick={handleGuess}
-              isSelected={selectedPlayerId === player2.id}
-              isCorrect={selectedPlayerId !== null ? (currentQuestion?.getCorrectPlayerId(player1, player2) === player2.id) : null}
-              showPick={selectedPlayerId !== null}
-              disabled={selectedPlayerId !== null || gameOver}
-              isDarkMode={isDarkMode}
-            />
-          )}
-        </div>
-
-        {/* Feedback - Smaller & Aesthetic */}
-        {feedbackMessage && (
-          <div className={`feedback-message ${
-            isCorrectGuess === true ? 'correct' : 
-            isCorrectGuess === false ? 'incorrect' : 'timeout'
-          }`}>
-            {feedbackMessage}
-          </div>
-        )}
-
-        {/* Action Buttons - EXACTLY EQUAL SIZE */}
-        {selectedPlayerId !== null && (
-          <div className="action-buttons">
-            {!gameOver ? (
-              <button onClick={handleContinue} className="action-button continue-button">
-                Continue
-              </button>
-            ) : (
-              <>
-                <button onClick={handleContinue} className="action-button play-again-button">
-                  Play Again
-                </button>
-                <button onClick={shareStreak} className="action-button share-button">
-                  Share Streak
-                </button>
-              </>
-            )}
-          </div>
-        )}
-      </div>
-
-      {/* Share Modal */}
-      {showShareModal && (
-        <div className="share-modal-overlay">
-          <div className="share-modal">
-            <h2>Share Your Streak!</h2>
-            <p>Copy the text below to share your amazing streak!</p>
-            <textarea
-              ref={shareTextRef}
-              className="share-textarea"
-              readOnly
-              value={`I just scored a streak of ${currentStreak} in the NBA Rookie Draft Pick game! Think you can beat it? #NBADraftGame`}
-            />
-            <div className="share-buttons">
-              <button onClick={handleCopyShareText} className="action-button copy-button">
-                Copy
-              </button>
-              <button onClick={handleCloseShareModal} className="action-button back-button">
-                Back
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-    </div>
-  );
-};
-
-export default DraftDuelMain;
+      `}
