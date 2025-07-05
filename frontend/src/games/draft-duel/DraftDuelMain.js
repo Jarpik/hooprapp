@@ -327,7 +327,8 @@ const DraftDuelMain = () => {
     >
       <style jsx>{`
         @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&display=swap');
-        @import url('https://fonts.googleapis.com/css2?family=VT323&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono:wght@400&display=swap');
         
         /* Full screen takeover */
         .draft-duel-fullscreen {
@@ -342,6 +343,28 @@ const DraftDuelMain = () => {
           flex-direction: column;
           overflow-x: hidden;
           overflow-y: auto;
+        }
+
+        /* Game Title - Same style as VS text */
+        .game-title {
+          text-align: center;
+          margin: 1.5rem 0 1rem 0;
+          font-size: 4rem;
+          font-weight: 800;
+          background: linear-gradient(to top, #FFD700 30%, #FF4500 100%);
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          background-clip: text;
+          filter: drop-shadow(0 0 8px rgba(255, 165, 0, 0.8)) drop-shadow(0 0 15px rgba(255, 69, 0, 0.6));
+          animation: flicker 1.5s infinite alternate;
+          z-index: 20;
+        }
+
+        @keyframes flicker {
+          0%, 100% { opacity: 1; transform: scale(1); }
+          25% { opacity: 0.9; transform: scale(1.02); }
+          50% { opacity: 1; transform: scale(1); }
+          75% { opacity: 0.95; transform: scale(1.01); }
         }
 
         /* Dark Mode Toggle */
@@ -366,39 +389,62 @@ const DraftDuelMain = () => {
           transform: scale(1.1);
         }
 
-        /* Scoreboard */
+        /* Scoreboard - Enhanced Digital Look */
         .scoreboard {
-          background-color: #000;
-          border: 5px solid #333;
-          border-radius: 15px;
+          background: linear-gradient(145deg, #000000, #1a1a1a);
+          border: 6px solid #333;
+          border-radius: 20px;
           display: flex;
           width: 95%;
           max-width: 900px;
-          box-shadow: inset 0 0 20px rgba(0,0,0,0.7), 0 8px 20px rgba(0,0,0,0.5);
-          font-family: 'VT323', monospace;
+          box-shadow: 
+            inset 0 0 30px rgba(0,0,0,0.8), 
+            0 10px 30px rgba(0,0,0,0.6),
+            0 0 20px rgba(255, 140, 0, 0.3);
+          font-family: 'Share Tech Mono', monospace;
           color: #FF8C00;
-          text-shadow: 0 0 12px rgba(255, 140, 0, 0.8);
+          text-shadow: 0 0 15px rgba(255, 140, 0, 0.9);
           position: relative;
-          padding: 5px;
-          min-height: 100px;
-          height: auto;
-          margin: 2rem auto 1rem;
+          padding: 8px;
+          min-height: 120px;
+          margin: 0 auto 2rem;
+        }
+
+        .scoreboard::before {
+          content: '';
+          position: absolute;
+          top: -3px;
+          left: -3px;
+          right: -3px;
+          bottom: -3px;
+          background: linear-gradient(45deg, #FF8C00, #FFD700, #FF4500, #FF8C00);
+          border-radius: 23px;
+          z-index: -1;
+          opacity: 0.3;
+          animation: borderGlow 3s ease-in-out infinite;
+        }
+
+        @keyframes borderGlow {
+          0%, 100% { opacity: 0.3; }
+          50% { opacity: 0.6; }
         }
 
         .scoreboard-box {
-          background-color: #000;
-          border: 2px solid #333;
-          border-radius: 8px;
-          box-shadow: inset 0 0 10px rgba(0,0,0,0.5), 0 2px 5px rgba(0,0,0,0.2);
+          background: linear-gradient(145deg, #0a0a0a, #000000);
+          border: 3px solid #444;
+          border-radius: 12px;
+          box-shadow: 
+            inset 0 0 15px rgba(0,0,0,0.8), 
+            0 4px 8px rgba(0,0,0,0.4);
           flex: 1;
           display: flex;
           flex-direction: column;
           align-items: center;
           justify-content: space-between;
-          padding: 5px;
-          margin: 0 5px;
+          padding: 8px;
+          margin: 0 6px;
           position: relative;
-          min-height: 60px;
+          min-height: 80px;
         }
 
         .scoreboard-middle-box {
@@ -406,77 +452,96 @@ const DraftDuelMain = () => {
           display: flex;
           flex-direction: column;
           justify-content: space-between;
-          padding: 5px;
+          padding: 8px;
         }
 
         .scoreboard-box:not(.scoreboard-middle-box)::before {
           content: '';
           position: absolute;
-          left: 5%;
-          right: 5%;
-          top: 45%;
+          left: 8%;
+          right: 8%;
+          top: 50%;
           transform: translateY(-50%);
           height: 2px;
-          background-color: #333;
-          box-shadow: 0 0 5px rgba(255, 140, 0, 0.5);
+          background: linear-gradient(90deg, transparent, #FF8C00, transparent);
+          box-shadow: 0 0 8px rgba(255, 140, 0, 0.6);
         }
 
         .scoreboard-label {
           font-family: 'Outfit', sans-serif;
-          font-size: 1.2rem;
+          font-size: 1rem;
           font-weight: 700;
           color: #FFD700;
-          margin-bottom: 5px;
-          align-self: center;
-          padding-top: 5px;
+          margin-bottom: 8px;
+          text-transform: uppercase;
+          letter-spacing: 1px;
+          text-shadow: 0 0 10px rgba(255, 215, 0, 0.8);
         }
 
+        /* 7-Segment Display Font for Numbers */
         .scoreboard-value {
-          font-family: 'VT323', monospace;
-          font-size: 3rem;
-          font-weight: 700;
+          font-family: 'Orbitron', monospace;
+          font-size: 3.5rem;
+          font-weight: 900;
           line-height: 1;
           color: #FF8C00;
-          text-shadow: 0 0 15px rgba(255, 140, 0, 0.8);
+          text-shadow: 
+            0 0 20px rgba(255, 140, 0, 1),
+            0 0 40px rgba(255, 140, 0, 0.6),
+            0 0 60px rgba(255, 140, 0, 0.3);
           align-self: center;
-          padding-bottom: 5px;
+          padding-bottom: 8px;
+          filter: brightness(1.2);
         }
 
         .scoreboard-question-text {
           font-family: 'Outfit', sans-serif;
-          font-size: 1.2rem;
+          font-size: 1.3rem;
           font-weight: 700;
           color: ${isDarkMode ? '#FFF' : '#333'};
-          text-shadow: 0 0 8px rgba(${isDarkMode ? '255,255,255' : '0,0,0'},0.6);
+          text-shadow: 0 0 10px rgba(${isDarkMode ? '255,255,255' : '0,0,0'},0.7);
           text-align: center;
-          align-self: flex-start;
           width: 100%;
-          padding-top: 5px;
+          padding-top: 8px;
+          text-transform: uppercase;
+          letter-spacing: 0.5px;
         }
 
+        /* 7-Segment Display Font for Timer */
         .scoreboard-timer {
-          font-family: 'VT323', monospace;
-          font-size: 3rem;
-          font-weight: 700;
+          font-family: 'Orbitron', monospace;
+          font-size: 3.5rem;
+          font-weight: 900;
           line-height: 1;
           color: #FF0000;
-          text-shadow: 0 0 15px rgba(255, 0, 0, 0.9);
-          min-width: 100px;
+          text-shadow: 
+            0 0 20px rgba(255, 0, 0, 1),
+            0 0 40px rgba(255, 0, 0, 0.6),
+            0 0 60px rgba(255, 0, 0, 0.3);
           text-align: center;
-          align-self: flex-end;
           width: 100%;
-          padding-bottom: 5px;
+          padding-bottom: 8px;
+          filter: brightness(1.2);
         }
 
         .scoreboard-timer.warning {
           color: #FF3333;
-          text-shadow: 0 0 20px rgba(255, 50, 50, 1);
+          text-shadow: 
+            0 0 25px rgba(255, 50, 50, 1),
+            0 0 50px rgba(255, 50, 50, 0.8),
+            0 0 75px rgba(255, 50, 50, 0.5);
           animation: pulse-red 1s infinite alternate;
         }
 
         @keyframes pulse-red {
-          from { text-shadow: 0 0 15px rgba(255, 0, 0, 0.9); }
-          to { text-shadow: 0 0 25px rgba(255, 0, 0, 1.2); }
+          from { 
+            filter: brightness(1.2);
+            transform: scale(1);
+          }
+          to { 
+            filter: brightness(1.5);
+            transform: scale(1.05);
+          }
         }
 
         /* Main Game Area - Horizontal Focus */
@@ -677,13 +742,6 @@ const DraftDuelMain = () => {
           margin: 0 2rem;
         }
 
-        @keyframes flicker {
-          0%, 100% { opacity: 1; transform: scale(1); }
-          25% { opacity: 0.9; transform: scale(1.02); }
-          50% { opacity: 1; transform: scale(1); }
-          75% { opacity: 0.95; transform: scale(1.01); }
-        }
-
         /* Feedback Message - Smaller & Aesthetic */
         .feedback-message {
           font-size: 1.5rem;
@@ -713,7 +771,7 @@ const DraftDuelMain = () => {
           color: white;
         }
 
-        /* Action Buttons - Equal Size */
+        /* Action Buttons - EQUAL SIZE FIXED */
         .action-buttons {
           display: flex;
           gap: 1rem;
@@ -732,8 +790,10 @@ const DraftDuelMain = () => {
           cursor: pointer;
           transition: all 0.3s ease;
           box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-          min-width: 160px;
-          width: 160px;
+          /* FIXED: Both buttons same exact size */
+          width: 180px;
+          min-width: 180px;
+          max-width: 180px;
         }
 
         .action-button:hover {
@@ -842,23 +902,30 @@ const DraftDuelMain = () => {
 
         /* Mobile Responsive - STILL HORIZONTAL */
         @media (max-width: 768px) {
+          .game-title {
+            font-size: 3rem;
+            margin: 1rem 0 0.5rem 0;
+          }
+          
           .scoreboard {
             width: 98%;
-            margin: 1rem auto 1rem;
-            padding: 3px;
+            margin: 0.5rem auto 1.5rem;
+            padding: 6px;
+            min-height: 100px;
           }
           
           .scoreboard-box, .scoreboard-middle-box {
-            padding: 3px;
-            margin: 0 3px;
+            padding: 6px;
+            margin: 0 4px;
+            min-height: 60px;
           }
           
           .scoreboard-value, .scoreboard-timer {
-            font-size: 2rem;
+            font-size: 2.5rem;
           }
           
           .scoreboard-question-text {
-            font-size: 1rem;
+            font-size: 1.1rem;
           }
           
           .players-comparison {
@@ -903,10 +970,15 @@ const DraftDuelMain = () => {
           .action-button {
             width: 200px;
             min-width: 200px;
+            max-width: 200px;
           }
         }
 
         @media (max-width: 480px) {
+          .game-title {
+            font-size: 2.5rem;
+          }
+          
           .players-comparison {
             gap: 1rem;
           }
@@ -927,7 +999,11 @@ const DraftDuelMain = () => {
           }
           
           .scoreboard-value, .scoreboard-timer {
-            font-size: 1.5rem;
+            font-size: 2rem;
+          }
+          
+          .scoreboard-question-text {
+            font-size: 1rem;
           }
         }
       `}</style>
@@ -949,7 +1025,10 @@ const DraftDuelMain = () => {
         )}
       </button>
 
-      {/* High School Basketball Scoreboard */}
+      {/* Game Title - Same style as VS text */}
+      <div className="game-title">DRAFT DUEL</div>
+
+      {/* Enhanced Digital Scoreboard */}
       <div className="scoreboard">
         <div className="scoreboard-box">
           <div className="scoreboard-label">Streak</div>
@@ -1016,7 +1095,7 @@ const DraftDuelMain = () => {
           </div>
         )}
 
-        {/* Action Buttons - Equal Size */}
+        {/* Action Buttons - EXACTLY EQUAL SIZE */}
         {selectedPlayerId !== null && (
           <div className="action-buttons">
             {!gameOver ? (
