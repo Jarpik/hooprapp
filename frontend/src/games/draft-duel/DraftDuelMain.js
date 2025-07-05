@@ -389,7 +389,7 @@ const DraftDuelMain = () => {
           transform: scale(1.1);
         }
 
-        /* Scoreboard - Enhanced Digital Look */
+        /* Scoreboard - Simplified 3-Section Layout */
         .scoreboard {
           background: linear-gradient(145deg, #000000, #1a1a1a);
           border: 6px solid #333;
@@ -407,7 +407,7 @@ const DraftDuelMain = () => {
           position: relative;
           padding: 8px;
           min-height: 120px;
-          margin: 0 auto 2rem;
+          margin: 0 auto 1rem;
         }
 
         .scoreboard::before {
@@ -447,15 +447,7 @@ const DraftDuelMain = () => {
           min-height: 80px;
         }
 
-        .scoreboard-middle-box {
-          flex: 2;
-          display: flex;
-          flex-direction: column;
-          justify-content: space-between;
-          padding: 8px;
-        }
-
-        .scoreboard-box:not(.scoreboard-middle-box)::before {
+        .scoreboard-box::before {
           content: '';
           position: absolute;
           left: 8%;
@@ -494,19 +486,6 @@ const DraftDuelMain = () => {
           filter: brightness(1.2);
         }
 
-        .scoreboard-question-text {
-          font-family: 'Outfit', sans-serif;
-          font-size: 1.3rem;
-          font-weight: 700;
-          color: ${isDarkMode ? '#FFF' : '#333'};
-          text-shadow: 0 0 10px rgba(${isDarkMode ? '255,255,255' : '0,0,0'},0.7);
-          text-align: center;
-          width: 100%;
-          padding-top: 8px;
-          text-transform: uppercase;
-          letter-spacing: 0.5px;
-        }
-
         /* 7-Segment Display Font for Timer */
         .scoreboard-timer {
           font-family: 'Orbitron', monospace;
@@ -542,6 +521,31 @@ const DraftDuelMain = () => {
             filter: brightness(1.5);
             transform: scale(1.05);
           }
+        }
+
+        /* Question Section - Moved Below Scoreboard */
+        .question-section {
+          width: 95%;
+          max-width: 900px;
+          margin: 0 auto 2rem;
+          text-align: center;
+          background: linear-gradient(135deg, rgba(59, 130, 246, 0.15), rgba(147, 51, 234, 0.15));
+          border-radius: 20px;
+          padding: 1.5rem 2rem;
+          border: 1px solid rgba(255, 255, 255, 0.1);
+          backdrop-filter: blur(10px);
+          box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+        }
+
+        .question-text {
+          font-family: 'Outfit', sans-serif;
+          font-size: 1.8rem;
+          font-weight: 700;
+          color: ${isDarkMode ? '#FFF' : '#333'};
+          text-shadow: 0 0 10px rgba(${isDarkMode ? '255,255,255' : '0,0,0'},0.7);
+          text-transform: uppercase;
+          letter-spacing: 1px;
+          margin: 0;
         }
 
         /* Main Game Area - Horizontal Focus */
@@ -909,12 +913,12 @@ const DraftDuelMain = () => {
           
           .scoreboard {
             width: 98%;
-            margin: 0.5rem auto 1.5rem;
+            margin: 0 auto 0.5rem;
             padding: 6px;
             min-height: 100px;
           }
           
-          .scoreboard-box, .scoreboard-middle-box {
+          .scoreboard-box {
             padding: 6px;
             margin: 0 4px;
             min-height: 60px;
@@ -924,8 +928,14 @@ const DraftDuelMain = () => {
             font-size: 2.5rem;
           }
           
-          .scoreboard-question-text {
-            font-size: 1.1rem;
+          .question-section {
+            width: 98%;
+            margin: 0 auto 1.5rem;
+            padding: 1rem;
+          }
+          
+          .question-text {
+            font-size: 1.4rem;
           }
           
           .players-comparison {
@@ -979,6 +989,10 @@ const DraftDuelMain = () => {
             font-size: 2.5rem;
           }
           
+          .question-text {
+            font-size: 1.2rem;
+          }
+          
           .players-comparison {
             gap: 1rem;
           }
@@ -1000,10 +1014,6 @@ const DraftDuelMain = () => {
           
           .scoreboard-value, .scoreboard-timer {
             font-size: 2rem;
-          }
-          
-          .scoreboard-question-text {
-            font-size: 1rem;
           }
         }
       `}</style>
@@ -1028,17 +1038,15 @@ const DraftDuelMain = () => {
       {/* Game Title - Same style as VS text */}
       <div className="game-title">DRAFT DUEL</div>
 
-      {/* Enhanced Digital Scoreboard */}
+      {/* Simplified Scoreboard - 3 Sections */}
       <div className="scoreboard">
         <div className="scoreboard-box">
           <div className="scoreboard-label">Streak</div>
           <div className="scoreboard-value">{currentStreak}</div>
         </div>
 
-        <div className="scoreboard-box scoreboard-middle-box">
-          <div className="scoreboard-question-text">
-            {currentQuestion ? currentQuestion.text : "Loading question..."}
-          </div>
+        <div className="scoreboard-box">
+          <div className="scoreboard-label">Shot Clock</div>
           <div className={`scoreboard-timer ${shotClockTime <= 3 ? 'warning' : ''}`}>
             {shotClockTime}
           </div>
@@ -1047,6 +1055,13 @@ const DraftDuelMain = () => {
         <div className="scoreboard-box">
           <div className="scoreboard-label">High Score</div>
           <div className="scoreboard-value">{highScore}</div>
+        </div>
+      </div>
+
+      {/* Question Section - Better Focus */}
+      <div className="question-section">
+        <div className="question-text">
+          {currentQuestion ? currentQuestion.text : "Loading question..."}
         </div>
       </div>
 
