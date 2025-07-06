@@ -102,25 +102,25 @@ const DraftDuelMain = () => {
   const shareTextRef = useRef(null);
   const [isDarkMode, setIsDarkMode] = useState(true);
   const [gameStarted, setGameStarted] = useState(false);
-  const [currentMode, setCurrentMode] = useState('EASY');
+  const [currentMode, setCurrentMode] = useState('Easy');
 
-  // Difficulty system
+  // Difficulty system - FIXED TO MATCH SPECIFICATION EXACTLY
   const getDifficultyMode = (streak) => {
-    if (streak >= 20) return 'EXPERT';
-    if (streak >= 10) return 'HARD';
-    return 'EASY';
+    if (streak >= 20) return 'Expert';
+    if (streak >= 10) return 'Hard';
+    return 'Easy';
   };
 
   const getModeColor = (mode) => {
     switch (mode) {
-      case 'EASY': return '#10B981'; // Green
-      case 'HARD': return '#F59E0B'; // Orange  
-      case 'EXPERT': return '#EF4444'; // Red
+      case 'Easy': return '#10B981'; // Green
+      case 'Hard': return '#F59E0B'; // Orange  
+      case 'Expert': return '#EF4444'; // Red
       default: return '#10B981';
     }
   };
 
-  // Question types organized by difficulty
+  // Question types organized by difficulty - CORRECTED BASED ON SPECIFICATION
   const EASY_QUESTIONS = [
     {
       text: "Which player was drafted HIGHER?",
@@ -154,20 +154,7 @@ const DraftDuelMain = () => {
     },
   ];
 
-  const HARD_QUESTIONS = [
-    {
-      text: "Which player is TALLER?",
-      getCorrectPlayerId: (p1, p2) => (p1.height > p2.height ? p1.id : p2.id),
-      filter: (p1, p2) => p1.height !== p2.height,
-    },
-    {
-      text: "Which player is SHORTER?",
-      getCorrectPlayerId: (p1, p2) => (p1.height < p2.height ? p1.id : p2.id),
-      filter: (p1, p2) => p1.height !== p2.height,
-    },
-  ];
-
-  const EXPERT_QUESTIONS = [
+  const HEIGHT_QUESTIONS = [
     {
       text: "Which player is TALLER?",
       getCorrectPlayerId: (p1, p2) => (p1.height > p2.height ? p1.id : p2.id),
@@ -182,10 +169,13 @@ const DraftDuelMain = () => {
 
   const getQuestionsForMode = (mode) => {
     switch (mode) {
-      case 'EASY': return EASY_QUESTIONS;
-      case 'HARD': return HARD_QUESTIONS;
-      case 'EXPERT': return EXPERT_QUESTIONS;
-      default: return EASY_QUESTIONS;
+      case 'Easy': 
+        return EASY_QUESTIONS;
+      case 'Hard': 
+      case 'Expert': 
+        return [...EASY_QUESTIONS, ...HEIGHT_QUESTIONS]; // Hard and Expert both use all 8 questions
+      default: 
+        return EASY_QUESTIONS;
     }
   };
 
@@ -282,7 +272,7 @@ const DraftDuelMain = () => {
   const startGame = () => {
     setGameStarted(true);
     setCurrentStreak(0);
-    setCurrentMode('EASY');
+    setCurrentMode('Easy');
     setGameOver(false);
     setSelectedPlayerId(null);
     setIsCorrectGuess(null);
@@ -357,7 +347,7 @@ const DraftDuelMain = () => {
     if (gameOver) {
       setGameStarted(false);
       setCurrentStreak(0);
-      setCurrentMode('EASY');
+      setCurrentMode('Easy');
       setPlayer1(null);
       setPlayer2(null);
       setCurrentQuestion(null);
@@ -391,6 +381,214 @@ const DraftDuelMain = () => {
   const toggleDarkMode = () => {
     setIsDarkMode(prevMode => !prevMode);
   };
+
+  // START GAME SCREEN - Added this functionality
+  if (!gameStarted) {
+    return (
+      <div 
+        className="draft-duel-fullscreen"
+        style={{
+          backgroundColor: isDarkMode ? '#1A202C' : '#F8F8F0',
+          backgroundImage: `url("data:image/svg+xml;utf8,${encodedBasketballPattern}")`,
+          backgroundRepeat: 'repeat',
+          backgroundSize: '200px 200px',
+        }}
+      >
+        <style jsx>{`
+          @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&display=swap');
+          @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap');
+          @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono:wght@400&display=swap');
+          @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap');
+          
+          .draft-duel-fullscreen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            font-family: 'Outfit', sans-serif;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+            overflow-y: auto;
+            padding-bottom: 120px;
+            min-height: calc(100vh + 120px);
+          }
+
+          .start-game-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: ${isDarkMode ? 'linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%)' : 'linear-gradient(135deg, #f8f9fa 0%, #e9ecef 50%, #dee2e6 100%)'};
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+            color: ${isDarkMode ? '#ffffff' : '#333333'};
+            text-align: center;
+            padding: 2rem;
+          }
+
+          .start-title {
+            font-size: 4rem;
+            font-weight: 800;
+            background: linear-gradient(45deg, #FFD700, #FF8C00, #FF4500);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 1rem;
+            animation: flicker 1.5s infinite alternate;
+          }
+
+          @keyframes flicker {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            25% { opacity: 0.9; transform: scale(1.02); }
+            50% { opacity: 1; transform: scale(1); }
+            75% { opacity: 0.95; transform: scale(1.01); }
+          }
+
+          .start-subtitle {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 2rem;
+            opacity: 0.9;
+          }
+
+          .start-instructions {
+            max-width: 600px;
+            text-align: left;
+            margin-bottom: 2rem;
+            font-size: 1.1rem;
+            line-height: 1.6;
+          }
+
+          .start-instructions h3 {
+            color: ${isDarkMode ? '#4ecdc4' : '#2c3e50'};
+            margin-bottom: 1rem;
+          }
+
+          .start-instructions ul {
+            padding-left: 1.5rem;
+          }
+
+          .start-instructions li {
+            margin-bottom: 0.5rem;
+          }
+
+          .difficulty-tiers {
+            background: rgba(0,0,0,0.2);
+            padding: 1rem;
+            border-radius: 0.5rem;
+            margin: 1rem 0;
+          }
+
+          .difficulty-tiers ul {
+            margin-top: 0.5rem;
+          }
+
+          .start-button {
+            background: linear-gradient(135deg, #3B82F6 0%, #1D4ED8 100%);
+            color: white;
+            border: none;
+            padding: 1.5rem 3rem;
+            border-radius: 2rem;
+            font-size: 1.5rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 20px rgba(59, 130, 246, 0.3);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+          }
+
+          .start-button:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 30px rgba(59, 130, 246, 0.4);
+          }
+
+          .start-button:active {
+            transform: translateY(-2px);
+          }
+
+          .theme-toggle {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            border-radius: 50%;
+            width: 3rem;
+            height: 3rem;
+            font-size: 1.5rem;
+            cursor: pointer;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+            z-index: 100;
+          }
+
+          .theme-toggle:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: scale(1.1);
+          }
+
+          @media (max-width: 768px) {
+            .start-title {
+              font-size: 3rem;
+            }
+            
+            .start-instructions {
+              font-size: 1rem;
+              max-width: 90%;
+            }
+            
+            .start-button {
+              font-size: 1.2rem;
+              padding: 1.2rem 2.5rem;
+            }
+          }
+        `}</style>
+
+        {/* Theme Toggle */}
+        <button 
+          className="theme-toggle"
+          onClick={toggleDarkMode}
+          aria-label="Toggle theme"
+        >
+          {isDarkMode ? '☀️' : '🌙'}
+        </button>
+
+        <div className="start-game-screen">
+          <div className="start-title">🏀 DRAFT DUEL</div>
+          <div className="start-subtitle">NBA Rookie Trivia Challenge</div>
+          
+          <div className="start-instructions">
+            <h3>How to Play:</h3>
+            <ul>
+              <li>Compare two NBA rookies and answer questions about them</li>
+              <li>You have 10 seconds per question - make it count!</li>
+              <li>One wrong answer or timeout ends the game</li>
+              <li>Game gets progressively harder as you build your streak:</li>
+              <div className="difficulty-tiers">
+                <ul>
+                  <li><strong>Easy Mode (0-9 points):</strong> Draft position, age, and position questions</li>
+                  <li><strong>Hard Mode (10-19 points):</strong> All questions including height comparisons</li>
+                  <li><strong>Expert Mode (20+ points):</strong> Maximum difficulty - prove your NBA knowledge!</li>
+                </ul>
+              </div>
+            </ul>
+          </div>
+
+          <button onClick={startGame} className="start-button">
+            Start Game
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div 
@@ -468,65 +666,6 @@ const DraftDuelMain = () => {
           box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
         }
 
-        /* Start Game Screen */
-        .start-game-screen {
-          position: fixed;
-          top: 0;
-          left: 0;
-          width: 100vw;
-          height: 100vh;
-          background: ${isDarkMode ? 'linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%)' : 'linear-gradient(135deg, #f8f9fa 0%, #e9ecef 50%, #dee2e6 100%)'};
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          justify-content: center;
-          z-index: 10000;
-          color: ${isDarkMode ? '#ffffff' : '#333333'};
-          text-align: center;
-          padding: 2rem;
-        }
-
-        .start-title {
-          font-size: 4rem;
-          font-weight: 800;
-          background: linear-gradient(45deg, #FFD700, #FF8C00, #FF4500);
-          -webkit-background-clip: text;
-          -webkit-text-fill-color: transparent;
-          background-clip: text;
-          margin-bottom: 1rem;
-          animation: flicker 1.5s infinite alternate;
-        }
-
-        .start-subtitle {
-          font-size: 1.5rem;
-          font-weight: 600;
-          margin-bottom: 2rem;
-          opacity: 0.9;
-        }
-
-        .start-button {
-          background: linear-gradient(135deg, #3B82F6 0%, #1D4ED8 100%);
-          color: white;
-          border: none;
-          padding: 1.5rem 3rem;
-          border-radius: 2rem;
-          font-size: 1.5rem;
-          font-weight: 700;
-          cursor: pointer;
-          transition: all 0.3s ease;
-          box-shadow: 0 8px 20px rgba(59, 130, 246, 0.3);
-          text-transform: uppercase;
-          letter-spacing: 1px;
-        }
-
-        .start-button:hover {
-          transform: translateY(-4px);
-          box-shadow: 0 12px 30px rgba(59, 130, 246, 0.4);
-        }
-
-        .start-button:active {
-          transform: translateY(-2px);
-        }
         .theme-toggle {
           position: absolute;
           top: 1rem;
@@ -896,14 +1035,6 @@ const DraftDuelMain = () => {
           margin: 0;
         }
 
-        .summer-league {
-          font-size: 0.9rem;
-          opacity: 0.8;
-          margin: 0;
-          color: #FBD38D;
-          font-style: italic;
-        }
-
         @keyframes fade-in-up {
           from {
             opacity: 0;
@@ -1199,216 +1330,3 @@ const DraftDuelMain = () => {
           
           .feedback-message {
             font-size: 1.2rem;
-          }
-          
-          .action-buttons {
-            flex-direction: column;
-            align-items: center;
-            gap: 0.5rem;
-          }
-          
-          .action-button {
-            width: 200px !important;
-            min-width: 200px !important;
-            max-width: 200px !important;
-            height: 50px !important;
-            min-height: 50px !important;
-            max-height: 50px !important;
-          }
-        }
-
-        @media (max-width: 480px) {
-          .game-title {
-            font-size: 2.5rem;
-          }
-          
-          .scoreboard {
-            height: 100px;
-            min-height: 100px;
-            max-height: 100px;
-            padding: 6px;
-          }
-          
-          .scoreboard-box {
-            padding: 6px 2px;
-            height: calc(100% - 12px);
-            min-height: 76px;
-            max-height: 76px;
-          }
-          
-          .scoreboard-label {
-            font-size: 0.6rem;
-            height: 14px;
-            line-height: 14px;
-            margin-bottom: 4px;
-          }
-          
-          .scoreboard-value, .scoreboard-timer {
-            font-size: 1.8rem;
-            min-height: 40px;
-          }
-          
-          .question-text {
-            font-size: 1.2rem;
-          }
-          
-          .player-card {
-            width: 12rem !important;
-            height: 16rem !important;
-          }
-          
-          .player-image {
-            width: 7rem !important;
-            height: 8.5rem !important;
-          }
-          
-          .vs-text {
-            font-size: 2.5rem !important;
-            margin: 0 0.5rem !important;
-          }
-        }
-      `}</style>
-
-      {        /* Theme Toggle */}
-      <button 
-        className="theme-toggle"
-        onClick={toggleDarkMode}
-        aria-label="Toggle theme"
-      >
-        {isDarkMode ? (
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-            <path strokeLinecap="round" strokeLinejoin="round" d="M12 3v1m0 16v1m9-9h1M4 12H3m15.354 5.354l-.707.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
-          </svg>
-        ) : (
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-            <path strokeLinecap="round" strokeLinejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9 9 0 008.354-5.646z" />
-          </svg>
-        )}
-      </button>
-
-      {/* Game Title */}
-      <div className="game-title">DRAFT DUEL</div>
-
-      {/* Scoreboard */}
-      <div className="scoreboard">
-        <div className="scoreboard-box">
-          <div className="scoreboard-label">Streak</div>
-          <div className="scoreboard-value">{currentStreak}</div>
-        </div>
-
-        <div className="scoreboard-box">
-          <div className="scoreboard-label">Shot Clock</div>
-          <div className={`scoreboard-timer ${shotClockTime <= 3 ? 'warning' : ''}`}>
-            {shotClockTime}
-          </div>
-        </div>
-
-        <div className="scoreboard-box">
-          <div className="scoreboard-label">High Score</div>
-          <div className="scoreboard-value">{highScore}</div>
-        </div>
-      </div>
-
-      {/* Question Section */}
-      <div className="question-section">
-        <div className="question-text">
-          {currentQuestion ? currentQuestion.text : "Loading question..."}
-        </div>
-      </div>
-
-      {/* Game Area */}
-      <div className="game-area">
-        {/* Basketball Court Background */}
-        <div className="court-background" dangerouslySetInnerHTML={{ __html: basketballCourtSVG }} />
-
-        {/* Player Comparison */}
-        <div className="players-comparison">
-          {player1 && (
-            <PlayerCard
-              player={player1}
-              onClick={handleGuess}
-              isSelected={selectedPlayerId === player1.id}
-              isCorrect={selectedPlayerId !== null ? (currentQuestion?.getCorrectPlayerId(player1, player2) === player1.id) : null}
-              showPick={selectedPlayerId !== null}
-              disabled={selectedPlayerId !== null || gameOver}
-              isDarkMode={isDarkMode}
-            />
-          )}
-          
-          {/* VS Text */}
-          <div className="vs-text">VS</div>
-          
-          {player2 && (
-            <PlayerCard
-              player={player2}
-              onClick={handleGuess}
-              isSelected={selectedPlayerId === player2.id}
-              isCorrect={selectedPlayerId !== null ? (currentQuestion?.getCorrectPlayerId(player1, player2) === player2.id) : null}
-              showPick={selectedPlayerId !== null}
-              disabled={selectedPlayerId !== null || gameOver}
-              isDarkMode={isDarkMode}
-            />
-          )}
-        </div>
-
-        {/* Feedback Area */}
-        <div className="feedback-area">
-          {feedbackMessage && (
-            <div className={`feedback-message ${
-              isCorrectGuess === true ? 'correct' : 
-              isCorrectGuess === false ? 'incorrect' : 'timeout'
-            }`}>
-              {feedbackMessage}
-            </div>
-          )}
-        </div>
-
-        {/* Action Buttons */}
-        {selectedPlayerId !== null && (
-          <div className="action-buttons">
-            {!gameOver ? (
-              <button onClick={handleContinue} className="action-button continue-button">
-                Continue
-              </button>
-            ) : (
-              <>
-                <button onClick={handleContinue} className="action-button play-again-button">
-                  Play Again
-                </button>
-                <button onClick={shareStreak} className="action-button share-button">
-                  Share Streak
-                </button>
-              </>
-            )}
-          </div>
-        )}
-      </div>
-
-      {/* Share Modal */}
-      {showShareModal && (
-        <div className="share-modal-overlay">
-          <div className="share-modal">
-            <h2>Share Your Streak!</h2>
-            <p>Copy the text below to share your amazing streak!</p>
-            <textarea
-              ref={shareTextRef}
-              className="share-textarea"
-              readOnly
-              value={`I just scored a streak of ${currentStreak} in the NBA Rookie Draft Pick game! Think you can beat it? Play at hooprapp.com! #NBADraftGame #SummerLeague`}
-            />
-            <div className="share-buttons">
-              <button onClick={handleCopyShareText} className="action-button copy-button">
-                Copy
-              </button>
-              <button onClick={handleCloseShareModal} className="action-button back-button">
-                Back
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-    </div>
-  );
-};
-
-export default DraftDuelMain;
