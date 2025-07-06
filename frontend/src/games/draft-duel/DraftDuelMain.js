@@ -263,16 +263,6 @@ const DraftDuelMain = () => {
   // CORRECTED Question types organized by difficulty - EXACTLY AS SPECIFIED
   const EASY_QUESTIONS = [
     {
-      text: "Which player was drafted HIGHER?",
-      getCorrectPlayerId: (p1, p2) => (p1.draftPick < p2.draftPick ? p1.id : p2.id),
-      filter: (p1, p2) => p1.draftPick !== p2.draftPick,
-    },
-    {
-      text: "Which player was drafted LOWER?",
-      getCorrectPlayerId: (p1, p2) => (p1.draftPick > p2.draftPick ? p1.id : p2.id),
-      filter: (p1, p2) => p1.draftPick !== p2.draftPick,
-    },
-    {
       text: "Which player is OLDER?",
       getCorrectPlayerId: (p1, p2) => (p1.age > p2.age ? p1.id : p2.id),
       filter: (p1, p2) => p1.age !== p2.age,
@@ -292,9 +282,6 @@ const DraftDuelMain = () => {
       getCorrectPlayerId: (p1, p2) => (p1.position === "Forward" ? p1.id : p2.id),
       filter: (p1, p2) => (p1.position === "Forward" && p2.position !== "Forward") || (p2.position === "Forward" && p1.position !== "Forward"),
     },
-  ];
-
-  const HEIGHT_QUESTIONS = [
     {
       text: "Which player is TALLER?",
       getCorrectPlayerId: (p1, p2) => (p1.height > p2.height ? p1.id : p2.id),
@@ -307,13 +294,113 @@ const DraftDuelMain = () => {
     },
   ];
 
-  const getQuestionsForMode = (mode) => {
+  const HARD_QUESTIONS = [
+    {
+      text: "Which player was drafted HIGHER?",
+      getCorrectPlayerId: (p1, p2) => (p1.draftPick < p2.draftPick ? p1.id : p2.id),
+      filter: (p1, p2) => p1.draftPick !== p2.draftPick,
+    },
+    {
+      text: "Which player was drafted LOWER?",
+      getCorrectPlayerId: (p1, p2) => (p1.draftPick > p2.draftPick ? p1.id : p2.id),
+      filter: (p1, p2) => p1.draftPick !== p2.draftPick,
+    },
+    {
+      text: "Which player scored MORE points per game?",
+      getCorrectPlayerId: (p1, p2) => (p1.preDraftStats.ppg > p2.preDraftStats.ppg ? p1.id : p2.id),
+      filter: (p1, p2) => p1.preDraftStats.ppg !== p2.preDraftStats.ppg,
+    },
+    {
+      text: "Which player scored FEWER points per game?",
+      getCorrectPlayerId: (p1, p2) => (p1.preDraftStats.ppg < p2.preDraftStats.ppg ? p1.id : p2.id),
+      filter: (p1, p2) => p1.preDraftStats.ppg !== p2.preDraftStats.ppg,
+    },
+    {
+      text: "Which player is HEAVIER?",
+      getCorrectPlayerId: (p1, p2) => (p1.weight > p2.weight ? p1.id : p2.id),
+      filter: (p1, p2) => p1.weight !== p2.weight,
+    },
+    {
+      text: "Which player is LIGHTER?",
+      getCorrectPlayerId: (p1, p2) => (p1.weight < p2.weight ? p1.id : p2.id),
+      filter: (p1, p2) => p1.weight !== p2.weight,
+    },
+  ];
+
+  // Dynamic home place questions for Hard Mode
+  const getHomePlaceQuestions = (p1, p2) => {
+    const questions = [];
+    
+    // Check if one player is from a specific place and the other isn't
+    if (p1.homePlace !== p2.homePlace) {
+      questions.push({
+        text: `Which player is from ${p1.homePlace}?`,
+        getCorrectPlayerId: (player1, player2) => p1.id,
+        filter: (player1, player2) => true,
+      });
+      questions.push({
+        text: `Which player is from ${p2.homePlace}?`,
+        getCorrectPlayerId: (player1, player2) => p2.id,
+        filter: (player1, player2) => true,
+      });
+    }
+    
+    return questions;
+  };
+
+  const EXPERT_QUESTIONS = [
+    {
+      text: "Which player had MORE rebounds per game?",
+      getCorrectPlayerId: (p1, p2) => (p1.preDraftStats.rpg > p2.preDraftStats.rpg ? p1.id : p2.id),
+      filter: (p1, p2) => p1.preDraftStats.rpg !== p2.preDraftStats.rpg,
+    },
+    {
+      text: "Which player had FEWER rebounds per game?",
+      getCorrectPlayerId: (p1, p2) => (p1.preDraftStats.rpg < p2.preDraftStats.rpg ? p1.id : p2.id),
+      filter: (p1, p2) => p1.preDraftStats.rpg !== p2.preDraftStats.rpg,
+    },
+    {
+      text: "Which player had MORE assists per game?",
+      getCorrectPlayerId: (p1, p2) => (p1.preDraftStats.apg > p2.preDraftStats.apg ? p1.id : p2.id),
+      filter: (p1, p2) => p1.preDraftStats.apg !== p2.preDraftStats.apg,
+    },
+    {
+      text: "Which player had FEWER assists per game?",
+      getCorrectPlayerId: (p1, p2) => (p1.preDraftStats.apg < p2.preDraftStats.apg ? p1.id : p2.id),
+      filter: (p1, p2) => p1.preDraftStats.apg !== p2.preDraftStats.apg,
+    },
+    {
+      text: "Which player played in the ACC?",
+      getCorrectPlayerId: (p1, p2) => (p1.conference === "ACC" ? p1.id : p2.id),
+      filter: (p1, p2) => (p1.conference === "ACC" && p2.conference !== "ACC") || (p2.conference === "ACC" && p1.conference !== "ACC"),
+    },
+    {
+      text: "Which player played in the SEC?",
+      getCorrectPlayerId: (p1, p2) => (p1.conference === "SEC" ? p1.id : p2.id),
+      filter: (p1, p2) => (p1.conference === "SEC" && p2.conference !== "SEC") || (p2.conference === "SEC" && p1.conference !== "SEC"),
+    },
+    {
+      text: "Which player played in the Big Ten?",
+      getCorrectPlayerId: (p1, p2) => (p1.conference === "Big Ten" ? p1.id : p2.id),
+      filter: (p1, p2) => (p1.conference === "Big Ten" && p2.conference !== "Big Ten") || (p2.conference === "Big Ten" && p1.conference !== "Big Ten"),
+    },
+    {
+      text: "Which player played in the Big 12?",
+      getCorrectPlayerId: (p1, p2) => (p1.conference === "Big 12" ? p1.id : p2.id),
+      filter: (p1, p2) => (p1.conference === "Big 12" && p2.conference !== "Big 12") || (p2.conference === "Big 12" && p1.conference !== "Big 12"),
+    },
+  ];
+
+  const getQuestionsForMode = (mode, p1, p2) => {
     switch (mode) {
       case 'Easy': 
         return EASY_QUESTIONS;
       case 'Hard': 
+        // Hard mode gets its own questions PLUS dynamic home place questions
+        const homePlaceQuestions = getHomePlaceQuestions(p1, p2);
+        return [...HARD_QUESTIONS, ...homePlaceQuestions];
       case 'Expert': 
-        return [...EASY_QUESTIONS, ...HEIGHT_QUESTIONS]; // Hard and Expert both use all 8 questions
+        return EXPERT_QUESTIONS;
       default: 
         return EASY_QUESTIONS;
     }
@@ -385,7 +472,7 @@ const DraftDuelMain = () => {
 
     const mode = getDifficultyMode(currentStreak);
     setCurrentMode(mode);
-    const questions = getQuestionsForMode(mode);
+    const questions = getQuestionsForMode(mode, null, null);
 
     let p1, p2, randomQuestion;
     let attempts = 0;
@@ -394,7 +481,10 @@ const DraftDuelMain = () => {
     do {
       p1 = ROOKIES_2025_NBA[Math.floor(Math.random() * ROOKIES_2025_NBA.length)];
       p2 = ROOKIES_2025_NBA[Math.floor(Math.random() * ROOKIES_2025_NBA.length)];
-      randomQuestion = questions[Math.floor(Math.random() * questions.length)];
+      
+      // Get questions for this specific player pair (important for home place questions)
+      const questionsForPair = getQuestionsForMode(mode, p1, p2);
+      randomQuestion = questionsForPair[Math.floor(Math.random() * questionsForPair.length)];
       attempts++;
     } while ((p1.id === p2.id || (randomQuestion.filter && !randomQuestion.filter(p1, p2))) && attempts < maxAttempts);
 
