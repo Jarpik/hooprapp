@@ -29,16 +29,16 @@ const getContrastTextColor = (hexcolor) => {
 
 // NBA Rookies data
 const ROOKIES_2025_NBA = [
-  { id: 1, name: "Cooper Flagg", draftPick: 1, team: "Dallas Mavericks", preDraftTeam: "Duke", imageUrl: "https://a.espncdn.com/combiner/i?img=/i/headshots/nba/players/full/5041939.png&w=350&h=254", height: 81, age: 18, position: "Forward", conference: "ACC" },
-  { id: 2, name: "Dylan Harper", draftPick: 2, team: "San Antonio Spurs", preDraftTeam: "Rutgers", imageUrl: "https://a.espncdn.com/combiner/i?img=/i/headshots/nba/players/full/5037871.png&w=350&h=254", height: 76, age: 18, position: "Guard", conference: "Big Ten" },
-  { id: 3, name: "VJ Edgecombe", draftPick: 3, team: "Philadelphia 76ers", preDraftTeam: "Baylor", imageUrl: "https://a.espncdn.com/combiner/i?img=/i/headshots/nba/players/full/5124612.png&w=350&h=254", height: 77, age: 19, position: "Guard", conference: "Big 12" },
-  { id: 4, name: "Kon Knueppel", draftPick: 4, team: "Charlotte Hornets", preDraftTeam: "Duke", imageUrl: "https://a.espncdn.com/combiner/i?img=/i/headshots/nba/players/full/5061575.png&w=350&h=254", height: 79, age: 19, position: "Forward", conference: "ACC" },
-  { id: 5, name: "Ace Bailey", draftPick: 5, team: "Utah Jazz", preDraftTeam: "Rutgers", imageUrl: "https://a.espncdn.com/combiner/i?img=/i/headshots/nba/players/full/4873138.png&w=350&h=254", height: 81, age: 19, position: "Forward", conference: "Big Ten" },
-  { id: 6, name: "Tre Johnson", draftPick: 6, team: "Washington Wizards", preDraftTeam: "Texas", imageUrl: "https://a.espncdn.com/combiner/i?img=/i/headshots/nba/players/full/5238230.png&w=350&h=254", height: 76, age: 19, position: "Guard", conference: "Big 12" },
-  { id: 7, name: "Jeremiah Fears", draftPick: 7, team: "New Orleans Pelicans", preDraftTeam: "Oklahoma", imageUrl: "https://a.espncdn.com/combiner/i?img=/i/headshots/nba/players/full/5144091.png&w=350&h=254", height: 74, age: 18, position: "Guard", conference: "Big 12" },
-  { id: 8, name: "Egor Demin", draftPick: 8, team: "Brooklyn Nets", preDraftTeam: "BYU", imageUrl: "https://a.espncdn.com/combiner/i?img=/i/headshots/mens-college-basketball/players/full/5243213.png", height: 79, age: 19, position: "Guard", conference: "Big 12" },
-  { id: 9, name: "Collin Murray-Boyles", draftPick: 9, team: "Toronto Raptors", preDraftTeam: "South Carolina", imageUrl: "https://a.espncdn.com/combiner/i?img=/i/headshots/nba/players/full/5093267.png&w=350&h=254", height: 80, age: 20, position: "Forward", conference: "SEC" },
-  { id: 10, name: "Khaman Maluach", draftPick: 10, team: "Phoenix Suns", preDraftTeam: "Duke", imageUrl: "https://a.espncdn.com/combiner/i?img=/i/headshots/nba/players/full/5203685.png&w=350&h=254", height: 85, age: 18, position: "Center", conference: "ACC" },
+  { id: 1, name: "Cooper Flagg", draftPick: 1, team: "Dallas Mavericks", preDraftTeam: "Duke", imageUrl: "https://a.espncdn.com/combiner/i?img=/i/headshots/nba/players/full/5041939.png&w=350&h=254", height: 81, age: 18, position: "Forward", conference: "ACC", summerLeague: "Utah Summer League" },
+  { id: 2, name: "Dylan Harper", draftPick: 2, team: "San Antonio Spurs", preDraftTeam: "Rutgers", imageUrl: "https://a.espncdn.com/combiner/i?img=/i/headshots/nba/players/full/5037871.png&w=350&h=254", height: 76, age: 18, position: "Guard", conference: "Big Ten", summerLeague: "Utah Summer League" },
+  { id: 3, name: "VJ Edgecombe", draftPick: 3, team: "Philadelphia 76ers", preDraftTeam: "Baylor", imageUrl: "https://a.espncdn.com/combiner/i?img=/i/headshots/nba/players/full/5124612.png&w=350&h=254", height: 77, age: 19, position: "Guard", conference: "Big 12", summerLeague: "California Classic" },
+  { id: 4, name: "Kon Knueppel", draftPick: 4, team: "Charlotte Hornets", preDraftTeam: "Duke", imageUrl: "https://a.espncdn.com/combiner/i?img=/i/headshots/nba/players/full/5061575.png&w=350&h=254", height: 79, age: 19, position: "Forward", conference: "ACC", summerLeague: "Utah Summer League" },
+  { id: 5, name: "Ace Bailey", draftPick: 5, team: "Utah Jazz", preDraftTeam: "Rutgers", imageUrl: "https://a.espncdn.com/combiner/i?img=/i/headshots/nba/players/full/4873138.png&w=350&h=254", height: 81, age: 19, position: "Forward", conference: "Big Ten", summerLeague: "Utah Summer League" },
+  { id: 6, name: "Tre Johnson", draftPick: 6, team: "Washington Wizards", preDraftTeam: "Texas", imageUrl: "https://a.espncdn.com/combiner/i?img=/i/headshots/nba/players/full/5238230.png&w=350&h=254", height: 76, age: 19, position: "Guard", conference: "Big 12", summerLeague: "2K25 Summer League" },
+  { id: 7, name: "Jeremiah Fears", draftPick: 7, team: "New Orleans Pelicans", preDraftTeam: "Oklahoma", imageUrl: "https://a.espncdn.com/combiner/i?img=/i/headshots/nba/players/full/5144091.png&w=350&h=254", height: 74, age: 18, position: "Guard", conference: "Big 12", summerLeague: "2K25 Summer League" },
+  { id: 8, name: "Egor Demin", draftPick: 8, team: "Brooklyn Nets", preDraftTeam: "BYU", imageUrl: "https://a.espncdn.com/combiner/i?img=/i/headshots/mens-college-basketball/players/full/5243213.png", height: 79, age: 19, position: "Guard", conference: "Big 12", summerLeague: "2K25 Summer League" },
+  { id: 9, name: "Collin Murray-Boyles", draftPick: 9, team: "Toronto Raptors", preDraftTeam: "South Carolina", imageUrl: "https://a.espncdn.com/combiner/i?img=/i/headshots/nba/players/full/5093267.png&w=350&h=254", height: 80, age: 20, position: "Forward", conference: "SEC", summerLeague: "California Classic" },
+  { id: 10, name: "Khaman Maluach", draftPick: 10, team: "Phoenix Suns", preDraftTeam: "Duke", imageUrl: "https://a.espncdn.com/combiner/i?img=/i/headshots/nba/players/full/5203685.png&w=350&h=254", height: 85, age: 18, position: "Center", conference: "ACC", summerLeague: "California Classic" },
 ];
 
 // PlayerCard component
@@ -104,7 +104,7 @@ const DraftDuelMain = () => {
   const [gameStarted, setGameStarted] = useState(false);
   const [currentMode, setCurrentMode] = useState('Easy');
 
-  // Difficulty system - FIXED TO MATCH SPECIFICATION EXACTLY
+  // Difficulty system
   const getDifficultyMode = (streak) => {
     if (streak >= 20) return 'Expert';
     if (streak >= 10) return 'Hard';
@@ -120,7 +120,7 @@ const DraftDuelMain = () => {
     }
   };
 
-  // Question types organized by difficulty - CORRECTED BASED ON SPECIFICATION
+  // CORRECTED Question types organized by difficulty - EXACTLY AS SPECIFIED
   const EASY_QUESTIONS = [
     {
       text: "Which player was drafted HIGHER?",
@@ -382,7 +382,7 @@ const DraftDuelMain = () => {
     setIsDarkMode(prevMode => !prevMode);
   };
 
-  // START GAME SCREEN - Added this functionality
+  // START GAME SCREEN - This was missing!
   if (!gameStarted) {
     return (
       <div 
@@ -1330,3 +1330,227 @@ const DraftDuelMain = () => {
           
           .feedback-message {
             font-size: 1.2rem;
+          }
+          
+          .action-buttons {
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+          }
+          
+          .action-button {
+            width: 200px !important;
+            min-width: 200px !important;
+            max-width: 200px !important;
+            height: 50px !important;
+            min-height: 50px !important;
+            max-height: 50px !important;
+          }
+        }
+
+        @media (max-width: 480px) {
+          .game-title {
+            font-size: 2.5rem;
+          }
+          
+          .scoreboard {
+            height: 100px;
+            min-height: 100px;
+            max-height: 100px;
+            padding: 6px;
+          }
+          
+          .scoreboard-box {
+            padding: 6px 2px;
+            height: calc(100% - 12px);
+            min-height: 76px;
+            max-height: 76px;
+          }
+          
+          .scoreboard-label {
+            font-size: 0.6rem;
+            height: 14px;
+            line-height: 14px;
+            margin-bottom: 4px;
+          }
+          
+          .scoreboard-value, .scoreboard-timer {
+            font-size: 1.8rem;
+            min-height: 40px;
+          }
+          
+          .question-text {
+            font-size: 1.2rem;
+          }
+          
+          .player-card {
+            width: 12rem !important;
+            height: 16rem !important;
+          }
+          
+          .player-image {
+            width: 7rem !important;
+            height: 8.5rem !important;
+          }
+          
+          .vs-text {
+            font-size: 2.5rem !important;
+            margin: 0 0.5rem !important;
+          }
+        }
+      `}</style>
+
+      {/* Mode Indicator */}
+      <div 
+        className="mode-indicator"
+        style={{ 
+          borderColor: getModeColor(currentMode),
+          color: getModeColor(currentMode)
+        }}
+      >
+        {currentMode} Mode
+      </div>
+
+      {/* Theme Toggle */}
+      <button 
+        className="theme-toggle"
+        onClick={toggleDarkMode}
+        aria-label="Toggle theme"
+      >
+        {isDarkMode ? (
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M12 3v1m0 16v1m9-9h1M4 12H3m15.354 5.354l-.707.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+          </svg>
+        ) : (
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9 9 0 008.354-5.646z" />
+          </svg>
+        )}
+      </button>
+
+      {/* Game Title */}
+      <div className="game-title">DRAFT DUEL</div>
+
+      {/* Scoreboard */}
+      <div className="scoreboard">
+        <div className="scoreboard-box">
+          <div className="scoreboard-label">Streak</div>
+          <div className="scoreboard-value">{currentStreak}</div>
+        </div>
+
+        <div className="scoreboard-box">
+          <div className="scoreboard-label">Shot Clock</div>
+          <div className={`scoreboard-timer ${shotClockTime <= 3 ? 'warning' : ''}`}>
+            {shotClockTime}
+          </div>
+        </div>
+
+        <div className="scoreboard-box">
+          <div className="scoreboard-label">High Score</div>
+          <div className="scoreboard-value">{highScore}</div>
+        </div>
+      </div>
+
+      {/* Question Section */}
+      <div className="question-section">
+        <div className="question-text">
+          {currentQuestion ? currentQuestion.text : "Loading question..."}
+        </div>
+      </div>
+
+      {/* Game Area */}
+      <div className="game-area">
+        {/* Basketball Court Background */}
+        <div className="court-background" dangerouslySetInnerHTML={{ __html: basketballCourtSVG }} />
+
+        {/* Player Comparison */}
+        <div className="players-comparison">
+          {player1 && (
+            <PlayerCard
+              player={player1}
+              onClick={handleGuess}
+              isSelected={selectedPlayerId === player1.id}
+              isCorrect={selectedPlayerId !== null ? (currentQuestion?.getCorrectPlayerId(player1, player2) === player1.id) : null}
+              showPick={selectedPlayerId !== null}
+              disabled={selectedPlayerId !== null || gameOver}
+              isDarkMode={isDarkMode}
+            />
+          )}
+          
+          {/* VS Text */}
+          <div className="vs-text">VS</div>
+          
+          {player2 && (
+            <PlayerCard
+              player={player2}
+              onClick={handleGuess}
+              isSelected={selectedPlayerId === player2.id}
+              isCorrect={selectedPlayerId !== null ? (currentQuestion?.getCorrectPlayerId(player1, player2) === player2.id) : null}
+              showPick={selectedPlayerId !== null}
+              disabled={selectedPlayerId !== null || gameOver}
+              isDarkMode={isDarkMode}
+            />
+          )}
+        </div>
+
+        {/* Feedback Area */}
+        <div className="feedback-area">
+          {feedbackMessage && (
+            <div className={`feedback-message ${
+              isCorrectGuess === true ? 'correct' : 
+              isCorrectGuess === false ? 'incorrect' : 'timeout'
+            }`}>
+              {feedbackMessage}
+            </div>
+          )}
+        </div>
+
+        {/* Action Buttons */}
+        {selectedPlayerId !== null && (
+          <div className="action-buttons">
+            {!gameOver ? (
+              <button onClick={handleContinue} className="action-button continue-button">
+                Continue
+              </button>
+            ) : (
+              <>
+                <button onClick={handleContinue} className="action-button play-again-button">
+                  Play Again
+                </button>
+                <button onClick={shareStreak} className="action-button share-button">
+                  Share Streak
+                </button>
+              </>
+            )}
+          </div>
+        )}
+      </div>
+
+      {/* Share Modal */}
+      {showShareModal && (
+        <div className="share-modal-overlay">
+          <div className="share-modal">
+            <h2>Share Your Streak!</h2>
+            <p>Copy the text below to share your amazing streak!</p>
+            <textarea
+              ref={shareTextRef}
+              className="share-textarea"
+              readOnly
+              value={`I just scored a streak of ${currentStreak} in the NBA Rookie Draft Pick game! Reached ${currentMode} Mode! Think you can beat it? Play at hooprapp.com! #NBADraftGame #SummerLeague`}
+            />
+            <div className="share-buttons">
+              <button onClick={handleCopyShareText} className="action-button copy-button">
+                Copy
+              </button>
+              <button onClick={handleCloseShareModal} className="action-button back-button">
+                Back
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default DraftDuelMain;
