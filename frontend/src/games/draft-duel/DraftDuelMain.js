@@ -27,7 +27,7 @@ const getContrastTextColor = (hexcolor) => {
   return (y >= 128) ? '#333333' : '#FFFFFF';
 };
 
-// NBA Rookies data with Summer League info
+// NBA Rookies data
 const ROOKIES_2025_NBA = [
   { id: 1, name: "Cooper Flagg", draftPick: 1, team: "Dallas Mavericks", preDraftTeam: "Duke", imageUrl: "https://a.espncdn.com/combiner/i?img=/i/headshots/nba/players/full/5041939.png&w=350&h=254", height: 81, age: 18, position: "Forward", conference: "ACC", summerLeague: "Utah Summer League" },
   { id: 2, name: "Dylan Harper", draftPick: 2, team: "San Antonio Spurs", preDraftTeam: "Rutgers", imageUrl: "https://a.espncdn.com/combiner/i?img=/i/headshots/nba/players/full/5037871.png&w=350&h=254", height: 76, age: 18, position: "Guard", conference: "Big Ten", summerLeague: "Utah Summer League" },
@@ -41,51 +41,47 @@ const ROOKIES_2025_NBA = [
   { id: 10, name: "Khaman Maluach", draftPick: 10, team: "Phoenix Suns", preDraftTeam: "Duke", imageUrl: "https://a.espncdn.com/combiner/i?img=/i/headshots/nba/players/full/5203685.png&w=350&h=254", height: 85, age: 18, position: "Center", conference: "ACC", summerLeague: "California Classic" },
 ];
 
-// PROPERLY Mobile-optimized PlayerCard component
+// Simple PlayerCard component
 const PlayerCard = ({ player, onClick, isSelected, isCorrect, showPick, disabled, isDarkMode }) => {
   const cardBackgroundColor = TEAM_COLORS[player.preDraftTeam] || TEAM_COLORS.DEFAULT;
   const cardTextColor = getContrastTextColor(cardBackgroundColor);
 
-  let cardClasses = "mobile-player-card";
+  let cardClasses = "player-card";
   if (isSelected) cardClasses += " selected";
   if (isCorrect === true) cardClasses += " correct";
   if (isCorrect === false) cardClasses += " incorrect";
   if (disabled) cardClasses += " disabled";
 
   return (
-    <div className="mobile-player-wrapper">
+    <div className="player-card-wrapper">
       <button
         className={cardClasses}
         onClick={() => onClick(player.id)}
         disabled={disabled}
         style={{ backgroundColor: cardBackgroundColor, color: cardTextColor }}
       >
-        <div className="mobile-player-content">
-          <img
-            src={player.imageUrl}
-            alt={player.name}
-            className="mobile-player-image"
-            onError={(e) => { 
-              e.target.onerror = null; 
-              e.target.src = `https://placehold.co/80x100/666666/FFFFFF?text=${player.name.split(' ').map(n => n[0]).join('')}`; 
-            }}
-          />
-          <div className="mobile-player-info">
-            <h3 className="mobile-player-name">{player.name}</h3>
-            <p className="mobile-player-team">{player.preDraftTeam}</p>
-            <div className="mobile-player-stats">
-              <span className="mobile-stat-badge position">{player.position}</span>
-              <span className="mobile-stat-badge height">{Math.floor(player.height/12)}'{player.height%12}"</span>
-            </div>
-          </div>
+        <img
+          src={player.imageUrl}
+          alt={player.name}
+          className="player-image"
+          onError={(e) => { 
+            e.target.onerror = null; 
+            e.target.src = `https://placehold.co/200x200/666666/FFFFFF?text=${player.name.split(' ').map(n => n[0]).join('')}`; 
+          }}
+        />
+        <h3 className="player-name">{player.name}</h3>
+        <p className="player-team">{player.preDraftTeam}</p>
+        <div className="player-stats">
+          <span className="stat-badge">{player.position}</span>
+          <span className="stat-badge">{Math.floor(player.height/12)}'{player.height%12}"</span>
         </div>
       </button>
 
       {showPick && (
-        <div className="mobile-reveal-section">
-          <div className="mobile-pick-number">Pick #{player.draftPick}</div>
-          <div className="mobile-nba-team">{player.team}</div>
-          <div className="mobile-summer-league">{player.summerLeague}</div>
+        <div className="reveal-section">
+          <p className="pick-number">Pick #{player.draftPick}</p>
+          <p className="nba-team">{player.team}</p>
+          <p className="summer-league">{player.summerLeague}</p>
         </div>
       )}
     </div>
@@ -111,7 +107,7 @@ const DraftDuelMain = () => {
   const shareTextRef = useRef(null);
   const [isDarkMode, setIsDarkMode] = useState(true);
 
-  // Question types with Summer League addition
+  // Question types
   const QUESTIONS = [
     {
       text: "Which player was drafted HIGHER?",
@@ -281,215 +277,363 @@ const DraftDuelMain = () => {
     setIsDarkMode(prevMode => !prevMode);
   };
 
+  // Inline styles for mobile
+  const mobileStyles = {
+    container: {
+      position: 'fixed',
+      top: 0,
+      left: 0,
+      width: '100vw',
+      height: '100vh',
+      background: isDarkMode ? 'linear-gradient(135deg, #1a1a2e 0%, #16213e 100%)' : 'linear-gradient(135deg, #f8f9fa 0%, #dee2e6 100%)',
+      fontFamily: "'Outfit', sans-serif",
+      color: isDarkMode ? '#ffffff' : '#333333',
+      display: 'flex',
+      flexDirection: 'column',
+      overflow: 'hidden',
+      WebkitTextSizeAdjust: '100%',
+      userSelect: 'none'
+    },
+    header: {
+      display: 'flex',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      padding: '1rem',
+      paddingTop: 'calc(1rem + env(safe-area-inset-top))'
+    },
+    title: {
+      fontSize: '2rem',
+      fontWeight: '800',
+      background: 'linear-gradient(45deg, #FFD700, #FF8C00, #FF4500)',
+      WebkitBackgroundClip: 'text',
+      WebkitTextFillColor: 'transparent',
+      backgroundClip: 'text',
+      textAlign: 'center',
+      flex: 1
+    },
+    themeToggle: {
+      background: 'rgba(255, 255, 255, 0.1)',
+      border: 'none',
+      borderRadius: '50%',
+      width: '2.5rem',
+      height: '2.5rem',
+      fontSize: '1.2rem',
+      cursor: 'pointer',
+      color: isDarkMode ? '#FFD700' : '#FF6B35'
+    },
+    scoreboard: {
+      display: 'flex',
+      justifyContent: 'space-around',
+      background: 'rgba(0, 0, 0, 0.8)',
+      margin: '0 1rem 1rem',
+      padding: '0.75rem',
+      borderRadius: '15px',
+      boxShadow: '0 4px 12px rgba(0, 0, 0, 0.3)'
+    },
+    scoreItem: {
+      textAlign: 'center',
+      flex: 1
+    },
+    scoreLabel: {
+      fontSize: '0.75rem',
+      color: '#FFD700',
+      fontWeight: '600',
+      textTransform: 'uppercase',
+      marginBottom: '0.25rem'
+    },
+    scoreValue: {
+      fontSize: '1.5rem',
+      fontWeight: '900',
+      color: shotClockTime <= 3 ? '#FF3333' : '#FF8C00',
+      textShadow: '0 0 10px rgba(255, 140, 0, 0.8)'
+    },
+    question: {
+      margin: '0 1rem 1rem',
+      padding: '1rem',
+      background: 'rgba(59, 130, 246, 0.15)',
+      borderRadius: '15px',
+      border: '1px solid rgba(255, 255, 255, 0.1)',
+      backdropFilter: 'blur(10px)'
+    },
+    questionText: {
+      fontSize: '1.1rem',
+      fontWeight: '700',
+      textAlign: 'center',
+      margin: 0,
+      textTransform: 'uppercase'
+    },
+    playersContainer: {
+      flex: 1,
+      display: 'flex',
+      flexDirection: 'column',
+      padding: '0 1rem',
+      gap: '1rem',
+      overflowY: 'auto'
+    },
+    playerWrapper: {
+      width: '100%'
+    },
+    playerCard: {
+      width: '100%',
+      background: 'none',
+      border: '3px solid rgba(255, 255, 255, 0.2)',
+      borderRadius: '15px',
+      padding: '1rem',
+      cursor: 'pointer',
+      transition: 'all 0.3s ease',
+      boxShadow: '0 8px 20px rgba(0, 0, 0, 0.3)',
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center',
+      gap: '0.5rem',
+      minHeight: '140px'
+    },
+    playerImage: {
+      width: '60px',
+      height: '75px',
+      borderRadius: '50%',
+      objectFit: 'cover',
+      border: '2px solid rgba(255, 255, 255, 0.3)'
+    },
+    playerName: {
+      fontSize: '1.1rem',
+      fontWeight: '800',
+      margin: 0,
+      textAlign: 'center',
+      textShadow: '1px 1px 2px rgba(0, 0, 0, 0.3)'
+    },
+    playerTeam: {
+      fontSize: '0.9rem',
+      margin: 0,
+      opacity: 0.9,
+      textAlign: 'center'
+    },
+    playerStats: {
+      display: 'flex',
+      gap: '0.5rem',
+      flexWrap: 'wrap',
+      justifyContent: 'center'
+    },
+    statBadge: {
+      padding: '0.2rem 0.5rem',
+      borderRadius: '8px',
+      fontSize: '0.7rem',
+      fontWeight: '600',
+      textTransform: 'uppercase',
+      background: 'rgba(255, 165, 0, 0.2)',
+      color: '#FFD700',
+      border: '1px solid rgba(255, 215, 0, 0.3)'
+    },
+    vsText: {
+      fontSize: '2rem',
+      fontWeight: '800',
+      color: '#FFD700',
+      textAlign: 'center',
+      margin: '0.5rem 0',
+      textShadow: '0 0 10px rgba(255, 215, 0, 0.8)'
+    },
+    revealSection: {
+      marginTop: '0.75rem',
+      padding: '0.75rem',
+      background: 'rgba(0, 0, 0, 0.8)',
+      borderRadius: '10px',
+      textAlign: 'center'
+    },
+    pickNumber: {
+      fontSize: '1rem',
+      fontWeight: '700',
+      color: '#FBBF24',
+      margin: '0 0 0.25rem 0'
+    },
+    nbaTeam: {
+      fontSize: '0.9rem',
+      fontWeight: '600',
+      color: '#60A5FA',
+      margin: '0 0 0.25rem 0'
+    },
+    summerLeague: {
+      fontSize: '0.8rem',
+      color: '#FBD38D',
+      fontStyle: 'italic',
+      margin: 0
+    },
+    feedbackOverlay: {
+      position: 'fixed',
+      top: '50%',
+      left: '50%',
+      transform: 'translate(-50%, -50%)',
+      zIndex: 200,
+      pointerEvents: 'none'
+    },
+    feedbackMessage: {
+      padding: '1rem 2rem',
+      borderRadius: '25px',
+      fontSize: '1.1rem',
+      fontWeight: '700',
+      textAlign: 'center',
+      boxShadow: '0 8px 20px rgba(0, 0, 0, 0.4)',
+      maxWidth: '80vw',
+      background: isCorrectGuess === true ? '#10B981' : isCorrectGuess === false ? '#EF4444' : '#3B82F6',
+      color: 'white'
+    },
+    actions: {
+      position: 'fixed',
+      bottom: 0,
+      left: 0,
+      right: 0,
+      background: isDarkMode ? 'rgba(0, 0, 0, 0.95)' : 'rgba(255, 255, 255, 0.95)',
+      backdropFilter: 'blur(10px)',
+      padding: '1rem',
+      display: 'flex',
+      gap: '0.75rem',
+      justifyContent: 'center',
+      zIndex: 150,
+      paddingBottom: 'calc(1rem + env(safe-area-inset-bottom))',
+      borderTop: '1px solid rgba(255, 255, 255, 0.1)'
+    },
+    actionButton: {
+      flex: 1,
+      maxWidth: '150px',
+      height: '50px',
+      border: 'none',
+      borderRadius: '25px',
+      fontSize: '1rem',
+      fontWeight: '600',
+      cursor: 'pointer',
+      transition: 'all 0.3s ease',
+      boxShadow: '0 4px 12px rgba(0, 0, 0, 0.2)',
+      color: 'white'
+    }
+  };
+
   return (
-    <div className="draft-duel-mobile">
-      <style jsx>{`
-        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&display=swap');
-        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&display=swap');
-        
-        /* MOBILE-FIRST: Full viewport container */
-        .draft-duel-mobile {
-          position: fixed;
-          top: 0;
-          left: 0;
-          width: 100vw;
-          height: 100vh;
-          background: ${isDarkMode ? 'linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%)' : 'linear-gradient(135deg, #f8f9fa 0%, #e9ecef 50%, #dee2e6 100%)'};
-          font-family: 'Outfit', sans-serif;
-          overflow: hidden;
-          display: flex;
-          flex-direction: column;
-          color: ${isDarkMode ? '#ffffff' : '#333333'};
-          -webkit-text-size-adjust: 100%;
-          -webkit-touch-callout: none;
-          -webkit-user-select: none;
-          user-select: none;
-          overscroll-behavior: none;
-        }
-
-        /* Header with title and theme toggle */
-        .mobile-header {
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          padding: 1rem;
-          padding-top: calc(1rem + env(safe-area-inset-top));
-          position: relative;
-          z-index: 100;
-        }
-
-        .mobile-title {
-          font-size: 2.5rem;
-          font-weight: 600;
-          cursor: pointer;
-          transition: all 0.3s ease;
-          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-          touch-action: manipulation;
-          -webkit-tap-highlight-color: transparent;
-        }
-
-        .mobile-action-button:active {
-          transform: scale(0.95);
-        }
-
-        .mobile-continue-button {
-          background: linear-gradient(135deg, #3B82F6, #1D4ED8);
-          color: white;
-        }
-
-        .mobile-play-again-button {
-          background: linear-gradient(135deg, #10B981, #059669);
-          color: white;
-        }
-
-        .mobile-share-button {
-          background: linear-gradient(135deg, #8B5CF6, #7C3AED);
-          color: white;
-        }
-
-        /* Share modal */
-        .mobile-share-overlay {
-          position: fixed;
-          top: 0;
-          left: 0;
-          right: 0;
-          bottom: 0;
-          background: rgba(0, 0, 0, 0.8);
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          z-index: 1000;
-          padding: 1rem;
-        }
-
-        .mobile-share-modal {
-          background: ${isDarkMode ? '#2D3748' : '#FFFFFF'};
-          color: ${isDarkMode ? '#FFFFFF' : '#2D3748'};
-          padding: 2rem;
-          border-radius: 20px;
-          width: 100%;
-          max-width: 350px;
-          max-height: 90vh;
-          overflow-y: auto;
-          text-align: center;
-        }
-
-        .mobile-share-title {
-          font-size: 1.5rem;
-          font-weight: 800;
-          margin-bottom: 1rem;
-          color: ${isDarkMode ? '#FFD700' : '#FF6B35'};
-        }
-
-        .mobile-share-description {
-          font-size: 1rem;
-          margin-bottom: 1.5rem;
-          color: ${isDarkMode ? '#A0AEC0' : '#4A5568'};
-        }
-
-        .mobile-share-textarea {
-          width: 100%;
-          padding: 1rem;
-          border: 2px solid ${isDarkMode ? '#4A5568' : '#E2E8F0'};
-          border-radius: 10px;
-          font-family: 'Outfit', sans-serif;
-          font-size: 0.9rem;
-          resize: none;
-          height: 6rem;
-          margin-bottom: 1.5rem;
-          background: ${isDarkMode ? '#1A202C' : '#F7FAFC'};
-          color: ${isDarkMode ? '#FFFFFF' : '#2D3748'};
-          box-sizing: border-box;
-        }
-
-        .mobile-share-buttons {
-          display: flex;
-          gap: 1rem;
-          justify-content: center;
-        }
-
-        .mobile-copy-button {
-          background: linear-gradient(135deg, #3B82F6, #1D4ED8);
-          color: white;
-        }
-
-        .mobile-back-button {
-          background: ${isDarkMode ? '#4A5568' : '#E2E8F0'};
-          color: ${isDarkMode ? '#FFFFFF' : '#2D3748'};
-        }
-      `}</style>
-
+    <div style={mobileStyles.container}>
       {/* Header */}
-      <div className="mobile-header">
-        <div className="mobile-title">DRAFT DUEL</div>
+      <div style={mobileStyles.header}>
+        <div style={mobileStyles.title}>DRAFT DUEL</div>
         <button 
-          className="mobile-theme-toggle"
+          style={mobileStyles.themeToggle}
           onClick={toggleDarkMode}
-          aria-label="Toggle theme"
         >
           {isDarkMode ? '☀️' : '🌙'}
         </button>
       </div>
 
       {/* Scoreboard */}
-      <div className="mobile-scoreboard">
-        <div className="mobile-score-item">
-          <div className="mobile-score-label">Streak</div>
-          <div className="mobile-score-value">{currentStreak}</div>
+      <div style={mobileStyles.scoreboard}>
+        <div style={mobileStyles.scoreItem}>
+          <div style={mobileStyles.scoreLabel}>Streak</div>
+          <div style={mobileStyles.scoreValue}>{currentStreak}</div>
         </div>
-        <div className="mobile-score-item">
-          <div className="mobile-score-label">Timer</div>
-          <div className="mobile-timer-value">{shotClockTime}</div>
+        <div style={mobileStyles.scoreItem}>
+          <div style={mobileStyles.scoreLabel}>Timer</div>
+          <div style={mobileStyles.scoreValue}>{shotClockTime}</div>
         </div>
-        <div className="mobile-score-item">
-          <div className="mobile-score-label">Best</div>
-          <div className="mobile-score-value">{highScore}</div>
+        <div style={mobileStyles.scoreItem}>
+          <div style={mobileStyles.scoreLabel}>Best</div>
+          <div style={mobileStyles.scoreValue}>{highScore}</div>
         </div>
       </div>
 
       {/* Question */}
-      <div className="mobile-question">
-        <div className="mobile-question-text">
+      <div style={mobileStyles.question}>
+        <div style={mobileStyles.questionText}>
           {currentQuestion ? currentQuestion.text : "Loading question..."}
         </div>
       </div>
 
-      {/* Players Container */}
-      <div className="mobile-players-container">
+      {/* Players */}
+      <div style={mobileStyles.playersContainer}>
         {player1 && (
-          <PlayerCard
-            player={player1}
-            onClick={handleGuess}
-            isSelected={selectedPlayerId === player1.id}
-            isCorrect={selectedPlayerId !== null ? (currentQuestion?.getCorrectPlayerId(player1, player2) === player1.id) : null}
-            showPick={selectedPlayerId !== null}
-            disabled={selectedPlayerId !== null || gameOver}
-            isDarkMode={isDarkMode}
-          />
+          <div style={mobileStyles.playerWrapper}>
+            <button
+              style={{
+                ...mobileStyles.playerCard,
+                backgroundColor: TEAM_COLORS[player1.preDraftTeam] || TEAM_COLORS.DEFAULT,
+                color: getContrastTextColor(TEAM_COLORS[player1.preDraftTeam] || TEAM_COLORS.DEFAULT),
+                borderColor: selectedPlayerId === player1.id ? '#3B82F6' : 
+                           (selectedPlayerId !== null && currentQuestion?.getCorrectPlayerId(player1, player2) === player1.id) ? '#10B981' :
+                           (selectedPlayerId !== null && currentQuestion?.getCorrectPlayerId(player1, player2) !== player1.id) ? '#EF4444' :
+                           'rgba(255, 255, 255, 0.2)'
+              }}
+              onClick={() => handleGuess(player1.id)}
+              disabled={selectedPlayerId !== null || gameOver}
+            >
+              <img
+                style={mobileStyles.playerImage}
+                src={player1.imageUrl}
+                alt={player1.name}
+                onError={(e) => { 
+                  e.target.onerror = null; 
+                  e.target.src = `https://placehold.co/120x150/666666/FFFFFF?text=${player1.name.split(' ').map(n => n[0]).join('')}`; 
+                }}
+              />
+              <h3 style={mobileStyles.playerName}>{player1.name}</h3>
+              <p style={mobileStyles.playerTeam}>{player1.preDraftTeam}</p>
+              <div style={mobileStyles.playerStats}>
+                <span style={mobileStyles.statBadge}>{player1.position}</span>
+                <span style={mobileStyles.statBadge}>{Math.floor(player1.height/12)}'{player1.height%12}"</span>
+              </div>
+            </button>
+
+            {selectedPlayerId !== null && (
+              <div style={mobileStyles.revealSection}>
+                <p style={mobileStyles.pickNumber}>Pick #{player1.draftPick}</p>
+                <p style={mobileStyles.nbaTeam}>{player1.team}</p>
+                <p style={mobileStyles.summerLeague}>{player1.summerLeague}</p>
+              </div>
+            )}
+          </div>
         )}
-        
-        <div className="mobile-vs-divider">VS</div>
-        
+
+        <div style={mobileStyles.vsText}>VS</div>
+
         {player2 && (
-          <PlayerCard
-            player={player2}
-            onClick={handleGuess}
-            isSelected={selectedPlayerId === player2.id}
-            isCorrect={selectedPlayerId !== null ? (currentQuestion?.getCorrectPlayerId(player1, player2) === player2.id) : null}
-            showPick={selectedPlayerId !== null}
-            disabled={selectedPlayerId !== null || gameOver}
-            isDarkMode={isDarkMode}
-          />
+          <div style={mobileStyles.playerWrapper}>
+            <button
+              style={{
+                ...mobileStyles.playerCard,
+                backgroundColor: TEAM_COLORS[player2.preDraftTeam] || TEAM_COLORS.DEFAULT,
+                borderColor: selectedPlayerId === player2.id ? '#3B82F6' : 
+                           (selectedPlayerId !== null && currentQuestion?.getCorrectPlayerId(player1, player2) === player2.id) ? '#10B981' :
+                           (selectedPlayerId !== null && currentQuestion?.getCorrectPlayerId(player1, player2) !== player2.id) ? '#EF4444' :
+                           'rgba(255, 255, 255, 0.2)'
+              }}
+              onClick={() => handleGuess(player2.id)}
+              disabled={selectedPlayerId !== null || gameOver}
+            >
+              <img
+                style={mobileStyles.playerImage}
+                src={player2.imageUrl}
+                alt={player2.name}
+                onError={(e) => { 
+                  e.target.onerror = null; 
+                  e.target.src = `https://placehold.co/120x150/666666/FFFFFF?text=${player2.name.split(' ').map(n => n[0]).join('')}`; 
+                }}
+              />
+              <h3 style={mobileStyles.playerName}>{player2.name}</h3>
+              <p style={mobileStyles.playerTeam}>{player2.preDraftTeam}</p>
+              <div style={mobileStyles.playerStats}>
+                <span style={mobileStyles.statBadge}>{player2.position}</span>
+                <span style={mobileStyles.statBadge}>{Math.floor(player2.height/12)}'{player2.height%12}"</span>
+              </div>
+            </button>
+
+            {selectedPlayerId !== null && (
+              <div style={mobileStyles.revealSection}>
+                <p style={mobileStyles.pickNumber}>Pick #{player2.draftPick}</p>
+                <p style={mobileStyles.nbaTeam}>{player2.team}</p>
+                <p style={mobileStyles.summerLeague}>{player2.summerLeague}</p>
+              </div>
+            )}
+          </div>
         )}
       </div>
 
-      {/* Feedback Overlay */}
+      {/* Feedback */}
       {feedbackMessage && (
-        <div className="mobile-feedback-overlay">
-          <div className={`mobile-feedback-message ${
-            isCorrectGuess === true ? 'correct' : 
-            isCorrectGuess === false ? 'incorrect' : 'timeout'
-          }`}>
+        <div style={mobileStyles.feedbackOverlay}>
+          <div style={mobileStyles.feedbackMessage}>
             {feedbackMessage}
           </div>
         </div>
@@ -497,17 +641,35 @@ const DraftDuelMain = () => {
 
       {/* Action Buttons */}
       {selectedPlayerId !== null && (
-        <div className="mobile-actions">
+        <div style={mobileStyles.actions}>
           {!gameOver ? (
-            <button onClick={handleContinue} className="mobile-action-button mobile-continue-button">
+            <button 
+              style={{
+                ...mobileStyles.actionButton,
+                background: 'linear-gradient(135deg, #3B82F6, #1D4ED8)'
+              }}
+              onClick={handleContinue}
+            >
               Continue
             </button>
           ) : (
             <>
-              <button onClick={handleContinue} className="mobile-action-button mobile-play-again-button">
+              <button 
+                style={{
+                  ...mobileStyles.actionButton,
+                  background: 'linear-gradient(135deg, #10B981, #059669)'
+                }}
+                onClick={handleContinue}
+              >
                 Play Again
               </button>
-              <button onClick={shareStreak} className="mobile-action-button mobile-share-button">
+              <button 
+                style={{
+                  ...mobileStyles.actionButton,
+                  background: 'linear-gradient(135deg, #8B5CF6, #7C3AED)'
+                }}
+                onClick={shareStreak}
+              >
                 Share
               </button>
             </>
@@ -517,21 +679,86 @@ const DraftDuelMain = () => {
 
       {/* Share Modal */}
       {showShareModal && (
-        <div className="mobile-share-overlay">
-          <div className="mobile-share-modal">
-            <h2 className="mobile-share-title">🏀 Share Your Streak!</h2>
-            <p className="mobile-share-description">Show everyone your Draft knowledge!</p>
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          background: 'rgba(0, 0, 0, 0.8)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 1000,
+          padding: '1rem'
+        }}>
+          <div style={{
+            background: isDarkMode ? '#2D3748' : '#FFFFFF',
+            color: isDarkMode ? '#FFFFFF' : '#2D3748',
+            padding: '2rem',
+            borderRadius: '20px',
+            width: '100%',
+            maxWidth: '350px',
+            maxHeight: '90vh',
+            overflowY: 'auto',
+            textAlign: 'center'
+          }}>
+            <h2 style={{
+              fontSize: '1.5rem',
+              fontWeight: '800',
+              marginBottom: '1rem',
+              color: isDarkMode ? '#FFD700' : '#FF6B35'
+            }}>
+              🏀 Share Your Streak!
+            </h2>
+            <p style={{
+              fontSize: '1rem',
+              marginBottom: '1.5rem',
+              color: isDarkMode ? '#A0AEC0' : '#4A5568'
+            }}>
+              Show everyone your Draft knowledge!
+            </p>
             <textarea
               ref={shareTextRef}
-              className="mobile-share-textarea"
+              style={{
+                width: '100%',
+                padding: '1rem',
+                border: `2px solid ${isDarkMode ? '#4A5568' : '#E2E8F0'}`,
+                borderRadius: '10px',
+                fontFamily: "'Outfit', sans-serif",
+                fontSize: '0.9rem',
+                resize: 'none',
+                height: '6rem',
+                marginBottom: '1.5rem',
+                background: isDarkMode ? '#1A202C' : '#F7FAFC',
+                color: isDarkMode ? '#FFFFFF' : '#2D3748',
+                boxSizing: 'border-box'
+              }}
               readOnly
               value={`🏀 Just scored ${currentStreak} in a row on Draft Duel! Think you know the 2025 NBA Draft better? Play at hooprapp.com! #DraftDuel #NBADraft2025 #SummerLeague`}
             />
-            <div className="mobile-share-buttons">
-              <button onClick={handleCopyShareText} className="mobile-action-button mobile-copy-button">
+            <div style={{
+              display: 'flex',
+              gap: '1rem',
+              justifyContent: 'center'
+            }}>
+              <button 
+                style={{
+                  ...mobileStyles.actionButton,
+                  background: 'linear-gradient(135deg, #3B82F6, #1D4ED8)'
+                }}
+                onClick={handleCopyShareText}
+              >
                 Copy
               </button>
-              <button onClick={handleCloseShareModal} className="mobile-action-button mobile-back-button">
+              <button 
+                style={{
+                  ...mobileStyles.actionButton,
+                  background: isDarkMode ? '#4A5568' : '#E2E8F0',
+                  color: isDarkMode ? '#FFFFFF' : '#2D3748'
+                }}
+                onClick={handleCloseShareModal}
+              >
                 Back
               </button>
             </div>
@@ -542,320 +769,4 @@ const DraftDuelMain = () => {
   );
 };
 
-export default DraftDuelMain; 800;
-          background: linear-gradient(45deg, #FFD700, #FF8C00, #FF4500);
-          -webkit-background-clip: text;
-          -webkit-text-fill-color: transparent;
-          background-clip: text;
-          filter: drop-shadow(0 0 8px rgba(255, 165, 0, 0.6));
-          flex: 1;
-          text-align: center;
-        }
-
-        .mobile-theme-toggle {
-          background: rgba(255, 255, 255, 0.1);
-          border: none;
-          border-radius: 50%;
-          width: 2.5rem;
-          height: 2.5rem;
-          font-size: 1.2rem;
-          cursor: pointer;
-          backdrop-filter: blur(10px);
-          transition: all 0.3s ease;
-          color: ${isDarkMode ? '#FFD700' : '#FF6B35'};
-          touch-action: manipulation;
-        }
-
-        .mobile-theme-toggle:active {
-          transform: scale(0.95);
-        }
-
-        /* Compact scoreboard */
-        .mobile-scoreboard {
-          display: flex;
-          justify-content: space-around;
-          background: rgba(0, 0, 0, 0.8);
-          margin: 0 1rem;
-          padding: 0.75rem;
-          border-radius: 15px;
-          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-        }
-
-        .mobile-score-item {
-          text-align: center;
-          flex: 1;
-        }
-
-        .mobile-score-label {
-          font-size: 0.75rem;
-          color: #FFD700;
-          font-weight: 600;
-          text-transform: uppercase;
-          margin-bottom: 0.25rem;
-          letter-spacing: 0.5px;
-        }
-
-        .mobile-score-value {
-          font-family: 'Orbitron', monospace;
-          font-size: 1.5rem;
-          font-weight: 900;
-          color: #FF8C00;
-          text-shadow: 0 0 10px rgba(255, 140, 0, 0.8);
-        }
-
-        .mobile-timer-value {
-          font-family: 'Orbitron', monospace;
-          font-size: 1.5rem;
-          font-weight: 900;
-          color: ${shotClockTime <= 3 ? '#FF3333' : '#00FF41'};
-          text-shadow: 0 0 10px rgba(${shotClockTime <= 3 ? '255, 51, 51' : '0, 255, 65'}, 0.8);
-        }
-
-        /* Question section */
-        .mobile-question {
-          margin: 1rem;
-          padding: 1rem;
-          background: rgba(59, 130, 246, 0.15);
-          border-radius: 15px;
-          border: 1px solid rgba(255, 255, 255, 0.1);
-          backdrop-filter: blur(10px);
-        }
-
-        .mobile-question-text {
-          font-size: 1.2rem;
-          font-weight: 700;
-          text-align: center;
-          color: ${isDarkMode ? '#ffffff' : '#333333'};
-          margin: 0;
-          text-transform: uppercase;
-          letter-spacing: 0.5px;
-        }
-
-        /* MAIN PLAYERS SECTION - Vertical Stack */
-        .mobile-players-container {
-          flex: 1;
-          display: flex;
-          flex-direction: column;
-          padding: 1rem;
-          gap: 1rem;
-          overflow-y: auto;
-          -webkit-overflow-scrolling: touch;
-        }
-
-        .mobile-player-wrapper {
-          width: 100%;
-        }
-
-        .mobile-player-card {
-          width: 100%;
-          background: none;
-          border: 3px solid rgba(255, 255, 255, 0.2);
-          border-radius: 15px;
-          padding: 0;
-          cursor: pointer;
-          transition: all 0.3s ease;
-          box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
-          touch-action: manipulation;
-          -webkit-tap-highlight-color: transparent;
-          min-height: 120px;
-        }
-
-        .mobile-player-card:active {
-          transform: scale(0.98);
-        }
-
-        .mobile-player-card.selected {
-          border-color: #3B82F6;
-          box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.4), 0 8px 20px rgba(0, 0, 0, 0.3);
-        }
-
-        .mobile-player-card.correct {
-          border-color: #10B981;
-          box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.5), 0 8px 20px rgba(0, 0, 0, 0.3);
-        }
-
-        .mobile-player-card.incorrect {
-          border-color: #EF4444;
-          box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.5), 0 8px 20px rgba(0, 0, 0, 0.3);
-        }
-
-        .mobile-player-card.disabled {
-          opacity: 0.7;
-          cursor: not-allowed;
-        }
-
-        .mobile-player-content {
-          display: flex;
-          align-items: center;
-          gap: 1rem;
-          padding: 1rem;
-          width: 100%;
-          height: 100%;
-        }
-
-        .mobile-player-image {
-          width: 80px;
-          height: 100px;
-          border-radius: 50%;
-          object-fit: cover;
-          border: 2px solid rgba(255, 255, 255, 0.3);
-          flex-shrink: 0;
-        }
-
-        .mobile-player-info {
-          flex: 1;
-          text-align: left;
-        }
-
-        .mobile-player-name {
-          font-size: 1.3rem;
-          font-weight: 800;
-          margin: 0 0 0.25rem 0;
-          text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
-          line-height: 1.2;
-        }
-
-        .mobile-player-team {
-          font-size: 1rem;
-          margin: 0 0 0.5rem 0;
-          opacity: 0.9;
-        }
-
-        .mobile-player-stats {
-          display: flex;
-          gap: 0.5rem;
-          flex-wrap: wrap;
-        }
-
-        .mobile-stat-badge {
-          padding: 0.2rem 0.5rem;
-          border-radius: 8px;
-          font-size: 0.75rem;
-          font-weight: 600;
-          text-transform: uppercase;
-        }
-
-        .mobile-stat-badge.position {
-          background: rgba(255, 165, 0, 0.2);
-          color: #FFD700;
-          border: 1px solid rgba(255, 215, 0, 0.3);
-        }
-
-        .mobile-stat-badge.height {
-          background: rgba(59, 130, 246, 0.2);
-          color: #60A5FA;
-          border: 1px solid rgba(96, 165, 250, 0.3);
-        }
-
-        /* VS divider */
-        .mobile-vs-divider {
-          font-size: 2.5rem;
-          font-weight: 800;
-          color: #FFD700;
-          text-align: center;
-          margin: 0.5rem 0;
-          text-shadow: 0 0 10px rgba(255, 215, 0, 0.8);
-        }
-
-        /* Reveal section */
-        .mobile-reveal-section {
-          margin-top: 1rem;
-          padding: 0.75rem;
-          background: rgba(0, 0, 0, 0.8);
-          border-radius: 10px;
-          text-align: center;
-          animation: mobileSlideUp 0.3s ease-out;
-        }
-
-        .mobile-pick-number {
-          font-size: 1.2rem;
-          font-weight: 700;
-          color: #FBBF24;
-          margin-bottom: 0.25rem;
-        }
-
-        .mobile-nba-team {
-          font-size: 1rem;
-          font-weight: 600;
-          color: #60A5FA;
-          margin-bottom: 0.25rem;
-        }
-
-        .mobile-summer-league {
-          font-size: 0.9rem;
-          color: #FBD38D;
-          font-style: italic;
-        }
-
-        @keyframes mobileSlideUp {
-          from { opacity: 0; transform: translateY(20px); }
-          to { opacity: 1; transform: translateY(0); }
-        }
-
-        /* Feedback section - overlay style */
-        .mobile-feedback-overlay {
-          position: fixed;
-          top: 50%;
-          left: 50%;
-          transform: translate(-50%, -50%);
-          z-index: 200;
-          pointer-events: none;
-        }
-
-        .mobile-feedback-message {
-          padding: 1rem 2rem;
-          border-radius: 25px;
-          font-size: 1.2rem;
-          font-weight: 700;
-          text-align: center;
-          box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
-          animation: mobileBounceIn 0.5s ease-out;
-          max-width: 80vw;
-        }
-
-        .mobile-feedback-message.correct {
-          background: #10B981;
-          color: white;
-        }
-
-        .mobile-feedback-message.incorrect {
-          background: #EF4444;
-          color: white;
-        }
-
-        .mobile-feedback-message.timeout {
-          background: #3B82F6;
-          color: white;
-        }
-
-        @keyframes mobileBounceIn {
-          0% { opacity: 0; transform: scale(0.3); }
-          50% { opacity: 1; transform: scale(1.1); }
-          100% { opacity: 1; transform: scale(1); }
-        }
-
-        /* Bottom action buttons */
-        .mobile-actions {
-          position: fixed;
-          bottom: 0;
-          left: 0;
-          right: 0;
-          background: ${isDarkMode ? 'rgba(0, 0, 0, 0.95)' : 'rgba(255, 255, 255, 0.95)'};
-          backdrop-filter: blur(10px);
-          padding: 1rem;
-          display: flex;
-          gap: 0.75rem;
-          justify-content: center;
-          z-index: 150;
-          padding-bottom: calc(1rem + env(safe-area-inset-bottom));
-          border-top: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .mobile-action-button {
-          flex: 1;
-          max-width: 150px;
-          height: 50px;
-          border: none;
-          border-radius: 25px;
-          font-size: 1rem;
-          font-weight:
+export default DraftDuelMain;
