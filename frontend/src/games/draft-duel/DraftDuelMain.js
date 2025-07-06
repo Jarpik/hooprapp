@@ -422,7 +422,10 @@ const DraftDuelMain = () => {
             left: 0;
             width: 100vw;
             height: 100vh;
-            background: ${isDarkMode ? 'linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%)' : 'linear-gradient(135deg, #f8f9fa 0%, #e9ecef 50%, #dee2e6 100%)'};
+            background: ${isDarkMode ? '#1A202C' : '#F8F8F0'};
+            background-image: url("data:image/svg+xml;utf8,${encodedBasketballPattern}");
+            background-repeat: repeat;
+            background-size: 200px 200px;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -641,13 +644,13 @@ const DraftDuelMain = () => {
               <ul>
                 <li>Compare two NBA rookies and answer questions about them</li>
                 <li>You have 10 seconds per question - make it count!</li>
-                <li>One wrong answer or timeout ends the game</li>
+                <li>A wrong answer or running out of time ends the game</li>
                 <li>Game gets progressively harder as you build your streak:</li>
                 <div className="difficulty-tiers">
                   <ul>
-                    <li><strong>Easy Mode (0-9 points):</strong> Draft position, age, and position questions</li>
-                    <li><strong>Hard Mode (10-19 points):</strong> All questions including height comparisons</li>
-                    <li><strong>Expert Mode (20+ points):</strong> Maximum difficulty - prove your NBA knowledge!</li>
+                    <li><strong>Easy Mode:</strong> 0-9 points</li>
+                    <li><strong>Hard Mode:</strong> 10-19 points</li>
+                    <li><strong>Expert Mode:</strong> 20+ points</li>
                   </ul>
                 </div>
               </ul>
