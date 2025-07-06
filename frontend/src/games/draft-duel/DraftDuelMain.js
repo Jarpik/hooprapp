@@ -394,7 +394,7 @@ const DraftDuelMain = () => {
           transform: scale(1.1);
         }
 
-        /* FIXED SCOREBOARD */
+        /* FIXED SCOREBOARD - Real Basketball Style */
         .scoreboard {
           background: linear-gradient(145deg, #000000, #1a1a1a);
           border: 6px solid #333;
@@ -402,9 +402,9 @@ const DraftDuelMain = () => {
           display: flex;
           width: 95%;
           max-width: 900px;
-          height: 120px;
-          min-height: 120px;
-          max-height: 120px;
+          height: 140px;
+          min-height: 140px;
+          max-height: 140px;
           box-shadow: 
             inset 0 0 30px rgba(0,0,0,0.8), 
             0 10px 30px rgba(0,0,0,0.6),
@@ -413,7 +413,7 @@ const DraftDuelMain = () => {
           color: #FF8C00;
           text-shadow: 0 0 15px rgba(255, 140, 0, 0.9);
           position: relative;
-          padding: 8px;
+          padding: 12px;
           margin: 0 auto 1rem;
           flex-shrink: 0;
           overflow: hidden;
@@ -450,33 +450,35 @@ const DraftDuelMain = () => {
           flex-direction: column;
           align-items: center;
           justify-content: space-between;
-          padding: 8px;
-          margin: 0 6px;
+          padding: 12px 8px;
+          margin: 0 8px;
           position: relative;
-          height: calc(100% - 16px);
-          min-height: 96px;
-          max-height: 96px;
+          height: calc(100% - 24px);
+          min-height: 104px;
+          max-height: 104px;
           flex-shrink: 0;
           overflow: hidden;
         }
 
         .scoreboard-label {
           font-family: 'Outfit', sans-serif;
-          font-size: 1rem;
+          font-size: 0.85rem;
           font-weight: 700;
           color: #FFD700;
-          margin-bottom: 8px;
           text-transform: uppercase;
           letter-spacing: 1px;
           text-shadow: 0 0 10px rgba(255, 215, 0, 0.8);
           height: 20px;
           line-height: 20px;
           flex-shrink: 0;
+          margin-bottom: 8px;
+          text-align: center;
+          white-space: nowrap;
         }
 
         .scoreboard-value {
           font-family: 'Orbitron', monospace;
-          font-size: 3.5rem;
+          font-size: 3rem;
           font-weight: 900;
           line-height: 1;
           color: #FF8C00;
@@ -484,18 +486,18 @@ const DraftDuelMain = () => {
             0 0 20px rgba(255, 140, 0, 1),
             0 0 40px rgba(255, 140, 0, 0.6),
             0 0 60px rgba(255, 140, 0, 0.3);
-          height: 50px;
           display: flex;
           align-items: center;
           justify-content: center;
-          padding-bottom: 8px;
           filter: brightness(1.2);
-          flex-shrink: 0;
+          flex: 1;
+          min-height: 60px;
+          text-align: center;
         }
 
         .scoreboard-timer {
           font-family: 'Orbitron', monospace;
-          font-size: 3.5rem;
+          font-size: 3rem;
           font-weight: 900;
           line-height: 1;
           color: #FF0000;
@@ -503,14 +505,13 @@ const DraftDuelMain = () => {
             0 0 20px rgba(255, 0, 0, 1),
             0 0 40px rgba(255, 0, 0, 0.6),
             0 0 60px rgba(255, 0, 0, 0.3);
-          height: 50px;
           display: flex;
           align-items: center;
           justify-content: center;
-          width: 100%;
-          padding-bottom: 8px;
           filter: brightness(1.2);
-          flex-shrink: 0;
+          flex: 1;
+          min-height: 60px;
+          text-align: center;
         }
 
         .scoreboard-timer.warning {
@@ -944,7 +945,7 @@ const DraftDuelMain = () => {
           background: ${isDarkMode ? '#2D3748' : '#CBD5E0'};
         }
 
-        /* CRITICAL MOBILE RESPONSIVE FIXES */
+        /* MOBILE RESPONSIVE SCOREBOARD FIXES */
         @media (max-width: 768px) {
           .game-title {
             font-size: 3rem;
@@ -954,23 +955,32 @@ const DraftDuelMain = () => {
           .scoreboard {
             width: 98%;
             margin: 0 auto 0.5rem;
-            padding: 6px;
-            height: 100px;
-            min-height: 100px;
-            max-height: 100px;
+            padding: 8px;
+            height: 120px;
+            min-height: 120px;
+            max-height: 120px;
           }
           
           .scoreboard-box {
-            padding: 6px;
+            padding: 8px 4px;
             margin: 0 4px;
-            height: calc(100% - 12px);
-            min-height: 76px;
-            max-height: 76px;
+            height: calc(100% - 16px);
+            min-height: 88px;
+            max-height: 88px;
+          }
+          
+          .scoreboard-label {
+            font-size: 0.7rem;
+            height: 16px;
+            line-height: 16px;
+            margin-bottom: 6px;
+            letter-spacing: 0.5px;
           }
           
           .scoreboard-value, .scoreboard-timer {
-            font-size: 2.5rem;
-            height: 40px;
+            font-size: 2.2rem;
+            min-height: 50px;
+            flex: 1;
           }
           
           .question-section {
@@ -1038,6 +1048,32 @@ const DraftDuelMain = () => {
             font-size: 2.5rem;
           }
           
+          .scoreboard {
+            height: 100px;
+            min-height: 100px;
+            max-height: 100px;
+            padding: 6px;
+          }
+          
+          .scoreboard-box {
+            padding: 6px 2px;
+            height: calc(100% - 12px);
+            min-height: 76px;
+            max-height: 76px;
+          }
+          
+          .scoreboard-label {
+            font-size: 0.6rem;
+            height: 14px;
+            line-height: 14px;
+            margin-bottom: 4px;
+          }
+          
+          .scoreboard-value, .scoreboard-timer {
+            font-size: 1.8rem;
+            min-height: 40px;
+          }
+          
           .question-text {
             font-size: 1.2rem;
           }
@@ -1055,11 +1091,6 @@ const DraftDuelMain = () => {
           .vs-text {
             font-size: 2.5rem !important;
             margin: 0 0.5rem !important;
-          }
-          
-          .scoreboard-value, .scoreboard-timer {
-            font-size: 2rem;
-            height: 35px;
           }
         }
       `}</style>
