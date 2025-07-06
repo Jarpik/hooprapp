@@ -394,26 +394,25 @@ const DraftDuelMain = () => {
           transform: scale(1.1);
         }
 
-        /* FIXED SCOREBOARD - Real Basketball Style */
+        /* REDESIGNED BASKETBALL SCOREBOARD - LED Style */
         .scoreboard {
-          background: linear-gradient(145deg, #000000, #1a1a1a);
-          border: 6px solid #333;
-          border-radius: 20px;
+          background: linear-gradient(145deg, #2a2a2a, #1a1a1a);
+          border: 8px solid #444;
+          border-radius: 15px;
           display: flex;
+          flex-direction: column;
           width: 95%;
-          max-width: 900px;
-          height: 140px;
-          min-height: 140px;
-          max-height: 140px;
+          max-width: 600px;
+          height: 180px;
+          min-height: 180px;
+          max-height: 180px;
           box-shadow: 
-            inset 0 0 30px rgba(0,0,0,0.8), 
-            0 10px 30px rgba(0,0,0,0.6),
-            0 0 20px rgba(255, 140, 0, 0.3);
-          font-family: 'Share Tech Mono', monospace;
-          color: #FF8C00;
-          text-shadow: 0 0 15px rgba(255, 140, 0, 0.9);
+            inset 0 0 20px rgba(0,0,0,0.9), 
+            0 15px 40px rgba(0,0,0,0.7),
+            0 0 30px rgba(255, 69, 0, 0.2);
+          font-family: 'Orbitron', monospace;
           position: relative;
-          padding: 12px;
+          padding: 15px;
           margin: 0 auto 1rem;
           flex-shrink: 0;
           overflow: hidden;
@@ -422,116 +421,171 @@ const DraftDuelMain = () => {
         .scoreboard::before {
           content: '';
           position: absolute;
-          top: -3px;
-          left: -3px;
-          right: -3px;
-          bottom: -3px;
-          background: linear-gradient(45deg, #FF8C00, #FFD700, #FF4500, #FF8C00);
-          border-radius: 23px;
+          top: -4px;
+          left: -4px;
+          right: -4px;
+          bottom: -4px;
+          background: linear-gradient(45deg, #666, #333, #666);
+          border-radius: 19px;
           z-index: -1;
-          opacity: 0.3;
-          animation: borderGlow 3s ease-in-out infinite;
         }
 
-        @keyframes borderGlow {
-          0%, 100% { opacity: 0.3; }
-          50% { opacity: 0.6; }
+        /* Scoreboard Header */
+        .scoreboard-header {
+          display: flex;
+          justify-content: space-between;
+          margin-bottom: 15px;
+          height: 30px;
         }
 
-        .scoreboard-box {
-          background: linear-gradient(145deg, #0a0a0a, #000000);
-          border: 3px solid #444;
-          border-radius: 12px;
-          box-shadow: 
-            inset 0 0 15px rgba(0,0,0,0.8), 
-            0 4px 8px rgba(0,0,0,0.4);
+        .score-team-label {
+          background: linear-gradient(145deg, #333, #222);
+          color: #fff;
+          padding: 8px 20px;
+          border-radius: 8px;
+          font-size: 1rem;
+          font-weight: 700;
+          text-transform: uppercase;
+          letter-spacing: 1px;
+          border: 2px solid #555;
+          min-width: 120px;
+          text-align: center;
+          box-shadow: inset 0 0 10px rgba(0,0,0,0.5);
+        }
+
+        /* Main Score Display */
+        .scoreboard-main {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
           flex: 1;
+          gap: 20px;
+        }
+
+        .score-display {
+          background: linear-gradient(145deg, #000, #111);
+          border: 4px solid #333;
+          border-radius: 12px;
+          width: 120px;
+          height: 100px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          position: relative;
+          box-shadow: 
+            inset 0 0 20px rgba(0,0,0,0.9),
+            0 0 15px rgba(255, 140, 0, 0.3);
+        }
+
+        .score-display::before {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          background: radial-gradient(circle at center, transparent 30%, rgba(0,0,0,0.3) 70%);
+          border-radius: 8px;
+          pointer-events: none;
+        }
+
+        .score-number {
+          font-family: 'Orbitron', monospace;
+          font-size: 4rem;
+          font-weight: 900;
+          color: #FF6B00;
+          text-shadow: 
+            0 0 10px #FF6B00,
+            0 0 20px #FF6B00,
+            0 0 30px #FF8C00,
+            0 0 40px #FF8C00;
+          filter: brightness(1.2);
+          line-height: 1;
+        }
+
+        /* Center Clock Display */
+        .clock-display {
+          background: linear-gradient(145deg, #000, #111);
+          border: 4px solid #333;
+          border-radius: 12px;
+          width: 140px;
+          height: 100px;
           display: flex;
           flex-direction: column;
           align-items: center;
-          justify-content: space-between;
-          padding: 12px 8px;
-          margin: 0 8px;
+          justify-content: center;
           position: relative;
-          height: calc(100% - 24px);
-          min-height: 104px;
-          max-height: 104px;
-          flex-shrink: 0;
-          overflow: hidden;
+          box-shadow: 
+            inset 0 0 20px rgba(0,0,0,0.9),
+            0 0 15px rgba(255, 0, 0, 0.3);
         }
 
-        .scoreboard-label {
-          font-family: 'Outfit', sans-serif;
-          font-size: 0.85rem;
+        .clock-display::before {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          background: radial-gradient(circle at center, transparent 30%, rgba(0,0,0,0.3) 70%);
+          border-radius: 8px;
+          pointer-events: none;
+        }
+
+        .clock-label {
+          font-size: 0.7rem;
+          color: #FF6B00;
           font-weight: 700;
-          color: #FFD700;
           text-transform: uppercase;
           letter-spacing: 1px;
-          text-shadow: 0 0 10px rgba(255, 215, 0, 0.8);
-          height: 20px;
-          line-height: 20px;
-          flex-shrink: 0;
-          margin-bottom: 8px;
-          text-align: center;
-          white-space: nowrap;
+          margin-bottom: 5px;
+          text-shadow: 0 0 5px #FF6B00;
         }
 
-        .scoreboard-value {
+        .clock-number {
           font-family: 'Orbitron', monospace;
           font-size: 3rem;
           font-weight: 900;
-          line-height: 1;
-          color: #FF8C00;
-          text-shadow: 
-            0 0 20px rgba(255, 140, 0, 1),
-            0 0 40px rgba(255, 140, 0, 0.6),
-            0 0 60px rgba(255, 140, 0, 0.3);
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          filter: brightness(1.2);
-          flex: 1;
-          min-height: 60px;
-          text-align: center;
-        }
-
-        .scoreboard-timer {
-          font-family: 'Orbitron', monospace;
-          font-size: 3rem;
-          font-weight: 900;
-          line-height: 1;
           color: #FF0000;
           text-shadow: 
-            0 0 20px rgba(255, 0, 0, 1),
-            0 0 40px rgba(255, 0, 0, 0.6),
-            0 0 60px rgba(255, 0, 0, 0.3);
-          display: flex;
-          align-items: center;
-          justify-content: center;
+            0 0 10px #FF0000,
+            0 0 20px #FF0000,
+            0 0 30px #FF3333,
+            0 0 40px #FF3333;
           filter: brightness(1.2);
-          flex: 1;
-          min-height: 60px;
-          text-align: center;
+          line-height: 1;
         }
 
-        .scoreboard-timer.warning {
-          color: #FF3333;
-          text-shadow: 
-            0 0 25px rgba(255, 50, 50, 1),
-            0 0 50px rgba(255, 50, 50, 0.8),
-            0 0 75px rgba(255, 50, 50, 0.5);
-          animation: pulse-red 1s infinite alternate;
+        .clock-number.warning {
+          animation: clockPulse 0.5s infinite alternate;
         }
 
-        @keyframes pulse-red {
+        @keyframes clockPulse {
           from { 
             filter: brightness(1.2);
             transform: scale(1);
           }
           to { 
-            filter: brightness(1.5);
-            transform: scale(1.05);
+            filter: brightness(1.8);
+            transform: scale(1.1);
           }
+        }
+
+        /* Remove old scoreboard styles */
+        .scoreboard-box {
+          display: none;
+        }
+
+        .scoreboard-label {
+          display: none;
+        }
+
+        .scoreboard-value {
+          display: none;
+        }
+
+        .scoreboard-timer {
+          display: none;
         }
 
         /* Question Section */
@@ -697,6 +751,12 @@ const DraftDuelMain = () => {
           margin-bottom: 0.5rem;
           text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.4);
           letter-spacing: 0.5px;
+          /* Fix text overflow */
+          word-wrap: break-word;
+          overflow-wrap: break-word;
+          hyphens: auto;
+          max-width: 100%;
+          line-height: 1.2;
         }
 
         .player-team {
@@ -983,6 +1043,15 @@ const DraftDuelMain = () => {
             flex: 1;
           }
           
+          .player-name {
+            font-size: 1.3rem !important;
+            line-height: 1.1 !important;
+            max-width: 12rem !important;
+            word-wrap: break-word !important;
+            overflow-wrap: break-word !important;
+            hyphens: auto !important;
+          }
+          
           .question-section {
             width: 98%;
             margin: 0 auto 1.5rem;
@@ -1115,23 +1184,27 @@ const DraftDuelMain = () => {
       {/* Game Title */}
       <div className="game-title">DRAFT DUEL</div>
 
-      {/* Scoreboard */}
+      {/* NEW Basketball Scoreboard */}
       <div className="scoreboard">
-        <div className="scoreboard-box">
-          <div className="scoreboard-label">Streak</div>
-          <div className="scoreboard-value">{currentStreak}</div>
+        <div className="scoreboard-header">
+          <div className="score-team-label">STREAK</div>
+          <div className="score-team-label">BEST</div>
         </div>
-
-        <div className="scoreboard-box">
-          <div className="scoreboard-label">Shot Clock</div>
-          <div className={`scoreboard-timer ${shotClockTime <= 3 ? 'warning' : ''}`}>
-            {shotClockTime}
+        <div className="scoreboard-main">
+          <div className="score-display">
+            <div className="score-number">{currentStreak}</div>
           </div>
-        </div>
-
-        <div className="scoreboard-box">
-          <div className="scoreboard-label">High Score</div>
-          <div className="scoreboard-value">{highScore}</div>
+          
+          <div className="clock-display">
+            <div className="clock-label">SHOT CLOCK</div>
+            <div className={`clock-number ${shotClockTime <= 3 ? 'warning' : ''}`}>
+              {shotClockTime}
+            </div>
+          </div>
+          
+          <div className="score-display">
+            <div className="score-number">{highScore}</div>
+          </div>
         </div>
       </div>
 
