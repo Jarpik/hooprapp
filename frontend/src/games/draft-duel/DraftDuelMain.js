@@ -77,7 +77,6 @@ const PlayerCard = ({ player, onClick, isSelected, isCorrect, showPick, disabled
         <div className="reveal-section">
           <p className="pick-number">Pick #{player.draftPick}</p>
           <p className="nba-team">{player.team}</p>
-          <p className="summer-league">{player.summerLeague}</p>
         </div>
       )}
     </div>
