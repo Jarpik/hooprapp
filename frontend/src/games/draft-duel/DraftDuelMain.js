@@ -327,27 +327,6 @@ const DraftDuelMain = () => {
     },
   ];
 
-  // Dynamic home place questions for Hard Mode
-  const getHomePlaceQuestions = (p1, p2) => {
-    const questions = [];
-    
-    // Check if one player is from a specific place and the other isn't
-    if (p1.homePlace !== p2.homePlace) {
-      questions.push({
-        text: `Which player is from ${p1.homePlace}?`,
-        getCorrectPlayerId: (player1, player2) => p1.id,
-        filter: (player1, player2) => true,
-      });
-      questions.push({
-        text: `Which player is from ${p2.homePlace}?`,
-        getCorrectPlayerId: (player1, player2) => p2.id,
-        filter: (player1, player2) => true,
-      });
-    }
-    
-    return questions;
-  };
-
   const EXPERT_QUESTIONS = [
     {
       text: "Which player had MORE rebounds per game?",
@@ -391,14 +370,12 @@ const DraftDuelMain = () => {
     },
   ];
 
-  const getQuestionsForMode = (mode, p1, p2) => {
+  const getQuestionsForMode = (mode) => {
     switch (mode) {
       case 'Easy': 
         return EASY_QUESTIONS;
       case 'Hard': 
-        // Hard mode gets its own questions PLUS dynamic home place questions
-        const homePlaceQuestions = getHomePlaceQuestions(p1, p2);
-        return [...HARD_QUESTIONS, ...homePlaceQuestions];
+        return HARD_QUESTIONS;
       case 'Expert': 
         return EXPERT_QUESTIONS;
       default: 
@@ -472,7 +449,7 @@ const DraftDuelMain = () => {
 
     const mode = getDifficultyMode(currentStreak);
     setCurrentMode(mode);
-    const questions = getQuestionsForMode(mode, null, null);
+    const questions = getQuestionsForMode(mode);
 
     let p1, p2, randomQuestion;
     let attempts = 0;
@@ -481,10 +458,7 @@ const DraftDuelMain = () => {
     do {
       p1 = ROOKIES_2025_NBA[Math.floor(Math.random() * ROOKIES_2025_NBA.length)];
       p2 = ROOKIES_2025_NBA[Math.floor(Math.random() * ROOKIES_2025_NBA.length)];
-      
-      // Get questions for this specific player pair (important for home place questions)
-      const questionsForPair = getQuestionsForMode(mode, p1, p2);
-      randomQuestion = questionsForPair[Math.floor(Math.random() * questionsForPair.length)];
+      randomQuestion = questions[Math.floor(Math.random() * questions.length)];
       attempts++;
     } while ((p1.id === p2.id || (randomQuestion.filter && !randomQuestion.filter(p1, p2))) && attempts < maxAttempts);
 
@@ -1550,6 +1524,23 @@ const DraftDuelMain = () => {
             margin: 1rem 0 0.5rem 0;
           }
           
+          /* Mobile mode indicator - match theme toggle size */
+          .mode-indicator {
+            top: 1rem;
+            left: 1rem;
+            padding: 0.5rem;
+            border-radius: 50%;
+            font-size: 0.7rem;
+            width: 3rem;
+            height: 3rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            line-height: 1;
+            letter-spacing: 0;
+          }
+          
           .scoreboard {
             width: 98%;
             margin: 0 auto 0.5rem;
@@ -1656,6 +1647,14 @@ const DraftDuelMain = () => {
         @media (max-width: 480px) {
           .game-title {
             font-size: 2.5rem;
+          }
+          
+          /* Smaller mode indicator on very small screens */
+          .mode-indicator {
+            font-size: 0.6rem;
+            width: 2.5rem;
+            height: 2.5rem;
+            padding: 0.4rem;
           }
           
           .scoreboard {
