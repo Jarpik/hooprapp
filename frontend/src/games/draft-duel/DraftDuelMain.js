@@ -41,7 +41,7 @@ const ROOKIES_2025_NBA = [
   { id: 10, name: "Khaman Maluach", draftPick: 10, team: "Phoenix Suns", preDraftTeam: "Duke", imageUrl: "https://a.espncdn.com/combiner/i?img=/i/headshots/nba/players/full/5203685.png&w=350&h=254", height: 85, age: 18, position: "Center", conference: "ACC", summerLeague: "California Classic" },
 ];
 
-// Simple PlayerCard component
+// PlayerCard component
 const PlayerCard = ({ player, onClick, isSelected, isCorrect, showPick, disabled, isDarkMode }) => {
   const cardBackgroundColor = TEAM_COLORS[player.preDraftTeam] || TEAM_COLORS.DEFAULT;
   const cardTextColor = getContrastTextColor(cardBackgroundColor);
@@ -71,10 +71,6 @@ const PlayerCard = ({ player, onClick, isSelected, isCorrect, showPick, disabled
         />
         <h3 className="player-name">{player.name}</h3>
         <p className="player-team">{player.preDraftTeam}</p>
-        <div className="player-stats">
-          <span className="stat-badge">{player.position}</span>
-          <span className="stat-badge">{Math.floor(player.height/12)}'{player.height%12}"</span>
-        </div>
       </button>
 
       {showPick && (
@@ -156,6 +152,53 @@ const DraftDuelMain = () => {
     },
   ];
 
+  const basketballPatternSVG = `
+    <svg width="200" height="200" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+      <g opacity="0.055">
+        <circle cx="50" cy="50" r="45" fill="#FF8C00" stroke="#000000" stroke-width="2"/>
+        <path d="M50 5 C75 5 95 25 95 50 C95 75 75 95 50 95 C25 95 5 75 5 50 C5 25 25 5 50 5Z" fill="none" stroke="#000000" stroke-width="2"/>
+        <path d="M5 50 H95 M50 5 V95" fill="none" stroke="#000000" stroke-width="2"/>
+        <path d="M15 85 Q25 70 50 70 Q75 70 85 85" fill="none" stroke="#000000" stroke-width="2"/>
+        <path d="M15 15 Q25 30 50 30 Q75 30 85 15" fill="none" stroke="#000000" stroke-width="2"/>
+      </g>
+      <g transform="translate(100 100)" opacity="0.055">
+        <circle cx="50" cy="50" r="45" fill="#FF8C00" stroke="#000000" stroke-width="2"/>
+        <path d="M50 5 C75 5 95 25 95 50 C95 75 75 95 50 95 C25 95 5 75 5 50 C5 25 25 5 50 5Z" fill="none" stroke="#000000" stroke-width="2"/>
+        <path d="M5 50 H95 M50 5 V95" fill="none" stroke="#000000" stroke-width="2"/>
+        <path d="M15 85 Q25 70 50 70 Q75 70 85 85" fill="none" stroke="#000000" stroke-width="2"/>
+        <path d="M15 15 Q25 30 50 30 Q75 30 85 15" fill="none" stroke="#000000" stroke-width="2"/>
+      </g>
+    </svg>
+  `;
+
+  const basketballCourtSVG = `
+    <svg width="100%" height="100%" viewBox="0 0 1000 500" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg">
+      <rect x="0" y="0" width="1000" height="500" fill="${isDarkMode ? '#332211' : '#F0D8B6'}" fill-opacity="0.25" rx="10" ry="10"/>
+      <rect x="0" y="0" width="1000" height="500" fill="none" stroke="${isDarkMode ? '#D4AF37' : '#8B4513'}" stroke-width="6" stroke-opacity="0.45" rx="10" ry="10"/>
+      <line x1="500" y1="0" x2="500" y2="500" stroke="${isDarkMode ? '#D4AF37' : '#8B4513'}" stroke-width="6" stroke-opacity="0.45"/>
+      <circle cx="500" cy="250" r="60" fill="none" stroke="${isDarkMode ? '#D4AF37' : '#8B4513'}" stroke-width="6" stroke-opacity="0.45"/>
+      <circle cx="500" cy="250" r="10" fill="${isDarkMode ? '#D4AF37' : '#8B4513'}" fill-opacity="0.45"/>
+      <path d="M 100 50 L 100 450 L 400 450 L 400 50 Z" fill="none" stroke="${isDarkMode ? '#D4AF37' : '#8B4513'}" stroke-width="6" stroke-opacity="0.45"/>
+      <path d="M 100 50 A 237.5 237.5 0 0 1 100 450" fill="none" stroke="${isDarkMode ? '#D4AF37' : '#8B4513'}" stroke-width="6" stroke-opacity="0.45"/>
+      <rect x="0" y="150" width="190" height="200" fill="none" stroke="${isDarkMode ? '#D4AF37' : '#8B4513'}" stroke-width="6" stroke-opacity="0.45"/>
+      <circle cx="190" cy="250" r="60" fill="none" stroke="${isDarkMode ? '#D4AF37' : '#8B4513'}" stroke-width="6" stroke-opacity="0.45"/>
+      <line x1="190" y1="150" x2="190" y2="350" stroke="${isDarkMode ? '#D4AF37' : '#8B4513'}" stroke-width="6" stroke-opacity="0.45"/>
+      <circle cx="60" cy="250" r="7.5" fill="${isDarkMode ? '#D4AF37' : '#8B4513'}" fill-opacity="0.45"/>
+      <line x1="60" y1="230" x2="60" y2="270" stroke="${isDarkMode ? '#D4AF37' : '#8B4513'}" stroke-width="3" stroke-opacity="0.45"/>
+      <line x1="40" y1="250" x2="80" y2="250" stroke="${isDarkMode ? '#D4AF37' : '#8B4513'}" stroke-width="3" stroke-opacity="0.45"/>
+      <path d="M 900 50 L 900 450 L 600 450 L 600 50 Z" fill="none" stroke="${isDarkMode ? '#D4AF37' : '#8B4513'}" stroke-width="6" stroke-opacity="0.45"/>
+      <path d="M 900 50 A 237.5 237.5 0 0 0 900 450" fill="none" stroke="${isDarkMode ? '#D4AF37' : '#8B4513'}" stroke-width="6" stroke-opacity="0.45"/>
+      <rect x="810" y="150" width="190" height="200" fill="none" stroke="${isDarkMode ? '#D4AF37' : '#8B4513'}" stroke-width="6" stroke-opacity="0.45"/>
+      <circle cx="810" cy="250" r="60" fill="none" stroke="${isDarkMode ? '#D4AF37' : '#8B4513'}" stroke-width="6" stroke-opacity="0.45"/>
+      <line x1="810" y1="150" x2="810" y2="350" stroke="${isDarkMode ? '#D4AF37' : '#8B4513'}" stroke-width="6" stroke-opacity="0.45"/>
+      <circle cx="940" cy="250" r="7.5" fill="${isDarkMode ? '#D4AF37' : '#8B4513'}" fill-opacity="0.45"/>
+      <line x1="940" y1="230" x2="940" y2="270" stroke="${isDarkMode ? '#D4AF37' : '#8B4513'}" stroke-width="3" stroke-opacity="0.45"/>
+      <line x1="920" y1="250" x2="960" y2="250" stroke="${isDarkMode ? '#D4AF37' : '#8B4513'}" stroke-width="3" stroke-opacity="0.45"/>
+    </svg>
+  `;
+
+  const encodedBasketballPattern = encodeURIComponent(basketballPatternSVG).replace(/'/g, '%27').replace(/"/g, '%22');
+
   // Game logic functions
   const handleTimeOut = useCallback(() => {
     setIsCorrectGuess(false);
@@ -232,10 +275,10 @@ const DraftDuelMain = () => {
     if (isGuessCorrect) {
       setIsCorrectGuess(true);
       setCurrentStreak(prev => prev + 1);
-      setFeedbackMessage('Correct! 🔥');
+      setFeedbackMessage('Correct!');
     } else {
       setIsCorrectGuess(false);
-      setFeedbackMessage('Incorrect! 😤');
+      setFeedbackMessage('Incorrect!');
       setGameOver(true);
       if (currentStreak > highScore) {
         setHighScore(currentStreak);
@@ -277,488 +320,883 @@ const DraftDuelMain = () => {
     setIsDarkMode(prevMode => !prevMode);
   };
 
-  // Inline styles for mobile
-  const mobileStyles = {
-    container: {
-      position: 'fixed',
-      top: 0,
-      left: 0,
-      width: '100vw',
-      height: '100vh',
-      background: isDarkMode ? 'linear-gradient(135deg, #1a1a2e 0%, #16213e 100%)' : 'linear-gradient(135deg, #f8f9fa 0%, #dee2e6 100%)',
-      fontFamily: "'Outfit', sans-serif",
-      color: isDarkMode ? '#ffffff' : '#333333',
-      display: 'flex',
-      flexDirection: 'column',
-      overflow: 'hidden',
-      WebkitTextSizeAdjust: '100%',
-      userSelect: 'none'
-    },
-    header: {
-      display: 'flex',
-      justifyContent: 'space-between',
-      alignItems: 'center',
-      padding: '1rem',
-      paddingTop: 'calc(1rem + env(safe-area-inset-top))'
-    },
-    title: {
-      fontSize: '2rem',
-      fontWeight: '800',
-      background: 'linear-gradient(45deg, #FFD700, #FF8C00, #FF4500)',
-      WebkitBackgroundClip: 'text',
-      WebkitTextFillColor: 'transparent',
-      backgroundClip: 'text',
-      textAlign: 'center',
-      flex: 1
-    },
-    themeToggle: {
-      background: 'rgba(255, 255, 255, 0.1)',
-      border: 'none',
-      borderRadius: '50%',
-      width: '2.5rem',
-      height: '2.5rem',
-      fontSize: '1.2rem',
-      cursor: 'pointer',
-      color: isDarkMode ? '#FFD700' : '#FF6B35'
-    },
-    scoreboard: {
-      display: 'flex',
-      justifyContent: 'space-around',
-      background: 'rgba(0, 0, 0, 0.8)',
-      margin: '0 1rem 1rem',
-      padding: '0.75rem',
-      borderRadius: '15px',
-      boxShadow: '0 4px 12px rgba(0, 0, 0, 0.3)'
-    },
-    scoreItem: {
-      textAlign: 'center',
-      flex: 1
-    },
-    scoreLabel: {
-      fontSize: '0.75rem',
-      color: '#FFD700',
-      fontWeight: '600',
-      textTransform: 'uppercase',
-      marginBottom: '0.25rem'
-    },
-    scoreValue: {
-      fontSize: '1.5rem',
-      fontWeight: '900',
-      color: shotClockTime <= 3 ? '#FF3333' : '#FF8C00',
-      textShadow: '0 0 10px rgba(255, 140, 0, 0.8)'
-    },
-    question: {
-      margin: '0 1rem 1rem',
-      padding: '1rem',
-      background: 'rgba(59, 130, 246, 0.15)',
-      borderRadius: '15px',
-      border: '1px solid rgba(255, 255, 255, 0.1)',
-      backdropFilter: 'blur(10px)'
-    },
-    questionText: {
-      fontSize: '1.1rem',
-      fontWeight: '700',
-      textAlign: 'center',
-      margin: 0,
-      textTransform: 'uppercase'
-    },
-    playersContainer: {
-      flex: 1,
-      display: 'flex',
-      flexDirection: 'column',
-      padding: '0 1rem',
-      gap: '1rem',
-      overflowY: 'auto'
-    },
-    playerWrapper: {
-      width: '100%'
-    },
-    playerCard: {
-      width: '100%',
-      background: 'none',
-      border: '3px solid rgba(255, 255, 255, 0.2)',
-      borderRadius: '15px',
-      padding: '1rem',
-      cursor: 'pointer',
-      transition: 'all 0.3s ease',
-      boxShadow: '0 8px 20px rgba(0, 0, 0, 0.3)',
-      display: 'flex',
-      flexDirection: 'column',
-      alignItems: 'center',
-      gap: '0.5rem',
-      minHeight: '140px'
-    },
-    playerImage: {
-      width: '60px',
-      height: '75px',
-      borderRadius: '50%',
-      objectFit: 'cover',
-      border: '2px solid rgba(255, 255, 255, 0.3)'
-    },
-    playerName: {
-      fontSize: '1.1rem',
-      fontWeight: '800',
-      margin: 0,
-      textAlign: 'center',
-      textShadow: '1px 1px 2px rgba(0, 0, 0, 0.3)'
-    },
-    playerTeam: {
-      fontSize: '0.9rem',
-      margin: 0,
-      opacity: 0.9,
-      textAlign: 'center'
-    },
-    playerStats: {
-      display: 'flex',
-      gap: '0.5rem',
-      flexWrap: 'wrap',
-      justifyContent: 'center'
-    },
-    statBadge: {
-      padding: '0.2rem 0.5rem',
-      borderRadius: '8px',
-      fontSize: '0.7rem',
-      fontWeight: '600',
-      textTransform: 'uppercase',
-      background: 'rgba(255, 165, 0, 0.2)',
-      color: '#FFD700',
-      border: '1px solid rgba(255, 215, 0, 0.3)'
-    },
-    vsText: {
-      fontSize: '2rem',
-      fontWeight: '800',
-      color: '#FFD700',
-      textAlign: 'center',
-      margin: '0.5rem 0',
-      textShadow: '0 0 10px rgba(255, 215, 0, 0.8)'
-    },
-    revealSection: {
-      marginTop: '0.75rem',
-      padding: '0.75rem',
-      background: 'rgba(0, 0, 0, 0.8)',
-      borderRadius: '10px',
-      textAlign: 'center'
-    },
-    pickNumber: {
-      fontSize: '1rem',
-      fontWeight: '700',
-      color: '#FBBF24',
-      margin: '0 0 0.25rem 0'
-    },
-    nbaTeam: {
-      fontSize: '0.9rem',
-      fontWeight: '600',
-      color: '#60A5FA',
-      margin: '0 0 0.25rem 0'
-    },
-    summerLeague: {
-      fontSize: '0.8rem',
-      color: '#FBD38D',
-      fontStyle: 'italic',
-      margin: 0
-    },
-    feedbackOverlay: {
-      position: 'fixed',
-      top: '50%',
-      left: '50%',
-      transform: 'translate(-50%, -50%)',
-      zIndex: 200,
-      pointerEvents: 'none'
-    },
-    feedbackMessage: {
-      padding: '1rem 2rem',
-      borderRadius: '25px',
-      fontSize: '1.1rem',
-      fontWeight: '700',
-      textAlign: 'center',
-      boxShadow: '0 8px 20px rgba(0, 0, 0, 0.4)',
-      maxWidth: '80vw',
-      background: isCorrectGuess === true ? '#10B981' : isCorrectGuess === false ? '#EF4444' : '#3B82F6',
-      color: 'white'
-    },
-    actions: {
-      position: 'fixed',
-      bottom: 0,
-      left: 0,
-      right: 0,
-      background: isDarkMode ? 'rgba(0, 0, 0, 0.95)' : 'rgba(255, 255, 255, 0.95)',
-      backdropFilter: 'blur(10px)',
-      padding: '1rem',
-      display: 'flex',
-      gap: '0.75rem',
-      justifyContent: 'center',
-      zIndex: 150,
-      paddingBottom: 'calc(1rem + env(safe-area-inset-bottom))',
-      borderTop: '1px solid rgba(255, 255, 255, 0.1)'
-    },
-    actionButton: {
-      flex: 1,
-      maxWidth: '150px',
-      height: '50px',
-      border: 'none',
-      borderRadius: '25px',
-      fontSize: '1rem',
-      fontWeight: '600',
-      cursor: 'pointer',
-      transition: 'all 0.3s ease',
-      boxShadow: '0 4px 12px rgba(0, 0, 0, 0.2)',
-      color: 'white'
-    }
-  };
-
   return (
-    <div style={mobileStyles.container}>
-      {/* Header */}
-      <div style={mobileStyles.header}>
-        <div style={mobileStyles.title}>DRAFT DUEL</div>
-        <button 
-          style={mobileStyles.themeToggle}
-          onClick={toggleDarkMode}
-        >
-          {isDarkMode ? '☀️' : '🌙'}
-        </button>
-      </div>
+    <div 
+      className="draft-duel-fullscreen"
+      style={{
+        backgroundColor: isDarkMode ? '#1A202C' : '#F8F8F0',
+        backgroundImage: `url("data:image/svg+xml;utf8,${encodedBasketballPattern}")`,
+        backgroundRepeat: 'repeat',
+        backgroundSize: '200px 200px',
+      }}
+    >
+      <style jsx>{`
+        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono:wght@400&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap');
+        
+        /* Full screen takeover */
+        .draft-duel-fullscreen {
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100vw;
+          height: 100vh;
+          font-family: 'Outfit', sans-serif;
+          z-index: 9999;
+          display: flex;
+          flex-direction: column;
+          overflow-x: hidden;
+          overflow-y: auto;
+        }
+
+        /* Game Title */
+        .game-title {
+          text-align: center;
+          margin: 1.5rem 0 1rem 0;
+          font-size: 4rem;
+          font-weight: 800;
+          background: linear-gradient(to top, #FFD700 30%, #FF4500 100%);
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          background-clip: text;
+          filter: drop-shadow(0 0 8px rgba(255, 165, 0, 0.8)) drop-shadow(0 0 15px rgba(255, 69, 0, 0.6));
+          animation: flicker 1.5s infinite alternate;
+          z-index: 20;
+        }
+
+        @keyframes flicker {
+          0%, 100% { opacity: 1; transform: scale(1); }
+          25% { opacity: 0.9; transform: scale(1.02); }
+          50% { opacity: 1; transform: scale(1); }
+          75% { opacity: 0.95; transform: scale(1.01); }
+        }
+
+        /* Theme Toggle */
+        .theme-toggle {
+          position: absolute;
+          top: 1rem;
+          right: 1rem;
+          background: rgba(255, 255, 255, 0.1);
+          border: none;
+          border-radius: 50%;
+          width: 3rem;
+          height: 3rem;
+          font-size: 1.5rem;
+          cursor: pointer;
+          backdrop-filter: blur(10px);
+          transition: all 0.3s ease;
+          z-index: 100;
+        }
+
+        .theme-toggle:hover {
+          background: rgba(255, 255, 255, 0.2);
+          transform: scale(1.1);
+        }
+
+        /* FIXED SCOREBOARD */
+        .scoreboard {
+          background: linear-gradient(145deg, #000000, #1a1a1a);
+          border: 6px solid #333;
+          border-radius: 20px;
+          display: flex;
+          width: 95%;
+          max-width: 900px;
+          height: 120px;
+          min-height: 120px;
+          max-height: 120px;
+          box-shadow: 
+            inset 0 0 30px rgba(0,0,0,0.8), 
+            0 10px 30px rgba(0,0,0,0.6),
+            0 0 20px rgba(255, 140, 0, 0.3);
+          font-family: 'Share Tech Mono', monospace;
+          color: #FF8C00;
+          text-shadow: 0 0 15px rgba(255, 140, 0, 0.9);
+          position: relative;
+          padding: 8px;
+          margin: 0 auto 1rem;
+          flex-shrink: 0;
+          overflow: hidden;
+        }
+
+        .scoreboard::before {
+          content: '';
+          position: absolute;
+          top: -3px;
+          left: -3px;
+          right: -3px;
+          bottom: -3px;
+          background: linear-gradient(45deg, #FF8C00, #FFD700, #FF4500, #FF8C00);
+          border-radius: 23px;
+          z-index: -1;
+          opacity: 0.3;
+          animation: borderGlow 3s ease-in-out infinite;
+        }
+
+        @keyframes borderGlow {
+          0%, 100% { opacity: 0.3; }
+          50% { opacity: 0.6; }
+        }
+
+        .scoreboard-box {
+          background: linear-gradient(145deg, #0a0a0a, #000000);
+          border: 3px solid #444;
+          border-radius: 12px;
+          box-shadow: 
+            inset 0 0 15px rgba(0,0,0,0.8), 
+            0 4px 8px rgba(0,0,0,0.4);
+          flex: 1;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: space-between;
+          padding: 8px;
+          margin: 0 6px;
+          position: relative;
+          height: calc(100% - 16px);
+          min-height: 96px;
+          max-height: 96px;
+          flex-shrink: 0;
+          overflow: hidden;
+        }
+
+        .scoreboard-label {
+          font-family: 'Outfit', sans-serif;
+          font-size: 1rem;
+          font-weight: 700;
+          color: #FFD700;
+          margin-bottom: 8px;
+          text-transform: uppercase;
+          letter-spacing: 1px;
+          text-shadow: 0 0 10px rgba(255, 215, 0, 0.8);
+          height: 20px;
+          line-height: 20px;
+          flex-shrink: 0;
+        }
+
+        .scoreboard-value {
+          font-family: 'Orbitron', monospace;
+          font-size: 3.5rem;
+          font-weight: 900;
+          line-height: 1;
+          color: #FF8C00;
+          text-shadow: 
+            0 0 20px rgba(255, 140, 0, 1),
+            0 0 40px rgba(255, 140, 0, 0.6),
+            0 0 60px rgba(255, 140, 0, 0.3);
+          height: 50px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          padding-bottom: 8px;
+          filter: brightness(1.2);
+          flex-shrink: 0;
+        }
+
+        .scoreboard-timer {
+          font-family: 'Orbitron', monospace;
+          font-size: 3.5rem;
+          font-weight: 900;
+          line-height: 1;
+          color: #FF0000;
+          text-shadow: 
+            0 0 20px rgba(255, 0, 0, 1),
+            0 0 40px rgba(255, 0, 0, 0.6),
+            0 0 60px rgba(255, 0, 0, 0.3);
+          height: 50px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          width: 100%;
+          padding-bottom: 8px;
+          filter: brightness(1.2);
+          flex-shrink: 0;
+        }
+
+        .scoreboard-timer.warning {
+          color: #FF3333;
+          text-shadow: 
+            0 0 25px rgba(255, 50, 50, 1),
+            0 0 50px rgba(255, 50, 50, 0.8),
+            0 0 75px rgba(255, 50, 50, 0.5);
+          animation: pulse-red 1s infinite alternate;
+        }
+
+        @keyframes pulse-red {
+          from { 
+            filter: brightness(1.2);
+            transform: scale(1);
+          }
+          to { 
+            filter: brightness(1.5);
+            transform: scale(1.05);
+          }
+        }
+
+        /* Question Section */
+        .question-section {
+          width: 95%;
+          max-width: 900px;
+          margin: 0 auto 2rem;
+          text-align: center;
+          background: linear-gradient(135deg, rgba(59, 130, 246, 0.15), rgba(147, 51, 234, 0.15));
+          border-radius: 20px;
+          padding: 1.5rem 2rem;
+          border: 1px solid rgba(255, 255, 255, 0.1);
+          backdrop-filter: blur(10px);
+          box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+        }
+
+        .question-text {
+          font-family: 'Outfit', sans-serif;
+          font-size: 1.8rem;
+          font-weight: 700;
+          color: ${isDarkMode ? '#FFF' : '#333'};
+          text-shadow: 0 0 10px rgba(${isDarkMode ? '255,255,255' : '0,0,0'},0.7);
+          text-transform: uppercase;
+          letter-spacing: 1px;
+          margin: 0;
+        }
+
+        /* Main Game Area */
+        .game-area {
+          flex: 1;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          position: relative;
+          padding: 1rem;
+          max-width: 1400px;
+          margin: 0 auto;
+          width: 100%;
+        }
+
+        .court-background {
+          position: absolute;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, -50%) scale(0.6);
+          z-index: 0;
+          opacity: 0.15;
+          pointer-events: none;
+          width: 1000px;
+          height: 500px;
+        }
+
+        /* CRITICAL MOBILE FIX: Player Comparison */
+        .players-comparison {
+          position: relative;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          gap: 3rem;
+          z-index: 10;
+          width: 100%;
+          max-width: 1200px;
+          margin: 2rem 0;
+        }
+
+        .player-card-wrapper {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 1rem;
+          z-index: 20;
+        }
+
+        /* Player Cards */
+        .player-card {
+          position: relative;
+          width: 18rem;
+          height: 22rem;
+          border-radius: 1rem;
+          padding: 1.5rem;
+          cursor: pointer;
+          transition: all 0.3s ease;
+          box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
+          border: 4px solid rgba(255, 255, 255, 0.2);
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: space-between;
+          background: none;
+          font-family: inherit;
+          z-index: 20;
+        }
+
+        .player-card:hover:not(.disabled) {
+          transform: translateY(-8px) scale(1.05);
+          box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
+          z-index: 30;
+        }
+
+        .player-card.selected {
+          border-color: #3B82F6;
+          box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.4), 0 15px 35px rgba(0, 0, 0, 0.4);
+          animation: pop-on-select 0.15s ease-out;
+        }
+
+        .player-card.correct {
+          border-color: #10B981;
+          box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.5), 0 15px 35px rgba(0, 0, 0, 0.4);
+          animation: pop-in 0.3s ease-out;
+        }
+
+        .player-card.incorrect {
+          border-color: #EF4444;
+          box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.5), 0 15px 35px rgba(0, 0, 0, 0.4);
+          animation: shake 0.5s ease-out;
+        }
+
+        .player-card.disabled {
+          opacity: 0.8;
+          cursor: not-allowed;
+        }
+
+        @keyframes pop-on-select {
+          0% { transform: scale(1); }
+          50% { transform: scale(1.03); }
+          100% { transform: scale(1.02); }
+        }
+
+        @keyframes pop-in {
+          0% { transform: scale(0.8); opacity: 0; }
+          70% { transform: scale(1.1); opacity: 1; }
+          100% { transform: scale(1); }
+        }
+
+        @keyframes shake {
+          10%, 90% { transform: translate3d(-1px, 0, 0); }
+          20%, 80% { transform: translate3d(2px, 0, 0); }
+          30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
+          40%, 60% { transform: translate3d(4px, 0, 0); }
+        }
+
+        /* Player Card Content */
+        .player-image {
+          width: 10rem;
+          height: 12rem;
+          border-radius: 50%;
+          object-fit: cover;
+          margin-bottom: 1rem;
+          border: 4px solid rgba(255, 255, 255, 0.3);
+          transition: transform 0.3s ease;
+        }
+
+        .player-card:hover .player-image {
+          transform: scale(1.05);
+        }
+
+        .player-name {
+          font-family: 'DM Sans', sans-serif;
+          font-size: 1.8rem;
+          font-weight: 800;
+          text-align: center;
+          margin-bottom: 0.5rem;
+          text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.4);
+          letter-spacing: 0.5px;
+        }
+
+        .player-team {
+          font-family: 'DM Sans', sans-serif;
+          font-size: 1.2rem;
+          text-align: center;
+          font-weight: 500;
+          margin: 0;
+          opacity: 0.9;
+        }
+
+        /* Reveal Section */
+        .reveal-section {
+          background: linear-gradient(135deg, rgba(0, 0, 0, 0.9), rgba(0, 0, 0, 0.8));
+          color: #ffffff;
+          padding: 1rem 1.5rem;
+          border-radius: 0.75rem;
+          box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4);
+          text-align: center;
+          animation: fade-in-up 0.5s ease-out;
+          min-width: 220px;
+          z-index: 25;
+        }
+
+        .pick-number {
+          font-size: 1.6rem;
+          font-weight: 700;
+          color: #FBBF24;
+          margin-bottom: 0.5rem;
+        }
+
+        .nba-team {
+          font-size: 1.1rem;
+          opacity: 0.9;
+          margin: 0;
+        }
+
+        .summer-league {
+          font-size: 0.9rem;
+          opacity: 0.8;
+          margin: 0;
+          color: #FBD38D;
+          font-style: italic;
+        }
+
+        @keyframes fade-in-up {
+          from {
+            opacity: 0;
+            transform: translateY(20px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+
+        /* VS Text */
+        .vs-text {
+          font-size: 5rem;
+          font-weight: 800;
+          background: linear-gradient(to top, #FFD700 30%, #FF4500 100%);
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          background-clip: text;
+          filter: drop-shadow(0 0 8px rgba(255, 165, 0, 0.8)) drop-shadow(0 0 15px rgba(255, 69, 0, 0.6));
+          animation: flicker 1.5s infinite alternate;
+          z-index: 15;
+          margin: 0 2rem;
+        }
+
+        /* Feedback Area */
+        .feedback-area {
+          height: 80px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          margin-top: 1rem;
+          flex-shrink: 0;
+        }
+
+        .feedback-message {
+          font-size: 1.5rem;
+          font-weight: 600;
+          text-align: center;
+          padding: 0.75rem 1.5rem;
+          border-radius: 0.5rem;
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+          animation: fade-in-up 0.5s ease-out;
+          max-width: 300px;
+          z-index: 10;
+          margin: 0;
+        }
+
+        .feedback-message.correct {
+          background: #10B981;
+          color: white;
+        }
+
+        .feedback-message.incorrect {
+          background: #EF4444;
+          color: white;
+        }
+
+        .feedback-message.timeout {
+          background: #3B82F6;
+          color: white;
+        }
+
+        /* Action Buttons */
+        .action-buttons {
+          display: flex;
+          gap: 1rem;
+          justify-content: center;
+          flex-wrap: wrap;
+          margin-top: 2rem;
+          z-index: 10;
+        }
+
+        .action-button {
+          width: 180px !important;
+          height: 50px !important;
+          min-width: 180px !important;
+          max-width: 180px !important;
+          min-height: 50px !important;
+          max-height: 50px !important;
+          padding: 0 !important;
+          margin: 0;
+          border: none;
+          border-radius: 25px;
+          font-size: 1rem;
+          font-weight: 600;
+          cursor: pointer;
+          transition: all 0.3s ease;
+          box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          text-align: center;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          box-sizing: border-box;
+        }
+
+        .action-button:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+        }
+
+        .action-button:active {
+          transform: translateY(0);
+        }
+
+        .continue-button {
+          background: linear-gradient(135deg, #3B82F6 0%, #1D4ED8 100%);
+          color: white;
+        }
+
+        .play-again-button {
+          background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+          color: white;
+        }
+
+        .share-button {
+          background: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%);
+          color: white;
+        }
+
+        /* Share Modal */
+        .share-modal-overlay {
+          position: fixed;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          background: rgba(0, 0, 0, 0.75);
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          z-index: 1000;
+          padding: 1rem;
+          animation: fade-in-up 0.3s ease-out;
+        }
+
+        .share-modal {
+          background: ${isDarkMode ? '#2D3748' : '#FFFFFF'};
+          color: ${isDarkMode ? '#FFFFFF' : '#2D3748'};
+          padding: 2rem;
+          border-radius: 1.5rem;
+          box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+          max-width: 28rem;
+          width: 100%;
+          text-align: center;
+        }
+
+        .share-modal h2 {
+          font-size: 2rem;
+          font-weight: 800;
+          margin-bottom: 1rem;
+          color: ${isDarkMode ? '#FFFFFF' : '#2D3748'};
+        }
+
+        .share-modal p {
+          font-size: 1.125rem;
+          margin-bottom: 1rem;
+          color: ${isDarkMode ? '#A0AEC0' : '#4A5568'};
+        }
+
+        .share-textarea {
+          width: 100%;
+          padding: 1rem;
+          border: 2px solid ${isDarkMode ? '#4A5568' : '#E2E8F0'};
+          border-radius: 0.5rem;
+          font-family: 'Courier New', monospace;
+          font-size: 1rem;
+          resize: none;
+          height: 7rem;
+          margin-bottom: 1rem;
+          background: ${isDarkMode ? '#1A202C' : '#F7FAFC'};
+          color: ${isDarkMode ? '#FFFFFF' : '#2D3748'};
+        }
+
+        .share-textarea:focus {
+          outline: none;
+          border-color: #3B82F6;
+          box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+        }
+
+        .share-buttons {
+          display: flex;
+          gap: 1rem;
+          justify-content: center;
+        }
+
+        .copy-button {
+          background: linear-gradient(135deg, #3B82F6 0%, #1D4ED8 100%);
+          color: white;
+        }
+
+        .back-button {
+          background: ${isDarkMode ? '#4A5568' : '#E2E8F0'};
+          color: ${isDarkMode ? '#FFFFFF' : '#2D3748'};
+        }
+
+        .back-button:hover {
+          background: ${isDarkMode ? '#2D3748' : '#CBD5E0'};
+        }
+
+        /* CRITICAL MOBILE RESPONSIVE FIXES */
+        @media (max-width: 768px) {
+          .game-title {
+            font-size: 3rem;
+            margin: 1rem 0 0.5rem 0;
+          }
+          
+          .scoreboard {
+            width: 98%;
+            margin: 0 auto 0.5rem;
+            padding: 6px;
+            height: 100px;
+            min-height: 100px;
+            max-height: 100px;
+          }
+          
+          .scoreboard-box {
+            padding: 6px;
+            margin: 0 4px;
+            height: calc(100% - 12px);
+            min-height: 76px;
+            max-height: 76px;
+          }
+          
+          .scoreboard-value, .scoreboard-timer {
+            font-size: 2.5rem;
+            height: 40px;
+          }
+          
+          .question-section {
+            width: 98%;
+            margin: 0 auto 1.5rem;
+            padding: 1rem;
+          }
+          
+          .question-text {
+            font-size: 1.4rem;
+          }
+          
+          /* CRITICAL FIX: Mobile players stack vertically */
+          .players-comparison {
+            flex-direction: column !important;
+            gap: 1.5rem !important;
+            margin: 1rem 0 !important;
+          }
+          
+          .player-card {
+            width: 14rem !important;
+            height: 18rem !important;
+          }
+          
+          .player-image {
+            width: 8rem !important;
+            height: 10rem !important;
+          }
+          
+          .player-name {
+            font-size: 1.5rem !important;
+          }
+          
+          .player-team {
+            font-size: 1rem !important;
+          }
+          
+          .vs-text {
+            font-size: 3rem !important;
+            margin: 0 1rem !important;
+          }
+          
+          .feedback-message {
+            font-size: 1.2rem;
+          }
+          
+          .action-buttons {
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+          }
+          
+          .action-button {
+            width: 200px !important;
+            min-width: 200px !important;
+            max-width: 200px !important;
+            height: 50px !important;
+            min-height: 50px !important;
+            max-height: 50px !important;
+          }
+        }
+
+        @media (max-width: 480px) {
+          .game-title {
+            font-size: 2.5rem;
+          }
+          
+          .question-text {
+            font-size: 1.2rem;
+          }
+          
+          .player-card {
+            width: 12rem !important;
+            height: 16rem !important;
+          }
+          
+          .player-image {
+            width: 7rem !important;
+            height: 8.5rem !important;
+          }
+          
+          .vs-text {
+            font-size: 2.5rem !important;
+            margin: 0 0.5rem !important;
+          }
+          
+          .scoreboard-value, .scoreboard-timer {
+            font-size: 2rem;
+            height: 35px;
+          }
+        }
+      `}</style>
+
+      {/* Theme Toggle */}
+      <button 
+        className="theme-toggle"
+        onClick={toggleDarkMode}
+        aria-label="Toggle theme"
+      >
+        {isDarkMode ? (
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M12 3v1m0 16v1m9-9h1M4 12H3m15.354 5.354l-.707.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+          </svg>
+        ) : (
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9 9 0 008.354-5.646z" />
+          </svg>
+        )}
+      </button>
+
+      {/* Game Title */}
+      <div className="game-title">DRAFT DUEL</div>
 
       {/* Scoreboard */}
-      <div style={mobileStyles.scoreboard}>
-        <div style={mobileStyles.scoreItem}>
-          <div style={mobileStyles.scoreLabel}>Streak</div>
-          <div style={mobileStyles.scoreValue}>{currentStreak}</div>
+      <div className="scoreboard">
+        <div className="scoreboard-box">
+          <div className="scoreboard-label">Streak</div>
+          <div className="scoreboard-value">{currentStreak}</div>
         </div>
-        <div style={mobileStyles.scoreItem}>
-          <div style={mobileStyles.scoreLabel}>Timer</div>
-          <div style={mobileStyles.scoreValue}>{shotClockTime}</div>
+
+        <div className="scoreboard-box">
+          <div className="scoreboard-label">Shot Clock</div>
+          <div className={`scoreboard-timer ${shotClockTime <= 3 ? 'warning' : ''}`}>
+            {shotClockTime}
+          </div>
         </div>
-        <div style={mobileStyles.scoreItem}>
-          <div style={mobileStyles.scoreLabel}>Best</div>
-          <div style={mobileStyles.scoreValue}>{highScore}</div>
+
+        <div className="scoreboard-box">
+          <div className="scoreboard-label">High Score</div>
+          <div className="scoreboard-value">{highScore}</div>
         </div>
       </div>
 
-      {/* Question */}
-      <div style={mobileStyles.question}>
-        <div style={mobileStyles.questionText}>
+      {/* Question Section */}
+      <div className="question-section">
+        <div className="question-text">
           {currentQuestion ? currentQuestion.text : "Loading question..."}
         </div>
       </div>
 
-      {/* Players */}
-      <div style={mobileStyles.playersContainer}>
-        {player1 && (
-          <div style={mobileStyles.playerWrapper}>
-            <button
-              style={{
-                ...mobileStyles.playerCard,
-                backgroundColor: TEAM_COLORS[player1.preDraftTeam] || TEAM_COLORS.DEFAULT,
-                color: getContrastTextColor(TEAM_COLORS[player1.preDraftTeam] || TEAM_COLORS.DEFAULT),
-                borderColor: selectedPlayerId === player1.id ? '#3B82F6' : 
-                           (selectedPlayerId !== null && currentQuestion?.getCorrectPlayerId(player1, player2) === player1.id) ? '#10B981' :
-                           (selectedPlayerId !== null && currentQuestion?.getCorrectPlayerId(player1, player2) !== player1.id) ? '#EF4444' :
-                           'rgba(255, 255, 255, 0.2)'
-              }}
-              onClick={() => handleGuess(player1.id)}
+      {/* Game Area */}
+      <div className="game-area">
+        {/* Basketball Court Background */}
+        <div className="court-background" dangerouslySetInnerHTML={{ __html: basketballCourtSVG }} />
+
+        {/* Player Comparison */}
+        <div className="players-comparison">
+          {player1 && (
+            <PlayerCard
+              player={player1}
+              onClick={handleGuess}
+              isSelected={selectedPlayerId === player1.id}
+              isCorrect={selectedPlayerId !== null ? (currentQuestion?.getCorrectPlayerId(player1, player2) === player1.id) : null}
+              showPick={selectedPlayerId !== null}
               disabled={selectedPlayerId !== null || gameOver}
-            >
-              <img
-                style={mobileStyles.playerImage}
-                src={player1.imageUrl}
-                alt={player1.name}
-                onError={(e) => { 
-                  e.target.onerror = null; 
-                  e.target.src = `https://placehold.co/120x150/666666/FFFFFF?text=${player1.name.split(' ').map(n => n[0]).join('')}`; 
-                }}
-              />
-              <h3 style={mobileStyles.playerName}>{player1.name}</h3>
-              <p style={mobileStyles.playerTeam}>{player1.preDraftTeam}</p>
-              <div style={mobileStyles.playerStats}>
-                <span style={mobileStyles.statBadge}>{player1.position}</span>
-                <span style={mobileStyles.statBadge}>{Math.floor(player1.height/12)}'{player1.height%12}"</span>
-              </div>
-            </button>
-
-            {selectedPlayerId !== null && (
-              <div style={mobileStyles.revealSection}>
-                <p style={mobileStyles.pickNumber}>Pick #{player1.draftPick}</p>
-                <p style={mobileStyles.nbaTeam}>{player1.team}</p>
-                <p style={mobileStyles.summerLeague}>{player1.summerLeague}</p>
-              </div>
-            )}
-          </div>
-        )}
-
-        <div style={mobileStyles.vsText}>VS</div>
-
-        {player2 && (
-          <div style={mobileStyles.playerWrapper}>
-            <button
-              style={{
-                ...mobileStyles.playerCard,
-                backgroundColor: TEAM_COLORS[player2.preDraftTeam] || TEAM_COLORS.DEFAULT,
-                borderColor: selectedPlayerId === player2.id ? '#3B82F6' : 
-                           (selectedPlayerId !== null && currentQuestion?.getCorrectPlayerId(player1, player2) === player2.id) ? '#10B981' :
-                           (selectedPlayerId !== null && currentQuestion?.getCorrectPlayerId(player1, player2) !== player2.id) ? '#EF4444' :
-                           'rgba(255, 255, 255, 0.2)'
-              }}
-              onClick={() => handleGuess(player2.id)}
+              isDarkMode={isDarkMode}
+            />
+          )}
+          
+          {/* VS Text */}
+          <div className="vs-text">VS</div>
+          
+          {player2 && (
+            <PlayerCard
+              player={player2}
+              onClick={handleGuess}
+              isSelected={selectedPlayerId === player2.id}
+              isCorrect={selectedPlayerId !== null ? (currentQuestion?.getCorrectPlayerId(player1, player2) === player2.id) : null}
+              showPick={selectedPlayerId !== null}
               disabled={selectedPlayerId !== null || gameOver}
-            >
-              <img
-                style={mobileStyles.playerImage}
-                src={player2.imageUrl}
-                alt={player2.name}
-                onError={(e) => { 
-                  e.target.onerror = null; 
-                  e.target.src = `https://placehold.co/120x150/666666/FFFFFF?text=${player2.name.split(' ').map(n => n[0]).join('')}`; 
-                }}
-              />
-              <h3 style={mobileStyles.playerName}>{player2.name}</h3>
-              <p style={mobileStyles.playerTeam}>{player2.preDraftTeam}</p>
-              <div style={mobileStyles.playerStats}>
-                <span style={mobileStyles.statBadge}>{player2.position}</span>
-                <span style={mobileStyles.statBadge}>{Math.floor(player2.height/12)}'{player2.height%12}"</span>
-              </div>
-            </button>
+              isDarkMode={isDarkMode}
+            />
+          )}
+        </div>
 
-            {selectedPlayerId !== null && (
-              <div style={mobileStyles.revealSection}>
-                <p style={mobileStyles.pickNumber}>Pick #{player2.draftPick}</p>
-                <p style={mobileStyles.nbaTeam}>{player2.team}</p>
-                <p style={mobileStyles.summerLeague}>{player2.summerLeague}</p>
-              </div>
+        {/* Feedback Area */}
+        <div className="feedback-area">
+          {feedbackMessage && (
+            <div className={`feedback-message ${
+              isCorrectGuess === true ? 'correct' : 
+              isCorrectGuess === false ? 'incorrect' : 'timeout'
+            }`}>
+              {feedbackMessage}
+            </div>
+          )}
+        </div>
+
+        {/* Action Buttons */}
+        {selectedPlayerId !== null && (
+          <div className="action-buttons">
+            {!gameOver ? (
+              <button onClick={handleContinue} className="action-button continue-button">
+                Continue
+              </button>
+            ) : (
+              <>
+                <button onClick={handleContinue} className="action-button play-again-button">
+                  Play Again
+                </button>
+                <button onClick={shareStreak} className="action-button share-button">
+                  Share Streak
+                </button>
+              </>
             )}
           </div>
         )}
       </div>
 
-      {/* Feedback */}
-      {feedbackMessage && (
-        <div style={mobileStyles.feedbackOverlay}>
-          <div style={mobileStyles.feedbackMessage}>
-            {feedbackMessage}
-          </div>
-        </div>
-      )}
-
-      {/* Action Buttons */}
-      {selectedPlayerId !== null && (
-        <div style={mobileStyles.actions}>
-          {!gameOver ? (
-            <button 
-              style={{
-                ...mobileStyles.actionButton,
-                background: 'linear-gradient(135deg, #3B82F6, #1D4ED8)'
-              }}
-              onClick={handleContinue}
-            >
-              Continue
-            </button>
-          ) : (
-            <>
-              <button 
-                style={{
-                  ...mobileStyles.actionButton,
-                  background: 'linear-gradient(135deg, #10B981, #059669)'
-                }}
-                onClick={handleContinue}
-              >
-                Play Again
-              </button>
-              <button 
-                style={{
-                  ...mobileStyles.actionButton,
-                  background: 'linear-gradient(135deg, #8B5CF6, #7C3AED)'
-                }}
-                onClick={shareStreak}
-              >
-                Share
-              </button>
-            </>
-          )}
-        </div>
-      )}
-
       {/* Share Modal */}
       {showShareModal && (
-        <div style={{
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          background: 'rgba(0, 0, 0, 0.8)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          zIndex: 1000,
-          padding: '1rem'
-        }}>
-          <div style={{
-            background: isDarkMode ? '#2D3748' : '#FFFFFF',
-            color: isDarkMode ? '#FFFFFF' : '#2D3748',
-            padding: '2rem',
-            borderRadius: '20px',
-            width: '100%',
-            maxWidth: '350px',
-            maxHeight: '90vh',
-            overflowY: 'auto',
-            textAlign: 'center'
-          }}>
-            <h2 style={{
-              fontSize: '1.5rem',
-              fontWeight: '800',
-              marginBottom: '1rem',
-              color: isDarkMode ? '#FFD700' : '#FF6B35'
-            }}>
-              🏀 Share Your Streak!
-            </h2>
-            <p style={{
-              fontSize: '1rem',
-              marginBottom: '1.5rem',
-              color: isDarkMode ? '#A0AEC0' : '#4A5568'
-            }}>
-              Show everyone your Draft knowledge!
-            </p>
+        <div className="share-modal-overlay">
+          <div className="share-modal">
+            <h2>Share Your Streak!</h2>
+            <p>Copy the text below to share your amazing streak!</p>
             <textarea
               ref={shareTextRef}
-              style={{
-                width: '100%',
-                padding: '1rem',
-                border: `2px solid ${isDarkMode ? '#4A5568' : '#E2E8F0'}`,
-                borderRadius: '10px',
-                fontFamily: "'Outfit', sans-serif",
-                fontSize: '0.9rem',
-                resize: 'none',
-                height: '6rem',
-                marginBottom: '1.5rem',
-                background: isDarkMode ? '#1A202C' : '#F7FAFC',
-                color: isDarkMode ? '#FFFFFF' : '#2D3748',
-                boxSizing: 'border-box'
-              }}
+              className="share-textarea"
               readOnly
-              value={`🏀 Just scored ${currentStreak} in a row on Draft Duel! Think you know the 2025 NBA Draft better? Play at hooprapp.com! #DraftDuel #NBADraft2025 #SummerLeague`}
+              value={`I just scored a streak of ${currentStreak} in the NBA Rookie Draft Pick game! Think you can beat it? Play at hooprapp.com! #NBADraftGame #SummerLeague`}
             />
-            <div style={{
-              display: 'flex',
-              gap: '1rem',
-              justifyContent: 'center'
-            }}>
-              <button 
-                style={{
-                  ...mobileStyles.actionButton,
-                  background: 'linear-gradient(135deg, #3B82F6, #1D4ED8)'
-                }}
-                onClick={handleCopyShareText}
-              >
+            <div className="share-buttons">
+              <button onClick={handleCopyShareText} className="action-button copy-button">
                 Copy
               </button>
-              <button 
-                style={{
-                  ...mobileStyles.actionButton,
-                  background: isDarkMode ? '#4A5568' : '#E2E8F0',
-                  color: isDarkMode ? '#FFFFFF' : '#2D3748'
-                }}
-                onClick={handleCloseShareModal}
-              >
+              <button onClick={handleCloseShareModal} className="action-button back-button">
                 Back
               </button>
             </div>
