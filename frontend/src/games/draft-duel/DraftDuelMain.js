@@ -29,16 +29,16 @@ const getContrastTextColor = (hexcolor) => {
 
 // NBA Rookies data
 const ROOKIES_2025_NBA = [
-  { id: 1, name: "Cooper Flagg", draftPick: 1, team: "Dallas Mavericks", preDraftTeam: "Duke", imageUrl: "https://a.espncdn.com/combiner/i?img=/i/headshots/nba/players/full/5041939.png&w=350&h=254", height: 81, age: 18, position: "Forward", conference: "ACC", summerLeague: "Utah Summer League" },
-  { id: 2, name: "Dylan Harper", draftPick: 2, team: "San Antonio Spurs", preDraftTeam: "Rutgers", imageUrl: "https://a.espncdn.com/combiner/i?img=/i/headshots/nba/players/full/5037871.png&w=350&h=254", height: 76, age: 18, position: "Guard", conference: "Big Ten", summerLeague: "Utah Summer League" },
-  { id: 3, name: "VJ Edgecombe", draftPick: 3, team: "Philadelphia 76ers", preDraftTeam: "Baylor", imageUrl: "https://a.espncdn.com/combiner/i?img=/i/headshots/nba/players/full/5124612.png&w=350&h=254", height: 77, age: 19, position: "Guard", conference: "Big 12", summerLeague: "California Classic" },
-  { id: 4, name: "Kon Knueppel", draftPick: 4, team: "Charlotte Hornets", preDraftTeam: "Duke", imageUrl: "https://a.espncdn.com/combiner/i?img=/i/headshots/nba/players/full/5061575.png&w=350&h=254", height: 79, age: 19, position: "Forward", conference: "ACC", summerLeague: "Utah Summer League" },
-  { id: 5, name: "Ace Bailey", draftPick: 5, team: "Utah Jazz", preDraftTeam: "Rutgers", imageUrl: "https://a.espncdn.com/combiner/i?img=/i/headshots/nba/players/full/4873138.png&w=350&h=254", height: 81, age: 19, position: "Forward", conference: "Big Ten", summerLeague: "Utah Summer League" },
-  { id: 6, name: "Tre Johnson", draftPick: 6, team: "Washington Wizards", preDraftTeam: "Texas", imageUrl: "https://a.espncdn.com/combiner/i?img=/i/headshots/nba/players/full/5238230.png&w=350&h=254", height: 76, age: 19, position: "Guard", conference: "Big 12", summerLeague: "2K25 Summer League" },
-  { id: 7, name: "Jeremiah Fears", draftPick: 7, team: "New Orleans Pelicans", preDraftTeam: "Oklahoma", imageUrl: "https://a.espncdn.com/combiner/i?img=/i/headshots/nba/players/full/5144091.png&w=350&h=254", height: 74, age: 18, position: "Guard", conference: "Big 12", summerLeague: "2K25 Summer League" },
-  { id: 8, name: "Egor Demin", draftPick: 8, team: "Brooklyn Nets", preDraftTeam: "BYU", imageUrl: "https://a.espncdn.com/combiner/i?img=/i/headshots/mens-college-basketball/players/full/5243213.png", height: 79, age: 19, position: "Guard", conference: "Big 12", summerLeague: "2K25 Summer League" },
-  { id: 9, name: "Collin Murray-Boyles", draftPick: 9, team: "Toronto Raptors", preDraftTeam: "South Carolina", imageUrl: "https://a.espncdn.com/combiner/i?img=/i/headshots/nba/players/full/5093267.png&w=350&h=254", height: 80, age: 20, position: "Forward", conference: "SEC", summerLeague: "California Classic" },
-  { id: 10, name: "Khaman Maluach", draftPick: 10, team: "Phoenix Suns", preDraftTeam: "Duke", imageUrl: "https://a.espncdn.com/combiner/i?img=/i/headshots/nba/players/full/5203685.png&w=350&h=254", height: 85, age: 18, position: "Center", conference: "ACC", summerLeague: "California Classic" },
+  { id: 1, name: "Cooper Flagg", draftPick: 1, team: "Dallas Mavericks", preDraftTeam: "Duke", imageUrl: "https://a.espncdn.com/combiner/i?img=/i/headshots/nba/players/full/5041939.png&w=350&h=254", height: 81, age: 18, position: "Forward", conference: "ACC" },
+  { id: 2, name: "Dylan Harper", draftPick: 2, team: "San Antonio Spurs", preDraftTeam: "Rutgers", imageUrl: "https://a.espncdn.com/combiner/i?img=/i/headshots/nba/players/full/5037871.png&w=350&h=254", height: 76, age: 18, position: "Guard", conference: "Big Ten" },
+  { id: 3, name: "VJ Edgecombe", draftPick: 3, team: "Philadelphia 76ers", preDraftTeam: "Baylor", imageUrl: "https://a.espncdn.com/combiner/i?img=/i/headshots/nba/players/full/5124612.png&w=350&h=254", height: 77, age: 19, position: "Guard", conference: "Big 12" },
+  { id: 4, name: "Kon Knueppel", draftPick: 4, team: "Charlotte Hornets", preDraftTeam: "Duke", imageUrl: "https://a.espncdn.com/combiner/i?img=/i/headshots/nba/players/full/5061575.png&w=350&h=254", height: 79, age: 19, position: "Forward", conference: "ACC" },
+  { id: 5, name: "Ace Bailey", draftPick: 5, team: "Utah Jazz", preDraftTeam: "Rutgers", imageUrl: "https://a.espncdn.com/combiner/i?img=/i/headshots/nba/players/full/4873138.png&w=350&h=254", height: 81, age: 19, position: "Forward", conference: "Big Ten" },
+  { id: 6, name: "Tre Johnson", draftPick: 6, team: "Washington Wizards", preDraftTeam: "Texas", imageUrl: "https://a.espncdn.com/combiner/i?img=/i/headshots/nba/players/full/5238230.png&w=350&h=254", height: 76, age: 19, position: "Guard", conference: "Big 12" },
+  { id: 7, name: "Jeremiah Fears", draftPick: 7, team: "New Orleans Pelicans", preDraftTeam: "Oklahoma", imageUrl: "https://a.espncdn.com/combiner/i?img=/i/headshots/nba/players/full/5144091.png&w=350&h=254", height: 74, age: 18, position: "Guard", conference: "Big 12" },
+  { id: 8, name: "Egor Demin", draftPick: 8, team: "Brooklyn Nets", preDraftTeam: "BYU", imageUrl: "https://a.espncdn.com/combiner/i?img=/i/headshots/mens-college-basketball/players/full/5243213.png", height: 79, age: 19, position: "Guard", conference: "Big 12" },
+  { id: 9, name: "Collin Murray-Boyles", draftPick: 9, team: "Toronto Raptors", preDraftTeam: "South Carolina", imageUrl: "https://a.espncdn.com/combiner/i?img=/i/headshots/nba/players/full/5093267.png&w=350&h=254", height: 80, age: 20, position: "Forward", conference: "SEC" },
+  { id: 10, name: "Khaman Maluach", draftPick: 10, team: "Phoenix Suns", preDraftTeam: "Duke", imageUrl: "https://a.espncdn.com/combiner/i?img=/i/headshots/nba/players/full/5203685.png&w=350&h=254", height: 85, age: 18, position: "Center", conference: "ACC" },
 ];
 
 // PlayerCard component
@@ -101,9 +101,27 @@ const DraftDuelMain = () => {
   const [showShareModal, setShowShareModal] = useState(false);
   const shareTextRef = useRef(null);
   const [isDarkMode, setIsDarkMode] = useState(true);
+  const [gameStarted, setGameStarted] = useState(false);
+  const [currentMode, setCurrentMode] = useState('EASY');
 
-  // Question types
-  const QUESTIONS = [
+  // Difficulty system
+  const getDifficultyMode = (streak) => {
+    if (streak >= 20) return 'EXPERT';
+    if (streak >= 10) return 'HARD';
+    return 'EASY';
+  };
+
+  const getModeColor = (mode) => {
+    switch (mode) {
+      case 'EASY': return '#10B981'; // Green
+      case 'HARD': return '#F59E0B'; // Orange  
+      case 'EXPERT': return '#EF4444'; // Red
+      default: return '#10B981';
+    }
+  };
+
+  // Question types organized by difficulty
+  const EASY_QUESTIONS = [
     {
       text: "Which player was drafted HIGHER?",
       getCorrectPlayerId: (p1, p2) => (p1.draftPick < p2.draftPick ? p1.id : p2.id),
@@ -113,16 +131,6 @@ const DraftDuelMain = () => {
       text: "Which player was drafted LOWER?",
       getCorrectPlayerId: (p1, p2) => (p1.draftPick > p2.draftPick ? p1.id : p2.id),
       filter: (p1, p2) => p1.draftPick !== p2.draftPick,
-    },
-    {
-      text: "Which player is TALLER?",
-      getCorrectPlayerId: (p1, p2) => (p1.height > p2.height ? p1.id : p2.id),
-      filter: (p1, p2) => p1.height !== p2.height,
-    },
-    {
-      text: "Which player is SHORTER?",
-      getCorrectPlayerId: (p1, p2) => (p1.height < p2.height ? p1.id : p2.id),
-      filter: (p1, p2) => p1.height !== p2.height,
     },
     {
       text: "Which player is OLDER?",
@@ -144,12 +152,42 @@ const DraftDuelMain = () => {
       getCorrectPlayerId: (p1, p2) => (p1.position === "Forward" ? p1.id : p2.id),
       filter: (p1, p2) => (p1.position === "Forward" && p2.position !== "Forward") || (p2.position === "Forward" && p1.position !== "Forward"),
     },
+  ];
+
+  const HARD_QUESTIONS = [
     {
-      text: "Which player is in the UTAH SUMMER LEAGUE?",
-      getCorrectPlayerId: (p1, p2) => (p1.summerLeague === "Utah Summer League" ? p1.id : p2.id),
-      filter: (p1, p2) => (p1.summerLeague === "Utah Summer League") !== (p2.summerLeague === "Utah Summer League"),
+      text: "Which player is TALLER?",
+      getCorrectPlayerId: (p1, p2) => (p1.height > p2.height ? p1.id : p2.id),
+      filter: (p1, p2) => p1.height !== p2.height,
+    },
+    {
+      text: "Which player is SHORTER?",
+      getCorrectPlayerId: (p1, p2) => (p1.height < p2.height ? p1.id : p2.id),
+      filter: (p1, p2) => p1.height !== p2.height,
     },
   ];
+
+  const EXPERT_QUESTIONS = [
+    {
+      text: "Which player is TALLER?",
+      getCorrectPlayerId: (p1, p2) => (p1.height > p2.height ? p1.id : p2.id),
+      filter: (p1, p2) => p1.height !== p2.height,
+    },
+    {
+      text: "Which player is SHORTER?",
+      getCorrectPlayerId: (p1, p2) => (p1.height < p2.height ? p1.id : p2.id),
+      filter: (p1, p2) => p1.height !== p2.height,
+    },
+  ];
+
+  const getQuestionsForMode = (mode) => {
+    switch (mode) {
+      case 'EASY': return EASY_QUESTIONS;
+      case 'HARD': return HARD_QUESTIONS;
+      case 'EXPERT': return EXPERT_QUESTIONS;
+      default: return EASY_QUESTIONS;
+    }
+  };
 
   const basketballPatternSVG = `
     <svg width="200" height="200" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
@@ -213,6 +251,12 @@ const DraftDuelMain = () => {
   }, [currentStreak, highScore, player1]);
 
   const selectRandomRookiesAndQuestion = useCallback(() => {
+    if (!gameStarted) return;
+
+    const mode = getDifficultyMode(currentStreak);
+    setCurrentMode(mode);
+    const questions = getQuestionsForMode(mode);
+
     let p1, p2, randomQuestion;
     let attempts = 0;
     const maxAttempts = 100;
@@ -220,7 +264,7 @@ const DraftDuelMain = () => {
     do {
       p1 = ROOKIES_2025_NBA[Math.floor(Math.random() * ROOKIES_2025_NBA.length)];
       p2 = ROOKIES_2025_NBA[Math.floor(Math.random() * ROOKIES_2025_NBA.length)];
-      randomQuestion = QUESTIONS[Math.floor(Math.random() * QUESTIONS.length)];
+      randomQuestion = questions[Math.floor(Math.random() * questions.length)];
       attempts++;
     } while ((p1.id === p2.id || (randomQuestion.filter && !randomQuestion.filter(p1, p2))) && attempts < maxAttempts);
 
@@ -232,16 +276,29 @@ const DraftDuelMain = () => {
     setFeedbackMessage('');
     setGameOver(false);
     setShotClockTime(10);
-  }, []);
+  }, [currentStreak, gameStarted]);
 
-  // Initialize game
+  // Start game function
+  const startGame = () => {
+    setGameStarted(true);
+    setCurrentStreak(0);
+    setCurrentMode('EASY');
+    setGameOver(false);
+    setSelectedPlayerId(null);
+    setIsCorrectGuess(null);
+    setFeedbackMessage('');
+  };
+
+  // Initialize game only when started
   useEffect(() => {
-    selectRandomRookiesAndQuestion();
-  }, [selectRandomRookiesAndQuestion]);
+    if (gameStarted) {
+      selectRandomRookiesAndQuestion();
+    }
+  }, [gameStarted, selectRandomRookiesAndQuestion]);
 
   // Shot clock timer
   useEffect(() => {
-    if (player1 && player2 && selectedPlayerId === null && !gameOver) {
+    if (gameStarted && player1 && player2 && selectedPlayerId === null && !gameOver) {
       shotClockIntervalRef.current = setInterval(() => {
         setShotClockTime((prevTime) => {
           if (prevTime <= 1) {
@@ -259,11 +316,11 @@ const DraftDuelMain = () => {
         clearInterval(shotClockIntervalRef.current);
       }
     };
-  }, [player1, player2, selectedPlayerId, gameOver, handleTimeOut]);
+  }, [gameStarted, player1, player2, selectedPlayerId, gameOver, handleTimeOut]);
 
   // Handle user's guess
   const handleGuess = (id) => {
-    if (selectedPlayerId !== null || !currentQuestion || gameOver) return;
+    if (selectedPlayerId !== null || !currentQuestion || gameOver || !gameStarted) return;
 
     clearInterval(shotClockIntervalRef.current);
     setSelectedPlayerId(id);
@@ -273,11 +330,20 @@ const DraftDuelMain = () => {
 
     if (isGuessCorrect) {
       setIsCorrectGuess(true);
-      setCurrentStreak(prev => prev + 1);
-      setFeedbackMessage('Correct!');
+      const newStreak = currentStreak + 1;
+      setCurrentStreak(newStreak);
+      
+      // Check for mode progression
+      const newMode = getDifficultyMode(newStreak);
+      if (newMode !== currentMode) {
+        setFeedbackMessage(`Correct! 🔥 ${newMode} MODE UNLOCKED!`);
+        setCurrentMode(newMode);
+      } else {
+        setFeedbackMessage('Correct! 🔥');
+      }
     } else {
       setIsCorrectGuess(false);
-      setFeedbackMessage('Incorrect!');
+      setFeedbackMessage('Incorrect! 😤');
       setGameOver(true);
       if (currentStreak > highScore) {
         setHighScore(currentStreak);
@@ -289,8 +355,15 @@ const DraftDuelMain = () => {
   // Handle continue/reset
   const handleContinue = () => {
     if (gameOver) {
+      setGameStarted(false);
       setCurrentStreak(0);
-      selectRandomRookiesAndQuestion();
+      setCurrentMode('EASY');
+      setPlayer1(null);
+      setPlayer2(null);
+      setCurrentQuestion(null);
+      setSelectedPlayerId(null);
+      setIsCorrectGuess(null);
+      setFeedbackMessage('');
     } else {
       selectRandomRookiesAndQuestion();
     }
@@ -376,7 +449,84 @@ const DraftDuelMain = () => {
           75% { opacity: 0.95; transform: scale(1.01); }
         }
 
-        /* Theme Toggle */
+        /* Mode Indicator */
+        .mode-indicator {
+          position: absolute;
+          top: 1rem;
+          left: 1rem;
+          background: rgba(0, 0, 0, 0.8);
+          padding: 0.75rem 1.5rem;
+          border-radius: 1rem;
+          border: 2px solid;
+          backdrop-filter: blur(10px);
+          font-family: 'Outfit', sans-serif;
+          font-weight: 700;
+          font-size: 1rem;
+          text-transform: uppercase;
+          letter-spacing: 1px;
+          z-index: 100;
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Start Game Screen */
+        .start-game-screen {
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100vw;
+          height: 100vh;
+          background: ${isDarkMode ? 'linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%)' : 'linear-gradient(135deg, #f8f9fa 0%, #e9ecef 50%, #dee2e6 100%)'};
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          z-index: 10000;
+          color: ${isDarkMode ? '#ffffff' : '#333333'};
+          text-align: center;
+          padding: 2rem;
+        }
+
+        .start-title {
+          font-size: 4rem;
+          font-weight: 800;
+          background: linear-gradient(45deg, #FFD700, #FF8C00, #FF4500);
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          background-clip: text;
+          margin-bottom: 1rem;
+          animation: flicker 1.5s infinite alternate;
+        }
+
+        .start-subtitle {
+          font-size: 1.5rem;
+          font-weight: 600;
+          margin-bottom: 2rem;
+          opacity: 0.9;
+        }
+
+        .start-button {
+          background: linear-gradient(135deg, #3B82F6 0%, #1D4ED8 100%);
+          color: white;
+          border: none;
+          padding: 1.5rem 3rem;
+          border-radius: 2rem;
+          font-size: 1.5rem;
+          font-weight: 700;
+          cursor: pointer;
+          transition: all 0.3s ease;
+          box-shadow: 0 8px 20px rgba(59, 130, 246, 0.3);
+          text-transform: uppercase;
+          letter-spacing: 1px;
+        }
+
+        .start-button:hover {
+          transform: translateY(-4px);
+          box-shadow: 0 12px 30px rgba(59, 130, 246, 0.4);
+        }
+
+        .start-button:active {
+          transform: translateY(-2px);
+        }
         .theme-toggle {
           position: absolute;
           top: 1rem;
@@ -1119,7 +1269,7 @@ const DraftDuelMain = () => {
         }
       `}</style>
 
-      {/* Theme Toggle */}
+      {        /* Theme Toggle */}
       <button 
         className="theme-toggle"
         onClick={toggleDarkMode}
