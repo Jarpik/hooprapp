@@ -335,7 +335,7 @@ const DraftDuelMain = () => {
         @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono:wght@400&display=swap');
         @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap');
         
-        /* Full screen takeover */
+        /* Full screen takeover with proper mobile scrolling */
         .draft-duel-fullscreen {
           position: fixed;
           top: 0;
@@ -348,6 +348,10 @@ const DraftDuelMain = () => {
           flex-direction: column;
           overflow-x: hidden;
           overflow-y: auto;
+          /* Add bottom padding for mobile browser UI */
+          padding-bottom: 120px;
+          /* Ensure content can scroll past browser UI */
+          min-height: calc(100vh + 120px);
         }
 
         /* Game Title */
@@ -696,12 +700,15 @@ const DraftDuelMain = () => {
           margin-bottom: 0.5rem;
           text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.4);
           letter-spacing: 0.5px;
-          /* Fix text overflow */
+          /* Fix text overflow and truncation */
           word-wrap: break-word;
           overflow-wrap: break-word;
           hyphens: auto;
           max-width: 100%;
           line-height: 1.2;
+          white-space: normal;
+          overflow: visible;
+          text-overflow: clip;
         }
 
         .player-team {
@@ -995,6 +1002,9 @@ const DraftDuelMain = () => {
             word-wrap: break-word !important;
             overflow-wrap: break-word !important;
             hyphens: auto !important;
+            white-space: normal !important;
+            overflow: visible !important;
+            text-overflow: clip !important;
           }
           
           .question-section {
