@@ -426,11 +426,27 @@ const DraftDuelMain = () => {
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: center;
+            justify-content: flex-start;
             z-index: 10000;
             color: ${isDarkMode ? '#ffffff' : '#333333'};
             text-align: center;
-            padding: 2rem;
+            padding: 1rem;
+            padding-top: 2rem;
+            overflow-y: auto;
+            box-sizing: border-box;
+          }
+
+          .start-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            width: 100%;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 1rem;
+            box-sizing: border-box;
           }
 
           .start-title {
@@ -442,6 +458,10 @@ const DraftDuelMain = () => {
             background-clip: text;
             margin-bottom: 1rem;
             animation: flicker 1.5s infinite alternate;
+            line-height: 1.1;
+            word-wrap: break-word;
+            hyphens: none;
+            white-space: nowrap;
           }
 
           @keyframes flicker {
@@ -503,6 +523,8 @@ const DraftDuelMain = () => {
             box-shadow: 0 8px 20px rgba(59, 130, 246, 0.3);
             text-transform: uppercase;
             letter-spacing: 1px;
+            margin-top: 1rem;
+            min-width: 200px;
           }
 
           .start-button:hover {
@@ -536,18 +558,66 @@ const DraftDuelMain = () => {
           }
 
           @media (max-width: 768px) {
+            .start-game-screen {
+              padding: 0.5rem;
+              padding-top: 1rem;
+              justify-content: flex-start;
+            }
+            
+            .start-content {
+              min-height: 100vh;
+              justify-content: center;
+              padding: 0.5rem;
+            }
+            
             .start-title {
-              font-size: 3rem;
+              font-size: 2.8rem;
+              margin-bottom: 0.5rem;
+              white-space: normal;
+              line-height: 1.1;
+            }
+            
+            .start-subtitle {
+              font-size: 1.2rem;
+              margin-bottom: 1.5rem;
             }
             
             .start-instructions {
-              font-size: 1rem;
-              max-width: 90%;
+              font-size: 0.95rem;
+              max-width: 95%;
+              margin-bottom: 1.5rem;
             }
             
             .start-button {
               font-size: 1.2rem;
               padding: 1.2rem 2.5rem;
+              margin-top: 0.5rem;
+              width: 90%;
+              max-width: 280px;
+            }
+          }
+
+          @media (max-width: 480px) {
+            .start-title {
+              font-size: 2.2rem;
+              margin-bottom: 0.5rem;
+            }
+            
+            .start-subtitle {
+              font-size: 1rem;
+              margin-bottom: 1rem;
+            }
+            
+            .start-instructions {
+              font-size: 0.9rem;
+              margin-bottom: 1rem;
+            }
+            
+            .start-button {
+              font-size: 1.1rem;
+              padding: 1rem 2rem;
+              width: 95%;
+              max-width: 260px;
             }
           }
         `}</style>
@@ -562,29 +632,31 @@ const DraftDuelMain = () => {
         </button>
 
         <div className="start-game-screen">
-          <div className="start-title">🏀 DRAFT DUEL</div>
-          <div className="start-subtitle">NBA Rookie Trivia Challenge</div>
-          
-          <div className="start-instructions">
-            <h3>How to Play:</h3>
-            <ul>
-              <li>Compare two NBA rookies and answer questions about them</li>
-              <li>You have 10 seconds per question - make it count!</li>
-              <li>One wrong answer or timeout ends the game</li>
-              <li>Game gets progressively harder as you build your streak:</li>
-              <div className="difficulty-tiers">
-                <ul>
-                  <li><strong>Easy Mode (0-9 points):</strong> Draft position, age, and position questions</li>
-                  <li><strong>Hard Mode (10-19 points):</strong> All questions including height comparisons</li>
-                  <li><strong>Expert Mode (20+ points):</strong> Maximum difficulty - prove your NBA knowledge!</li>
-                </ul>
-              </div>
-            </ul>
-          </div>
+          <div className="start-content">
+            <div className="start-title">🏀 DRAFT DUEL</div>
+            <div className="start-subtitle">NBA Rookie Trivia Challenge</div>
+            
+            <div className="start-instructions">
+              <h3>How to Play:</h3>
+              <ul>
+                <li>Compare two NBA rookies and answer questions about them</li>
+                <li>You have 10 seconds per question - make it count!</li>
+                <li>One wrong answer or timeout ends the game</li>
+                <li>Game gets progressively harder as you build your streak:</li>
+                <div className="difficulty-tiers">
+                  <ul>
+                    <li><strong>Easy Mode (0-9 points):</strong> Draft position, age, and position questions</li>
+                    <li><strong>Hard Mode (10-19 points):</strong> All questions including height comparisons</li>
+                    <li><strong>Expert Mode (20+ points):</strong> Maximum difficulty - prove your NBA knowledge!</li>
+                  </ul>
+                </div>
+              </ul>
+            </div>
 
-          <button onClick={startGame} className="start-button">
-            Start Game
-          </button>
+            <button onClick={startGame} className="start-button">
+              Start Game
+            </button>
+          </div>
         </div>
       </div>
     );
