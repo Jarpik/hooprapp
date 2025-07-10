@@ -3,7 +3,7 @@
     if (gameStarted) {
       selectRandomRookiesAndQuestion();
     }
-  }, [gameStarted, selectRandomRookiesAndQuestion]);
+  }, [gameStarted, selectRandomRookiesAndQuestion]);dQuestion]);
 
   // Shot clock timer
   useEffect(() => {
