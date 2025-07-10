@@ -1,11 +1,4 @@
-// Initialize game only when started
-  useEffect(() => {
-    if (gameStarted) {
-      selectRandomRookiesAndQuestion();
-    }
-  }, [gameStarted, selectRandomRookiesAndQuestion]);dQuestion]);
-
-  // Shot clock timer
+// Shot clock timer
   useEffect(() => {
     if (gameStarted && player1 && player2 && selectedPlayerId === null && !gameOver) {
       shotClockIntervalRef.current = setInterval(() => {
@@ -1365,7 +1358,7 @@ const TEAM_COLORS = {
   "Brisbane Bullets": "#002D62", "Mega Basket": "#FF0000", "West Virginia": "#EAAA00",
   "Nevada": "#003366", "Cholet Basket": "#CC0000", "Sydney Kings": "#522D80",
   "Illawarra Hawks": "#CC0000", "Trento": "#2C3E50", "UConn": "#000E2F", 
-  "Michigan": "#00274C", "DEFAULT": "#34495E",
+  "Michigan": "#00274C", "DEFAULT": "#34495E"
 };
 
 const getContrastTextColor = (hexcolor) => {
@@ -1437,7 +1430,7 @@ const ROOKIES_2025_NBA = [
   { id: 56, name: "Will Richard", draftPick: 56, team: "Golden State Warriors", preDraftTeam: "Florida", imageUrl: "https://a.espncdn.com/combiner/i?img=/i/headshots/nba/players/full/4897262.png&w=350&h=254", height: 76, weight: 206, age: 23, position: "Guard", conference: "SEC", homePlace: "Gainesville, Florida", preDraftStats: { ppg: 13.3, rpg: 4.6, apg: 1.9 } },
   { id: 57, name: "Max Shulga", draftPick: 57, team: "Boston Celtics", preDraftTeam: "VCU", imageUrl: "https://a.espncdn.com/combiner/i?img=/i/headshots/nba/players/full/4701992.png&w=350&h=254", height: 77, weight: 195, age: 22, position: "Guard", conference: "A-10", homePlace: "Kyiv, Ukraine", preDraftStats: { ppg: 15.0, rpg: 5.9, apg: 4.0 } },
   { id: 58, name: "Saliou Niang", draftPick: 58, team: "Cleveland Cavaliers", preDraftTeam: "Trento", imageUrl: "https://www.proballers.com/media/cache/resize_600_png/https---www.proballers.com/ul/player/saliou-niang2-1ef7f63f-7604-60ca-9ae6-9b306d77b6be.png", height: 77, weight: 190, age: 21, position: "Forward", conference: "International", homePlace: "Dakar, Senegal", preDraftStats: { ppg: 8.2, rpg: 5.1, apg: 1.4 } },
-  { id: 59, name: "Jahmai Mashack", draftPick: 59, team: "Memphis Grizzlies", preDraftTeam: "Tennessee", imageUrl: "https://a.espncdn.com/combiner/i?img=/i/headshots/nba/players/full/4683934.png&w=350&h=254", height: 76, weight: 201, age: 22, position: "Forward", conference: "SEC", homePlace: "Fontana, California", preDraftStats: { ppg: 6.0, rpg: 4.2, apg: 1.5 } },
+  { id: 59, name: "Jahmai Mashack", draftPick: 59, team: "Memphis Grizzlies", preDraftTeam: "Tennessee", imageUrl: "https://a.espncdn.com/combiner/i?img=/i/headshots/nba/players/full/4683934.png&w=350&h=254", height: 76, weight: 201, age: 22, position: "Forward", conference: "SEC", homePlace: "Fontana, California", preDraftStats: { ppg: 6.0, rpg: 4.2, apg: 1.5 } }
 ];
 
 // PlayerCard component
@@ -1785,4 +1778,4 @@ const DraftDuelMain = () => {
     if (gameStarted) {
       selectRandomRookiesAndQuestion();
     }
-  }, [gameStarted, selectRandomRookiesAn
+  }, [gameStarted, selectRandomRookiesAndQuestion]);https---www.proballers.com/ul/player/bogoljub-markovic-copie-
